@@ -1,3 +1,5 @@
+import com.google.protobuf.util.JsonFormat
+
 fun main(args: Array<String>) {
     println("Hello World!")
 
@@ -8,10 +10,10 @@ fun main(args: Array<String>) {
     val key = "APITLWrK8tbwr47"
     val secret = "lmFSh8b0DBwoakeHcuj9l7JQvSk0AuSf3AJ1HGvtgneB"
 
-    val client = RoomServiceClient("192.168.11.5:7800", key, secret)
+    val client = RoomServiceClient("http://192.168.11.5:7880", key, secret)
 
     val job = client.createRoom(CreateOptions(name = "asdffff"))
-    val room = job.get()
+    val room = job.execute()
 
-    println(room.toString())
+    println(JsonFormat.printer().print(room.body()))
 }

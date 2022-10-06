@@ -1,4 +1,5 @@
-import com.google.protobuf.gradle.*
+import com.google.protobuf.gradle.protobuf
+import com.google.protobuf.gradle.protoc
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -31,18 +32,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-sourceSets {
-    val grpc = create("grpc") {
-    }
-
-    getByName("test") {
-        compileClasspath += grpc.output
-        runtimeClasspath += grpc.output
-    }
-}
-
-val grpcVersion = "1.49.2"
-
 val protoc_platform: String? by project
 val protoSrc = "$projectDir/protocol"
 val protobufVersion = "3.21.7"
@@ -56,43 +45,21 @@ protobuf {
             artifact = "com.google.protobuf:protoc:$protobufVersion"
         }
     }
-
-    plugins {
-        id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
-        }
-    }
-
-    generateProtoTasks {
-        ofSourceSet("main").forEach {
-            it.plugins {
-                // Apply the "grpc" plugin whose spec is defined above, without
-                // options. Note the braces cannot be omitted, otherwise the
-                // plugin will not be added. This is because of the implicit way
-                // NamedDomainObjectContainer binds the methods.
-                id("grpc") { }
-            }
-        }
-    }
 }
 
-val grpcImplementation = configurations.getByName("grpcImplementation")
 
 dependencies {
     protobuf(files(protoSrc))
-    runtimeOnly("io.grpc:grpc-netty-shaded:1.49.2")
-
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-protobuf:2.9.0")
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
-    implementation("io.grpc:grpc-stub:$grpcVersion")
-    implementation("io.grpc:grpc-protobuf:$grpcVersion")
     implementation(protobufDep)
+    implementation("com.google.protobuf:protobuf-java-util:$protobufVersion")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
-    grpcImplementation("io.grpc:grpc-stub:$grpcVersion")
-    grpcImplementation("io.grpc:grpc-protobuf:$grpcVersion")
-    grpcImplementation(protobufDep)
     testImplementation(kotlin("test"))
 }
 

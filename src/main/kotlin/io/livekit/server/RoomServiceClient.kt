@@ -1,12 +1,16 @@
-import com.google.common.util.concurrent.ListenableFuture
-import io.grpc.ManagedChannelBuilder
-import io.livekit.server.JwtCredential
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import io.livekit.server.RoomCreate
-import io.livekit.server.RoomList
+import io.livekit.server.RoomService
 import livekit.LivekitModels
 import livekit.LivekitRoom
-import livekit.RoomServiceGrpc
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Call
+import retrofit2.Retrofit
+import retrofit2.converter.protobuf.ProtoConverterFactory
 import java.util.logging.Logger
+import javax.crypto.spec.SecretKeySpec
 
 class RoomServiceClient(
     private val host: String,
@@ -14,20 +18,25 @@ class RoomServiceClient(
     private val secret: String,
 ) {
 
-    private val channel = ManagedChannelBuilder.forTarget(host)
-        .usePlaintext()
+    val okhttp = with(OkHttpClient.Builder()) {
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        addInterceptor(loggingInterceptor)
+        build()
+    }
+    val service = Retrofit.Builder()
+        .baseUrl(host)
+        .addConverterFactory(ProtoConverterFactory.create())
+        .client(okhttp)
         .build()
-    private val stub = RoomServiceGrpc.newFutureStub(channel)
+        .create(RoomService::class.java)
 
-    private fun createCredentials(videoGrants: Map<String, Any> = emptyMap()) =
-        JwtCredential(apiKey, secret, videoGrants)
-
-    fun createRoom(options: CreateOptions): ListenableFuture<LivekitModels.Room> {
+    fun createRoom(options: CreateOptions): Call<LivekitModels.Room> {
         val request = LivekitRoom.CreateRoomRequest.newBuilder()
             .setName(options.name)
             .build()
-        val credentials = createCredentials(mapOf(RoomCreate(true).toPair()))
-        return stub.withCallCredentials(credentials).createRoom(request)
+        val credentials = authHeader(mapOf(RoomCreate(true).toPair()))
+        return service.createRoom(request, credentials)
     }
 
     fun listRooms(names: List<String>?) {
@@ -38,12 +47,27 @@ class RoomServiceClient(
             build()
         }
 
-        val credentials = createCredentials(mapOf(RoomList(true).toPair()))
-        stub.withCallCredentials(credentials).listRooms(request)
     }
 
     fun deleteRoom(roomname: String) {
 
+    }
+
+    fun authHeader(videoGrants: Map<String, Any>): String {
+        val jwt = Jwts.builder()
+            .setIssuer(apiKey)
+            .addClaims(
+                mapOf(
+                    "video" to videoGrants,
+                )
+            )
+            .signWith(
+                SecretKeySpec(secret.toByteArray(), "HmacSHA256"),
+                SignatureAlgorithm.HS256
+            )
+            .compact()
+
+        return "Bearer $jwt"
     }
 
     companion object {
