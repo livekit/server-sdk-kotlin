@@ -9,7 +9,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
-import java.util.logging.Logger
 import javax.crypto.spec.SecretKeySpec
 
 class EgressServiceClient(

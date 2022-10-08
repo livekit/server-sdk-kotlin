@@ -19,6 +19,11 @@ class RoomServiceClient(
     private val secret: String,
 ) {
 
+    /**
+     * Creates a new room. Explicit room creation is not required, since rooms will
+     * be automatically created when the first participant joins. This method can be
+     * used to customize room settings.
+     */
     @JvmOverloads
     fun createRoom(
         name: String,
@@ -43,6 +48,11 @@ class RoomServiceClient(
         return service.createRoom(request, credentials)
     }
 
+    /**
+     * List active rooms
+     * @param names when null or empty, list all rooms.
+     *              otherwise returns rooms with matching names
+     */
     @JvmOverloads
     fun listRooms(names: List<String>? = null): Call<List<LivekitModels.Room>> {
         val request = with(LivekitRoom.ListRoomsRequest.newBuilder()) {
@@ -65,6 +75,11 @@ class RoomServiceClient(
         return service.deleteRoom(request, credentials)
     }
 
+    /**
+     * Update metadata of a room
+     * @param roomName name of the room
+     * @param metadata the new metadata for the room
+     */
     fun updateRoomMetadata(roomName: String, metadata: String): Call<LivekitModels.Room> {
         val request = LivekitRoom.UpdateRoomMetadataRequest.newBuilder()
             .setRoom(roomName)
@@ -79,6 +94,10 @@ class RoomServiceClient(
         return service.updateRoomMetadata(request, credentials)
     }
 
+    /**
+     * List participants in a room
+     * @param roomName name of the room
+     */
     fun listParticipants(roomName: String): Call<List<LivekitModels.ParticipantInfo>> {
         val request = LivekitRoom.ListParticipantsRequest.newBuilder()
             .setRoom(roomName)
@@ -94,6 +113,12 @@ class RoomServiceClient(
         }
     }
 
+    /**
+     * Get information on a specific participant, including the tracks that participant
+     * has published
+     * @param roomName name of the room
+     * @param identity identity of the participant to return
+     */
     fun getParticipant(roomName: String, identity: String): Call<LivekitModels.ParticipantInfo> {
         val request = LivekitRoom.RoomParticipantIdentity.newBuilder()
             .setRoom(roomName)
@@ -108,6 +133,13 @@ class RoomServiceClient(
         return service.getParticipant(request, credentials)
     }
 
+    /**
+     * Removes a participant in the room. This will disconnect the participant
+     * and will emit a Disconnected event for that participant.
+     * Even after being removed, the participant can still re-join the room.
+     * @param roomName
+     * @param identity
+     */
     fun removeParticipant(roomName: String, identity: String): Call<Void> {
         val request = LivekitRoom.RoomParticipantIdentity.newBuilder()
             .setRoom(roomName)
@@ -122,6 +154,13 @@ class RoomServiceClient(
         return service.removeParticipant(request, credentials)
     }
 
+    /**
+     * Mutes a track that the participant has published.
+     * @param roomName
+     * @param identity
+     * @param trackSid sid of the track to be muted
+     * @param mute true to mute, false to unmute
+     */
     fun mutePublishedTrack(
         roomName: String,
         identity: String,
@@ -145,11 +184,19 @@ class RoomServiceClient(
         }
     }
 
+    /**
+     * Updates a participant's metadata or permissions
+     * @param roomName
+     * @param identity
+     * @param metadata optional, metadata to update
+     * @param participantPermission optional, new permissions to assign to participant
+     */
+    @JvmOverloads
     fun updateParticipant(
         roomName: String,
         identity: String,
-        metadata: String?,
-        participantPermission: LivekitModels.ParticipantPermission?,
+        metadata: String? = null,
+        participantPermission: LivekitModels.ParticipantPermission? = null,
     ): Call<LivekitModels.ParticipantInfo> {
         val request = with(LivekitRoom.UpdateParticipantRequest.newBuilder()) {
             this.room = roomName
@@ -172,6 +219,13 @@ class RoomServiceClient(
         return service.updateParticipant(request, credentials)
     }
 
+    /**
+     * Updates a participant's subscription to tracks
+     * @param roomName
+     * @param identity
+     * @param trackSids
+     * @param subscribe true to subscribe, false to unsubscribe
+     */
     fun updateSubscriptions(
         roomName: String,
         identity: String,
@@ -195,6 +249,13 @@ class RoomServiceClient(
         return service.updateSubscriptions(request, credentials)
     }
 
+    /**
+     * Sends data message to participants in the room
+     * @param room
+     * @param data opaque payload to send
+     * @param kind delivery reliability
+     * @param destinationSids optional. when empty, message is sent to everyone
+     */
     @JvmOverloads
     fun sendData(
         roomName: String,
