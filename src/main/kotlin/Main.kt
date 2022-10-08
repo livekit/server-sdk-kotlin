@@ -13,8 +13,11 @@ fun main(args: Array<String>) {
 
     val client = RoomServiceClient.create("http://192.168.11.5:7880", key, secret)
 
-    val job = client.createRoom("asdffff")
-    val room = job.execute()
+    val job = client.listParticipants("asdffff")
+    val participants = job.execute()
 
-    println(JsonFormat.printer().print(room.body()))
+    participants.body()!!.forEach {
+
+        println(JsonFormat.printer().print(it))
+    }
 }
