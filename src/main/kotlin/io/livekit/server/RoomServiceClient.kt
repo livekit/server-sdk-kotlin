@@ -6,9 +6,12 @@ import io.jsonwebtoken.SignatureAlgorithm
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitModels
 import livekit.LivekitRoom
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import java.util.logging.Logger
 import javax.crypto.spec.SecretKeySpec
 
 class RoomServiceClient(
@@ -233,13 +236,21 @@ class RoomServiceClient(
     }
 
     companion object {
+        private val logger = Logger.getLogger(RoomServiceClient::class.java.name)
 
         @JvmStatic
         fun create(host: String, apiKey: String, secret: String): RoomServiceClient {
 
+            val okhttp = with(OkHttpClient.Builder()) {
+                val loggingInterceptor = HttpLoggingInterceptor()
+                loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+                addInterceptor(loggingInterceptor)
+                build()
+            }
             val service = Retrofit.Builder()
                 .baseUrl(host)
                 .addConverterFactory(ProtoConverterFactory.create())
+                .client(okhttp)
                 .build()
                 .create(RoomService::class.java)
 
