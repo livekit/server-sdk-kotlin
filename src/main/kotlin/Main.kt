@@ -8,16 +8,15 @@ fun main(args: Array<String>) {
     // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
     println("Program arguments: ${args.joinToString()}")
 
-    val key = "APITLWrK8tbwr47"
-    val secret = "lmFSh8b0DBwoakeHcuj9l7JQvSk0AuSf3AJ1HGvtgneB"
+    val key = ""
+    val secret = ""
 
-    val client = RoomServiceClient.create("http://192.168.11.5:7880", key, secret)
+    val client = RoomServiceClient.create("http://example.com", key, secret)
 
-    val job = client.listParticipants("asdffff")
+    val job = client.listParticipants("room_name")
     val participants = job.execute()
 
     participants.body()!!.forEach {
-
         println(JsonFormat.printer().print(it))
     }
 }

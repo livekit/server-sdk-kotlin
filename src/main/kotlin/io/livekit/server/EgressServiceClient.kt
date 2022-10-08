@@ -314,15 +314,17 @@ class EgressServiceClient(
     }
 
     companion object {
-        private val logger = Logger.getLogger(RoomServiceClient::class.java.name)
 
         @JvmStatic
-        fun create(host: String, apiKey: String, secret: String): EgressServiceClient {
+        @JvmOverloads
+        fun create(host: String, apiKey: String, secret: String, logging: Boolean = false): EgressServiceClient {
 
             val okhttp = with(OkHttpClient.Builder()) {
-                val loggingInterceptor = HttpLoggingInterceptor()
-                loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-                addInterceptor(loggingInterceptor)
+                if (logging) {
+                    val loggingInterceptor = HttpLoggingInterceptor()
+                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+                    addInterceptor(loggingInterceptor)
+                }
                 build()
             }
 

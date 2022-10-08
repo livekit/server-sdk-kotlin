@@ -11,7 +11,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
-import java.util.logging.Logger
 import javax.crypto.spec.SecretKeySpec
 
 class RoomServiceClient(
@@ -44,7 +43,8 @@ class RoomServiceClient(
         return service.createRoom(request, credentials)
     }
 
-    fun listRooms(names: List<String>?): Call<List<LivekitModels.Room>> {
+    @JvmOverloads
+    fun listRooms(names: List<String>? = null): Call<List<LivekitModels.Room>> {
         val request = with(LivekitRoom.ListRoomsRequest.newBuilder()) {
             if (names != null) {
                 addAllNames(names)
@@ -195,6 +195,7 @@ class RoomServiceClient(
         return service.updateSubscriptions(request, credentials)
     }
 
+    @JvmOverloads
     fun sendData(
         roomName: String,
         data: ByteArray,
@@ -236,15 +237,17 @@ class RoomServiceClient(
     }
 
     companion object {
-        private val logger = Logger.getLogger(RoomServiceClient::class.java.name)
 
         @JvmStatic
-        fun create(host: String, apiKey: String, secret: String): RoomServiceClient {
+        @JvmOverloads
+        fun create(host: String, apiKey: String, secret: String, logging: Boolean = false): RoomServiceClient {
 
             val okhttp = with(OkHttpClient.Builder()) {
-                val loggingInterceptor = HttpLoggingInterceptor()
-                loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-                addInterceptor(loggingInterceptor)
+                if (logging) {
+                    val loggingInterceptor = HttpLoggingInterceptor()
+                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+                    addInterceptor(loggingInterceptor)
+                }
                 build()
             }
             val service = Retrofit.Builder()
