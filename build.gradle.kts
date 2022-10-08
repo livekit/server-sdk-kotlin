@@ -20,8 +20,12 @@ plugins {
     id("com.google.protobuf") version "0.8.19"
 }
 
-group = "io.livekit.server"
-version = "0.1.0-SNAPSHOT"
+val GROUP_ID = "io.livekit"
+val ARTIFACT_ID = "livekit-server-sdk"
+val VERSION = "0.1.0-SNAPSHOT"
+
+group = GROUP_ID
+version = VERSION
 
 repositories {
     mavenCentral()
@@ -48,7 +52,6 @@ protobuf {
     }
 }
 
-
 dependencies {
     protobuf(files(protoSrc))
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
@@ -74,4 +77,16 @@ tasks.withType<KotlinCompile> {
 
 application {
     mainClass.set("MainKt")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = GROUP_ID
+            artifactId = ARTIFACT_ID
+            version = VERSION
+
+            from(components["java"])
+        }
+    }
 }
