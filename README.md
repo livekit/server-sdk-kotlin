@@ -1,6 +1,6 @@
 # server-sdk-kotlin
 
-Kotlin SDK for accessing [livekit-server](https://github.com/livekit/livekit) APIs.
+Kotlin SDK for accessing [livekit-server](https://github.com/livekit/livekit) APIs. Currently for use in JVM environments.
 
 https://docs.livekit.io/guides/server-api/
 
