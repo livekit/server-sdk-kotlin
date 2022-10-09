@@ -45,7 +45,7 @@ public class Main {
             "secret");
 
     Call<LivekitModels.Room> call = client.createRoom("room_name");
-    Response<LivekitModels.Room> response = call.execute();
+    Response<LivekitModels.Room> response = call.execute(); // Use call.enqueue for async
     LivekitModels.Room room = response.body();
 
     System.out.println(JsonFormat.printer().print(room));
