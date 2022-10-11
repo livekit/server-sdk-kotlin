@@ -8,15 +8,34 @@ https://docs.livekit.io/guides/server-api/
 
 This SDK is available as a Maven package through [JitPack](https://jitpack.io/#livekit/server-sdk-kotlin).
 
+### Maven
+```xml title="pom.xml"
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>com.github.livekit</groupId>
+        <artifactId>server-sdk-kotlin</artifactId>
+        <version>97c8779b09</version>
+    </dependency>
+</dependencies>
+```
+
+### Gradle
 ```groovy title="build.gradle"
 
 repositories {
-	...
-	maven { url 'https://jitpack.io' }
+    ...
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-  implementation 'com.github.livekit:server-sdk-kotlin:<commit hash>'
+    implementation 'com.github.livekit:server-sdk-kotlin:<commit hash>'
 }
 ```
 
