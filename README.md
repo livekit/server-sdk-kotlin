@@ -22,6 +22,8 @@ dependencies {
 
 ## Usage
 
+### Server API Access
+
 Obtain a `RoomServiceClient` or `EgressServiceClient` through their respective `create` methods, and then run calls through the client.
 
 ```java
@@ -54,3 +56,24 @@ public class Main {
 ```
 
 `Call` adapters are also available through [Retrofit](https://github.com/square/retrofit/tree/master/retrofit-adapters) for other async constructs such as `CompletableFuture` and RxJava.
+
+
+### Creating Access Tokens
+
+Access tokens can be generated through the `io.livekit.server.AccessToken` class.
+
+```
+AccessToken token = new AccessToken("apiKey", "secret");
+
+// Fill in token information.
+token.setName("name");
+token.setIdentity("identity");
+token.setMetadata("metadata");
+token.addGrants(new RoomJoin(true), new Room("myroom"));
+
+// Sign and create token string.
+System.out.println("New access token: " + token.toJwt())
+```
+
+By default, tokens expire 6 hours after generation. You may override this by using `token.setTtl(long millis)`.
+    
