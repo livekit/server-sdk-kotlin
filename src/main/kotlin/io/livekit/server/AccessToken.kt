@@ -6,6 +6,13 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.crypto.spec.SecretKeySpec
 
+/**
+ * Access tokens are required to connect to the server.
+ *
+ * Once information is filled out, create the token string with [toJwt].
+ *
+ * https://docs.livekit.io/guides/access-tokens
+ */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class AccessToken(
     private val apiKey: String,
