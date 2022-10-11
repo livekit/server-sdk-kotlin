@@ -1,6 +1,6 @@
 package io.livekit.server
 
-sealed class VideoGrant(private val key: String, private val value: Any) {
+sealed class VideoGrant(val key: String, val value: Any) {
     fun toPair() = key to value
 }
 

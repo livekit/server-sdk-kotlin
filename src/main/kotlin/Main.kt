@@ -1,6 +1,10 @@
 import com.google.protobuf.util.JsonFormat
+import io.livekit.server.AccessToken
+import io.livekit.server.Room
+import io.livekit.server.RoomJoin
 import io.livekit.server.RoomServiceClient
 
+// TODO: support basic actions from main.
 fun main(args: Array<String>) {
     println("Hello World!")
 
@@ -11,6 +15,7 @@ fun main(args: Array<String>) {
     val key = ""
     val secret = ""
 
+    // Example call.
     val client = RoomServiceClient.create("http://example.com", key, secret)
 
     val job = client.listParticipants("room_name")
@@ -19,4 +24,14 @@ fun main(args: Array<String>) {
     participants.body()!!.forEach {
         println(JsonFormat.printer().print(it))
     }
+
+    // Example of creating token.
+    val token = AccessToken(key, secret)
+
+    token.name = "name"
+    token.identity = "identity"
+    token.metadata = "metadata"
+    token.addGrants(RoomJoin(true), Room("myroom"))
+
+    println(token.toJwt())
 }
