@@ -252,7 +252,6 @@ class EgressServiceClient(
         return service.updateLayout(request, credentials)
     }
 
-    @JvmOverloads
     fun updateStream(
         egressId: String,
         addOutputUrls: List<String> = emptyList(),
