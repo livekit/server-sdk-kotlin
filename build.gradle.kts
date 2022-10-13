@@ -21,7 +21,7 @@ plugins {
 
 val GROUP_ID = "io.livekit"
 val ARTIFACT_ID = "livekit-server-sdk"
-val VERSION = "0.1.0-SNAPSHOT"
+val VERSION = "0.1.0"
 
 group = GROUP_ID
 version = VERSION
