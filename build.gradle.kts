@@ -16,7 +16,6 @@ plugins {
     kotlin("jvm") version "1.7.10"
     id("idea")
     `maven-publish`
-    application
     id("com.google.protobuf") version "0.8.19"
 }
 
@@ -73,10 +72,6 @@ tasks.test {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
-}
-
-application {
-    mainClass.set("MainKt")
 }
 
 publishing {
