@@ -1,6 +1,7 @@
 import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URL
 
 buildscript {
     repositories {
@@ -10,6 +11,7 @@ buildscript {
     dependencies {
         classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.19")
         classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.5.0")
     }
 }
 
@@ -22,12 +24,14 @@ plugins {
     kotlin("jvm") version "1.7.10"
     `maven-publish`
     `java-library`
+    id("org.jetbrains.dokka") version "1.5.0"
     id("io.codearte.nexus-staging") version "0.30.0"
     id("com.google.protobuf") version "0.8.19"
 }
 
 
 java {
+    withJavadocJar()
     withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -50,6 +54,41 @@ protobuf {
             artifact = "com.google.protobuf:protoc:$protobufVersion"
         }
     }
+}
+
+fun org.jetbrains.dokka.gradle.DokkaTask.configureDokkaTask() {
+    moduleName.set("livekit-server-sdk")
+    dokkaSourceSets {
+        configureEach {
+            skipEmptyPackages.set(true)
+            includeNonPublic.set(false)
+            includes.from("module.md")
+            displayName.set("SDK")
+            sourceLink {
+                localDirectory.set(file("src/main/kotlin"))
+
+                // URL showing where the source code can be accessed through the web browser
+                remoteUrl.set(
+                    URL(
+                        "https://github.com/livekit/server-sdk-kotlin/tree/main/src/main/kotlin"
+                    )
+                )
+                // Suffix which is used to append the line number to the URL. Use #L for GitHub
+                remoteLineSuffix.set("#L")
+            }
+        }
+    }
+}
+
+tasks.dokkaHtml.configure {
+    configureDokkaTask()
+}
+
+tasks.dokkaJavadoc.configure {
+    configureDokkaTask()
+}
+val javadocJar = tasks.named<Jar>("javadocJar") {
+    from(tasks.named("dokkaJavadoc"))
 }
 
 dependencies {
