@@ -12,28 +12,27 @@ buildscript {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+apply(from = "gradle/gradle-mvn-push.gradle")
+
 plugins {
     kotlin("jvm") version "1.7.10"
-    id("idea")
     `maven-publish`
+    `java-library`
     id("com.google.protobuf") version "0.8.19"
 }
 
-val GROUP_ID = "io.livekit"
-val ARTIFACT_ID = "livekit-server-sdk"
-val VERSION = "0.1.0"
-
-group = GROUP_ID
-version = VERSION
-
-repositories {
-    mavenCentral()
-    maven("https://plugins.gradle.org/m2/")
-}
 
 java {
+    withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 val protoc_platform: String? by project
@@ -70,16 +69,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = GROUP_ID
-            artifactId = ARTIFACT_ID
-            version = VERSION
+            artifactId = properties["POM_ARTIFACT_ID"] as String
+            version = properties["VERSION_NAME"] as String
 
             from(components["java"])
         }
