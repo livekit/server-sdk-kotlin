@@ -9,6 +9,7 @@ buildscript {
     }
     dependencies {
         classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.19")
+        classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0")
     }
 }
 
@@ -21,6 +22,7 @@ plugins {
     kotlin("jvm") version "1.7.10"
     `maven-publish`
     `java-library`
+    id("io.codearte.nexus-staging") version "0.30.0"
     id("com.google.protobuf") version "0.8.19"
 }
 
@@ -67,6 +69,12 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+nexusStaging {
+    serverUrl = "https://s01.oss.sonatype.org/service/local/"
+    packageGroup = properties["GROUP"] as String
+    stagingProfileId = "16b57cbf143daa"
 }
 
 publishing {
