@@ -6,21 +6,15 @@ https://docs.livekit.io/guides/server-api/
 
 ## Installation
 
-This SDK is available as a Maven package through [JitPack](https://jitpack.io/#livekit/server-sdk-kotlin).
+This SDK is available as a Maven package through [Maven Central](https://search.maven.org/search?q=g:io.livekit%20a:livekit-server).
 
 ### Maven
 ```xml title="pom.xml"
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
 
 <dependencies>
     <dependency>
-        <groupId>com.github.livekit</groupId>
-        <artifactId>server-sdk-kotlin</artifactId>
+        <groupId>io.livekit</groupId>
+        <artifactId>livekit-server</artifactId>
         <version>97c8779b09</version>
     </dependency>
 </dependencies>
@@ -38,6 +32,8 @@ dependencies {
     implementation 'com.github.livekit:server-sdk-kotlin:<commit hash>'
 }
 ```
+
+Development snapshots are available through Sonatype: `https://s01.oss.sonatype.org/content/repositories/snapshots/`
 
 ## Usage
 
@@ -88,7 +84,7 @@ AccessToken token = new AccessToken("apiKey", "secret");
 token.setName("name");
 token.setIdentity("identity");
 token.setMetadata("metadata");
-token.addGrants(new RoomJoin(true), new Room("myroom"));
+token.addGrants(new RoomJoin(true), new RoomName("myroom"));
 
 // Sign and create token string.
 System.out.println("New access token: " + token.toJwt())
