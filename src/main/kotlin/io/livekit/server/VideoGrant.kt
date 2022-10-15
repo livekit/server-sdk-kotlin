@@ -34,8 +34,16 @@ class RoomAdmin(value: Boolean) : VideoGrant("roomAdmin", value)
 
 /**
  * name of the room, required if join or admin is set
+ * @see [RoomName]
  */
+@Deprecated("Use io.livekit.server.RoomName")
 class Room(value: String) : VideoGrant("room", value)
+
+/**
+ * name of the room, required if join or admin is set
+ */
+class RoomName(value: String) : VideoGrant("room", value)
+
 
 /**
  * allow participant to publish tracks

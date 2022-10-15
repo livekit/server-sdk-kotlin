@@ -88,7 +88,7 @@ class RoomServiceClient(
         val credentials = authHeader(
             mapOf(
                 RoomAdmin(true).toPair(),
-                Room(roomName).toPair(),
+                RoomName(roomName).toPair(),
             )
         )
         return service.updateRoomMetadata(request, credentials)
@@ -105,7 +105,7 @@ class RoomServiceClient(
         val credentials = authHeader(
             mapOf(
                 RoomAdmin(true).toPair(),
-                Room(roomName).toPair(),
+                RoomName(roomName).toPair(),
             )
         )
         return TransformCall(service.listParticipants(request, credentials)) {
@@ -127,7 +127,7 @@ class RoomServiceClient(
         val credentials = authHeader(
             mapOf(
                 RoomAdmin(true).toPair(),
-                Room(roomName).toPair(),
+                RoomName(roomName).toPair(),
             )
         )
         return service.getParticipant(request, credentials)
@@ -148,7 +148,7 @@ class RoomServiceClient(
         val credentials = authHeader(
             mapOf(
                 RoomAdmin(true).toPair(),
-                Room(roomName).toPair(),
+                RoomName(roomName).toPair(),
             )
         )
         return service.removeParticipant(request, credentials)
@@ -176,7 +176,7 @@ class RoomServiceClient(
         val credentials = authHeader(
             mapOf(
                 RoomAdmin(true).toPair(),
-                Room(roomName).toPair(),
+                RoomName(roomName).toPair(),
             )
         )
         return TransformCall(service.mutePublishedTrack(request, credentials)) {
@@ -213,7 +213,7 @@ class RoomServiceClient(
         val credentials = authHeader(
             mapOf(
                 RoomAdmin(true).toPair(),
-                Room(roomName).toPair(),
+                RoomName(roomName).toPair(),
             )
         )
         return service.updateParticipant(request, credentials)
@@ -243,7 +243,7 @@ class RoomServiceClient(
         val credentials = authHeader(
             mapOf(
                 RoomAdmin(true).toPair(),
-                Room(roomName).toPair(),
+                RoomName(roomName).toPair(),
             )
         )
         return service.updateSubscriptions(request, credentials)
@@ -274,7 +274,7 @@ class RoomServiceClient(
         val credentials = authHeader(
             mapOf(
                 RoomAdmin(true).toPair(),
-                Room(roomName).toPair(),
+                RoomName(roomName).toPair(),
             )
         )
         return service.sendData(request, credentials)

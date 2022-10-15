@@ -23,7 +23,7 @@ class AccessTokenTest {
         token.identity = "identity"
         token.metadata = "metadata"
 
-        token.addGrants(Room("room_name"))
+        token.addGrants(RoomName("room_name"))
 
         val jwt = token.toJwt()
 
