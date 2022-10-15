@@ -2,10 +2,8 @@ package io.livekit.server
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.io.Serializer
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 
@@ -88,7 +86,6 @@ class AccessToken(
 
     fun toJwt(): String {
         return with(Jwts.builder()) {
-            serializeToJsonWith(BasicSerializer())
             setIssuer(apiKey)
             val exp = expiration
             if (exp != null) {
