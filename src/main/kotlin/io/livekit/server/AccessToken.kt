@@ -2,9 +2,12 @@ package io.livekit.server
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.io.Serializer
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+
 
 /**
  * Access tokens are required to connect to the server.
@@ -21,19 +24,25 @@ class AccessToken(
     private val videoGrants = mutableSetOf<VideoGrant>()
 
     /**
-     * Amount of time in milliseconds before expiration
+     * Amount of time in milliseconds the created token is valid for.
+     *
+     * If [expiration] is not null, this value is ignored.
      *
      * Defaults to 6 hours.
      */
     var ttl: Long = TimeUnit.MILLISECONDS.convert(6, TimeUnit.HOURS)
 
     /**
-     * Date specifying the time [before which this token is invalid](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-25#section-4.1.5).
+     * Used to specify a expiration time.
      *
-     * Defined in milliseconds since epoch time.
-     *
+     * If not null, takes preference over [ttl].
      */
-    var notBefore: Long? = null
+    var expiration: Date? = null
+
+    /**
+     * Date specifying the time [before which this token is invalid](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-25#section-4.1.5).
+     */
+    var notBefore: Date? = null
 
     /**
      * Display name for the participant, available as `Participant.name`
@@ -79,11 +88,18 @@ class AccessToken(
 
     fun toJwt(): String {
         return with(Jwts.builder()) {
+            serializeToJsonWith(BasicSerializer())
             setIssuer(apiKey)
-            setExpiration(Date(System.currentTimeMillis() + ttl))
+            val exp = expiration
+            if (exp != null) {
+                setExpiration(exp)
+            } else {
+                setExpiration(Date(System.currentTimeMillis() + ttl))
+            }
+
             val nbf = notBefore
             if (nbf != null) {
-                setNotBefore(Date(nbf))
+                setNotBefore(nbf)
             }
 
             val id = identity
