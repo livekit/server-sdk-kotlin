@@ -15,25 +15,23 @@ This SDK is available as a Maven package through [Maven Central](https://search.
     <dependency>
         <groupId>io.livekit</groupId>
         <artifactId>livekit-server</artifactId>
-        <version>97c8779b09</version>
+        <version>0.3.0</version>
     </dependency>
 </dependencies>
 ```
 
 ### Gradle
+
 ```groovy title="build.gradle"
-
-repositories {
-    ...
-    maven { url 'https://jitpack.io' }
-}
-
 dependencies {
-    implementation 'com.github.livekit:server-sdk-kotlin:<commit hash>'
+    implementation 'com.github.livekit:server-sdk-kotlin:0.3.0'
 }
 ```
 
 Development snapshots are available through Sonatype: `https://s01.oss.sonatype.org/content/repositories/snapshots/`
+
+The current snapshot `VERSION_NAME` can be found in the root
+folder's [gradle.properties](https://github.com/livekit/server-sdk-kotlin/blob/main/gradle.properties).
 
 ## Usage
 
