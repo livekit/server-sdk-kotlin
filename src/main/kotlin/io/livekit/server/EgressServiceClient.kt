@@ -238,6 +238,93 @@ class EgressServiceClient(
         return service.startTrackEgress(request, credentials)
     }
 
+    @JvmOverloads
+    fun startWebEgress(
+        url: String,
+        output: LivekitEgress.EncodedFileOutput,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        audioOnly: Boolean = false,
+        videoOnly: Boolean = false
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
+            .setFile(output)
+        return startWebEgressImpl(
+            requestBuilder,
+            url,
+            optionsPreset,
+            optionsAdvanced,
+            audioOnly,
+            videoOnly
+        )
+    }
+
+    @JvmOverloads
+    fun startWebEgress(
+        url: String,
+        output: LivekitEgress.SegmentedFileOutput,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        audioOnly: Boolean = false,
+        videoOnly: Boolean = false
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
+            .setSegments(output)
+        return startWebEgressImpl(
+            requestBuilder,
+            url,
+            optionsPreset,
+            optionsAdvanced,
+            audioOnly,
+            videoOnly
+        )
+    }
+
+    @JvmOverloads
+    fun startWebEgress(
+        url: String,
+        output: LivekitEgress.StreamOutput,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        audioOnly: Boolean = false,
+        videoOnly: Boolean = false
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
+            .setStream(output)
+        return startWebEgressImpl(
+            requestBuilder,
+            url,
+            optionsPreset,
+            optionsAdvanced,
+            audioOnly,
+            videoOnly
+        )
+    }
+
+    private fun startWebEgressImpl(
+        requestBuilder: LivekitEgress.WebEgressRequest.Builder,
+        url: String,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset?,
+        optionsAdvanced: LivekitEgress.EncodingOptions?,
+        audioOnly: Boolean,
+        videoOnly: Boolean
+    ): Call<LivekitEgress.EgressInfo> {
+        val request = with(requestBuilder) {
+            this.url = url
+            if (optionsPreset != null) {
+                this.preset = optionsPreset
+            } else if (optionsAdvanced != null) {
+                this.advanced = optionsAdvanced
+            }
+            this.audioOnly = audioOnly
+            this.videoOnly = videoOnly
+            build()
+        }
+        val credentials = authHeader(RoomRecord(true))
+
+        return service.startWebEgress(request, credentials)
+    }
+
     fun updateLayout(
         egressId: String,
         layout: String,

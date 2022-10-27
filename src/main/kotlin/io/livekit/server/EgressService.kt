@@ -34,6 +34,13 @@ interface EgressService {
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.Egress/StartWebEgress")
+    fun startWebEgress(
+        @Body request: LivekitEgress.WebEgressRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitEgress.EgressInfo>
+
+    @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.Egress/UpdateLayout")
     fun updateLayout(
         @Body request: LivekitEgress.UpdateLayoutRequest,
