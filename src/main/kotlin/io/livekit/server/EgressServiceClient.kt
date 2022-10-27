@@ -270,7 +270,7 @@ class EgressServiceClient(
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
             .setSegments(output)
-        return startRoomCompositeEgressImpl(
+        return startWebEgressImpl(
             requestBuilder,
             url,
             optionsPreset,
@@ -291,7 +291,7 @@ class EgressServiceClient(
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
             .setStream(output)
-        return startRoomCompositeEgressImpl(
+        return startWebEgressImpl(
             requestBuilder,
             url,
             optionsPreset,
