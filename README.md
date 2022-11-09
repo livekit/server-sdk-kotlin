@@ -24,7 +24,7 @@ This SDK is available as a Maven package through [Maven Central](https://search.
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'com.github.livekit:server-sdk-kotlin:0.3.0'
+    implementation 'io.livekit:server-sdk-kotlin:0.3.0'
 }
 ```
 
