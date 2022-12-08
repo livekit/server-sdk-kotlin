@@ -1,8 +1,6 @@
 package io.livekit.server
 
 import com.google.protobuf.ByteString
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitModels
 import livekit.LivekitRoom
@@ -11,7 +9,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
-import javax.crypto.spec.SecretKeySpec
 
 class RoomServiceClient(
     private val service: RoomService,
@@ -44,7 +41,7 @@ class RoomServiceClient(
             }
             build()
         }
-        val credentials = authHeader(mapOf(RoomCreate(true).toPair()))
+        val credentials = authHeader(RoomCreate(true))
         return service.createRoom(request, credentials)
     }
 
@@ -61,7 +58,7 @@ class RoomServiceClient(
             }
             build()
         }
-        val credentials = authHeader(mapOf(RoomList(true).toPair()))
+        val credentials = authHeader(RoomList(true))
         return TransformCall(service.listRooms(request, credentials)) {
             it.roomsList
         }
@@ -71,7 +68,7 @@ class RoomServiceClient(
         val request = LivekitRoom.DeleteRoomRequest.newBuilder()
             .setRoom(roomName)
             .build()
-        val credentials = authHeader(mapOf(RoomCreate(true).toPair()))
+        val credentials = authHeader(RoomCreate(true))
         return service.deleteRoom(request, credentials)
     }
 
@@ -86,10 +83,8 @@ class RoomServiceClient(
             .setMetadata(metadata)
             .build()
         val credentials = authHeader(
-            mapOf(
-                RoomAdmin(true).toPair(),
-                RoomName(roomName).toPair(),
-            )
+            RoomAdmin(true),
+            RoomName(roomName),
         )
         return service.updateRoomMetadata(request, credentials)
     }
@@ -103,10 +98,8 @@ class RoomServiceClient(
             .setRoom(roomName)
             .build()
         val credentials = authHeader(
-            mapOf(
-                RoomAdmin(true).toPair(),
-                RoomName(roomName).toPair(),
-            )
+            RoomAdmin(true),
+            RoomName(roomName),
         )
         return TransformCall(service.listParticipants(request, credentials)) {
             it.participantsList
@@ -125,10 +118,8 @@ class RoomServiceClient(
             .setIdentity(identity)
             .build()
         val credentials = authHeader(
-            mapOf(
-                RoomAdmin(true).toPair(),
-                RoomName(roomName).toPair(),
-            )
+            RoomAdmin(true),
+            RoomName(roomName),
         )
         return service.getParticipant(request, credentials)
     }
@@ -146,10 +137,8 @@ class RoomServiceClient(
             .setIdentity(identity)
             .build()
         val credentials = authHeader(
-            mapOf(
-                RoomAdmin(true).toPair(),
-                RoomName(roomName).toPair(),
-            )
+            RoomAdmin(true),
+            RoomName(roomName),
         )
         return service.removeParticipant(request, credentials)
     }
@@ -174,10 +163,8 @@ class RoomServiceClient(
             .setMuted(mute)
             .build()
         val credentials = authHeader(
-            mapOf(
-                RoomAdmin(true).toPair(),
-                RoomName(roomName).toPair(),
-            )
+            RoomAdmin(true),
+            RoomName(roomName),
         )
         return TransformCall(service.mutePublishedTrack(request, credentials)) {
             it.track
@@ -211,10 +198,8 @@ class RoomServiceClient(
         }
 
         val credentials = authHeader(
-            mapOf(
-                RoomAdmin(true).toPair(),
-                RoomName(roomName).toPair(),
-            )
+            RoomAdmin(true),
+            RoomName(roomName),
         )
         return service.updateParticipant(request, credentials)
     }
@@ -241,10 +226,8 @@ class RoomServiceClient(
         }
 
         val credentials = authHeader(
-            mapOf(
-                RoomAdmin(true).toPair(),
-                RoomName(roomName).toPair(),
-            )
+            RoomAdmin(true),
+            RoomName(roomName),
         )
         return service.updateSubscriptions(request, credentials)
     }
@@ -272,27 +255,17 @@ class RoomServiceClient(
         }
 
         val credentials = authHeader(
-            mapOf(
-                RoomAdmin(true).toPair(),
-                RoomName(roomName).toPair(),
-            )
+            RoomAdmin(true),
+            RoomName(roomName),
         )
         return service.sendData(request, credentials)
     }
 
-    private fun authHeader(videoGrants: Map<String, Any>): String {
-        val jwt = Jwts.builder()
-            .setIssuer(apiKey)
-            .addClaims(
-                mapOf(
-                    "video" to videoGrants,
-                )
-            )
-            .signWith(
-                SecretKeySpec(secret.toByteArray(), "HmacSHA256"),
-                SignatureAlgorithm.HS256
-            )
-            .compact()
+    private fun authHeader(vararg videoGrants: VideoGrant): String {
+        val accessToken = AccessToken(apiKey, secret)
+        accessToken.addGrants(*videoGrants)
+
+        val jwt = accessToken.toJwt()
 
         return "Bearer $jwt"
     }

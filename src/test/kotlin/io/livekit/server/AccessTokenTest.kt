@@ -1,17 +1,17 @@
 package io.livekit.server
 
-import io.jsonwebtoken.Jwts
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import org.junit.jupiter.api.Test
 import java.util.*
-import javax.crypto.spec.SecretKeySpec
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class AccessTokenTest {
 
     companion object {
-        const val KEY = "key"
-        const val SECRET = "ababababababababababababababababababababababababababababababa"
+        const val KEY = "abcdefg"
+        const val SECRET = "abababa"
     }
 
     @Test
@@ -22,22 +22,28 @@ class AccessTokenTest {
         token.name = "name"
         token.identity = "identity"
         token.metadata = "metadata"
+        token.sha256 = "gfedcba"
 
         token.addGrants(RoomName("room_name"))
 
         val jwt = token.toJwt()
 
-        val claimsJws = Jwts.parserBuilder()
-            .setSigningKey(SecretKeySpec(SECRET.toByteArray(), "HmacSHA256"))
+        val alg = Algorithm.HMAC256(SECRET)
+        val decodedJWT = JWT.require(alg)
+            .withIssuer(KEY)
             .build()
-            .parseClaimsJws(jwt)
+            .verify(jwt)
 
-        assertEquals(KEY, claimsJws.body["iss"])
-        assertEquals(token.name, claimsJws.body["name"])
-        assertEquals(token.identity, claimsJws.body["jti"])
-        assertEquals(token.metadata, claimsJws.body["metadata"])
+        val claims = decodedJWT.claims
 
-        val videoGrants = claimsJws.body["video"] as? Map<*, *>
+        assertEquals(KEY, claims["iss"]?.asString())
+        assertEquals(token.name, claims["name"]?.asString())
+        assertEquals(token.identity, claims["jti"]?.asString())
+        assertEquals(token.metadata, claims["metadata"]?.asString())
+        assertEquals(token.sha256, claims["sha256"]?.asString())
+        assertEquals(token.expiration, decodedJWT.expiresAt)
+
+        val videoGrants = claims["video"]?.asMap()
         assertNotNull(videoGrants)
         assertEquals("room_name", videoGrants["room"])
     }
