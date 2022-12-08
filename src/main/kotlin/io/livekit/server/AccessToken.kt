@@ -1,10 +1,11 @@
 package io.livekit.server
 
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTCreator
+import com.auth0.jwt.algorithms.Algorithm
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.crypto.spec.SecretKeySpec
 
 
 /**
@@ -85,24 +86,24 @@ class AccessToken(
     }
 
     fun toJwt(): String {
-        return with(Jwts.builder()) {
-            setIssuer(apiKey)
+        return with(JWT.create()) {
+            withIssuer(apiKey)
             val exp = expiration
             if (exp != null) {
-                setExpiration(exp)
+                withExpiresAt(exp)
             } else {
-                setExpiration(Date(System.currentTimeMillis() + ttl))
+                withExpiresAt(Date(System.currentTimeMillis() + ttl))
             }
 
             val nbf = notBefore
             if (nbf != null) {
-                setNotBefore(nbf)
+                withNotBefore(nbf)
             }
 
             val id = identity
             if (id != null) {
-                setSubject(id)
-                setId(id)
+                withSubject(id)
+                withJWTId(id)
             } else {
                 val hasRoomJoin = videoGrants.any { it is RoomJoin && it.value == true }
                 if (hasRoomJoin) {
@@ -117,15 +118,31 @@ class AccessToken(
             sha256?.let { claimsMap["sha256"] = it }
             claimsMap["video"] = videoGrantsMap
 
-            addClaims(claimsMap)
-            signWith(
-                SecretKeySpec(secret.toByteArray(), "HmacSHA256"),
-                SignatureAlgorithm.HS256
-            )
+            claimsMap.forEach { key, value ->
+                withClaimAny(key, value)
+            }
+
+            val alg = Algorithm.HMAC256(secret)
 
             // Build token
-            compact()
+            sign(alg)
         }
     }
+}
 
+internal fun JWTCreator.Builder.withClaimAny(name: String, value: Any) {
+    when (value) {
+        is Boolean -> withClaim(name, value)
+        is Int -> withClaim(name, value)
+        is Long -> withClaim(name, value)
+        is Double -> withClaim(name, value)
+        is String -> withClaim(name, value)
+        is Date -> withClaim(name, value)
+        is Instant -> withClaim(name, value)
+        is List<*> -> withClaim(name, value)
+        is Map<*, *> -> {
+            @Suppress("UNCHECKED_CAST")
+            withClaim(name, value as Map<String, *>)
+        }
+    }
 }

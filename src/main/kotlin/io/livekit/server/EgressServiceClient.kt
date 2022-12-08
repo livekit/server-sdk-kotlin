@@ -1,7 +1,5 @@
 package io.livekit.server
 
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitEgress
 import okhttp3.OkHttpClient
@@ -9,7 +7,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
-import javax.crypto.spec.SecretKeySpec
 
 class EgressServiceClient(
     private val service: EgressService,
@@ -381,19 +378,10 @@ class EgressServiceClient(
     }
 
     private fun authHeader(vararg videoGrants: VideoGrant): String {
-        val videoGrantsMap = videoGrants.associate { grant -> grant.toPair() }
-        val jwt = Jwts.builder()
-            .setIssuer(apiKey)
-            .addClaims(
-                mapOf(
-                    "video" to videoGrantsMap,
-                )
-            )
-            .signWith(
-                SecretKeySpec(secret.toByteArray(), "HmacSHA256"),
-                SignatureAlgorithm.HS256
-            )
-            .compact()
+        val accessToken = AccessToken(apiKey, secret)
+        accessToken.addGrants(*videoGrants)
+
+        val jwt = accessToken.toJwt()
 
         return "Bearer $jwt"
     }
