@@ -42,16 +42,26 @@ tasks.withType<KotlinCompile> {
 }
 
 val protoc_platform: String? by project
-val protoSrc = "$projectDir/protocol"
+val protoSrc = arrayOf(
+        "$projectDir/protocol/livekit_analytics.proto",
+        "$projectDir/protocol/livekit_egress.proto",
+        "$projectDir/protocol/livekit_ingress.proto",
+        "$projectDir/protocol/livekit_internal.proto",
+        "$projectDir/protocol/livekit_models.proto",
+        "$projectDir/protocol/livekit_room.proto",
+        "$projectDir/protocol/livekit_rpc_internal.proto",
+        "$projectDir/protocol/livekit_rtc.proto",
+        "$projectDir/protocol/livekit_webhook.proto",
+    )
 val protobufVersion = "3.21.7"
 val protobufDep = "com.google.protobuf:protobuf-java:$protobufVersion"
 protobuf {
     protoc {
         // for apple m1, please add protoc_platform=osx-x86_64 in $HOME/.gradle/gradle.properties
-        if (protoc_platform != null) {
-            artifact = "com.google.protobuf:protoc:$protobufVersion:$protoc_platform"
+        artifact = if (protoc_platform != null) {
+            "com.google.protobuf:protoc:$protobufVersion:$protoc_platform"
         } else {
-            artifact = "com.google.protobuf:protoc:$protobufVersion"
+            "com.google.protobuf:protoc:$protobufVersion"
         }
     }
 }
@@ -92,7 +102,7 @@ val javadocJar = tasks.named<Jar>("javadocJar") {
 }
 
 dependencies {
-    protobuf(files(protoSrc))
+    protobuf(files(*protoSrc))
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
     api("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-protobuf:2.9.0")

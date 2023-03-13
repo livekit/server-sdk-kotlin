@@ -8,6 +8,12 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
 
+data class EncodedOutputs(
+    val fileOutput: LivekitEgress.EncodedFileOutput?,
+    val streamOutput: LivekitEgress.StreamOutput?,
+    val segmentOutput: LivekitEgress.SegmentedFileOutput?,
+)
+
 class EgressServiceClient(
     private val service: EgressService,
     private val apiKey: String,
@@ -25,8 +31,10 @@ class EgressServiceClient(
         videoOnly: Boolean = false,
         customBaseUrl: String = ""
     ): Call<LivekitEgress.EgressInfo> {
+        @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
             .setFile(output)
+            .setFileOutputs(0, output)
         return startRoomCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -50,8 +58,10 @@ class EgressServiceClient(
         videoOnly: Boolean = false,
         customBaseUrl: String = ""
     ): Call<LivekitEgress.EgressInfo> {
+        @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
             .setSegments(output)
+            .setSegmentOutputs(0, output)
         return startRoomCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -75,8 +85,43 @@ class EgressServiceClient(
         videoOnly: Boolean = false,
         customBaseUrl: String = ""
     ): Call<LivekitEgress.EgressInfo> {
+        @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
             .setStream(output)
+            .setStreamOutputs(0, output)
+        return startRoomCompositeEgressImpl(
+            requestBuilder,
+            roomName,
+            layout,
+            optionsPreset,
+            optionsAdvanced,
+            audioOnly,
+            videoOnly,
+            customBaseUrl
+        )
+    }
+
+    @JvmOverloads
+    fun startRoomCompositeEgress(
+        roomName: String,
+        output: EncodedOutputs,
+        layout: String = "",
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        audioOnly: Boolean = false,
+        videoOnly: Boolean = false,
+        customBaseUrl: String = ""
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
+        if (output.fileOutput != null) {
+            requestBuilder.setFileOutputs(0, output.fileOutput)
+        }
+        if (output.streamOutput != null) {
+            requestBuilder.setStreamOutputs(0, output.streamOutput)
+        }
+        if (output.segmentOutput != null) {
+            requestBuilder.setSegmentOutputs(0, output.segmentOutput)
+        }
         return startRoomCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -126,8 +171,10 @@ class EgressServiceClient(
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
     ): Call<LivekitEgress.EgressInfo> {
+        @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
             .setFile(output)
+            .setFileOutputs(0, output)
         return startTrackCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -147,8 +194,10 @@ class EgressServiceClient(
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
     ): Call<LivekitEgress.EgressInfo> {
+        @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
             .setSegments(output)
+            .setSegmentOutputs(0, output)
         return startTrackCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -168,8 +217,39 @@ class EgressServiceClient(
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
     ): Call<LivekitEgress.EgressInfo> {
+        @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
             .setStream(output)
+            .setStreamOutputs(0, output)
+        return startTrackCompositeEgressImpl(
+            requestBuilder,
+            roomName,
+            audioTrackId,
+            videoTrackId,
+            optionsPreset,
+            optionsAdvanced,
+        )
+    }
+
+    @JvmOverloads
+    fun startTrackCompositeEgress(
+        roomName: String,
+        output: EncodedOutputs,
+        audioTrackId: String?,
+        videoTrackId: String?,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
+        if (output.fileOutput != null) {
+            requestBuilder.setFileOutputs(0, output.fileOutput)
+        }
+        if (output.streamOutput != null) {
+            requestBuilder.setStreamOutputs(0, output.streamOutput)
+        }
+        if (output.segmentOutput != null) {
+            requestBuilder.setSegmentOutputs(0, output.segmentOutput)
+        }
         return startTrackCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -244,8 +324,10 @@ class EgressServiceClient(
         audioOnly: Boolean = false,
         videoOnly: Boolean = false
     ): Call<LivekitEgress.EgressInfo> {
+        @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
             .setFile(output)
+            .setFileOutputs(0, output)
         return startWebEgressImpl(
             requestBuilder,
             url,
@@ -265,8 +347,10 @@ class EgressServiceClient(
         audioOnly: Boolean = false,
         videoOnly: Boolean = false
     ): Call<LivekitEgress.EgressInfo> {
+        @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
             .setSegments(output)
+            .setSegmentOutputs(0, output)
         return startWebEgressImpl(
             requestBuilder,
             url,
@@ -286,8 +370,39 @@ class EgressServiceClient(
         audioOnly: Boolean = false,
         videoOnly: Boolean = false
     ): Call<LivekitEgress.EgressInfo> {
+        @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
             .setStream(output)
+            .setStreamOutputs(0, output)
+        return startWebEgressImpl(
+            requestBuilder,
+            url,
+            optionsPreset,
+            optionsAdvanced,
+            audioOnly,
+            videoOnly
+        )
+    }
+
+    @JvmOverloads
+    fun startWebEgress(
+        url: String,
+        output: EncodedOutputs,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        audioOnly: Boolean = false,
+        videoOnly: Boolean = false
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
+        if (output.fileOutput != null) {
+            requestBuilder.setFileOutputs(0, output.fileOutput)
+        }
+        if (output.streamOutput != null) {
+            requestBuilder.setStreamOutputs(0, output.streamOutput)
+        }
+        if (output.segmentOutput != null) {
+            requestBuilder.setSegmentOutputs(0, output.segmentOutput)
+        }
         return startWebEgressImpl(
             requestBuilder,
             url,
