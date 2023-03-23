@@ -27,6 +27,7 @@ class RoomServiceClient(
         emptyTimeout: Int? = null,
         maxParticipants: Int? = null,
         nodeId: String? = null,
+        metadata: String? = null,
     ): Call<LivekitModels.Room> {
         val request = with(LivekitRoom.CreateRoomRequest.newBuilder()) {
             this.name = name
@@ -38,6 +39,9 @@ class RoomServiceClient(
             }
             if (nodeId != null) {
                 this.nodeId = nodeId
+            }
+            if(metadata != null) {
+                this.metadata = metadata
             }
             build()
         }

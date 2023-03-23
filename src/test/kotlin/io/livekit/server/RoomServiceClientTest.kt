@@ -12,6 +12,7 @@ class RoomServiceClientTest {
         const val SECRET = TestConstants.SECRET
 
         const val ROOM_NAME = "room_name"
+        const val METADATA = "metadata"
     }
 
     lateinit var client: RoomServiceClient
@@ -23,11 +24,15 @@ class RoomServiceClientTest {
 
     @Test
     fun createRoom() {
-        val response = client.createRoom(ROOM_NAME).execute()
+        val response = client.createRoom(
+            name = ROOM_NAME,
+            metadata = METADATA,
+        ).execute()
         val room = response.body()
 
         assertTrue(response.isSuccessful)
         assertEquals(ROOM_NAME, room?.name)
+        assertEquals(METADATA, room?.metadata)
     }
 
     @Test
