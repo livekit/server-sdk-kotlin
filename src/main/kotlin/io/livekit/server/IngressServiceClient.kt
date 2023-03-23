@@ -48,6 +48,26 @@ class IngressServiceClient(
         return service.createIngress(request, credentials)
     }
 
+    /**
+     * List ingress
+     * @param roomName when null or empty, list all rooms.
+     *                 otherwise returns rooms with matching room name
+     */
+    @JvmOverloads
+    fun listIngress(roomName: String? = null): Call<List<LivekitIngress.IngressInfo>> {
+        val request = with(LivekitIngress.ListIngressRequest.newBuilder()) {
+            if (roomName != null) {
+                this.roomName = roomName
+            }
+            build()
+        }
+        val credentials = authHeader(IngressAdmin(true))
+        return TransformCall(service.listIngress(request, credentials)) {
+            it.itemsList
+        }
+    }
+
+
     private fun authHeader(vararg videoGrants: VideoGrant): String {
         val accessToken = AccessToken(apiKey, secret)
         accessToken.addGrants(*videoGrants)
@@ -56,5 +76,4 @@ class IngressServiceClient(
 
         return "Bearer $jwt"
     }
-
 }
