@@ -69,3 +69,10 @@ class Hidden(value: Boolean) : VideoGrant("hidden", value)
  * indicates this participant is recording the room
  */
 class Recorder(value: Boolean) : VideoGrant("recorder", value)
+
+
+/**
+ * permission to manage ingress
+ */
+class IngressAdmin(value: Boolean) : VideoGrant("ingressAdmin", value)
+
