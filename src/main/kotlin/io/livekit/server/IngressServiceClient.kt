@@ -35,11 +35,11 @@ class IngressServiceClient(
                 this.participantName = participantName
             }
 
-			if (audioOptions != null) {
+            if (audioOptions != null) {
                 this.audio = audioOptions
             }
 
-			if (videoOptions != null) {
+            if (videoOptions != null) {
                 this.video = videoOptions
             }
             build()
@@ -47,6 +47,53 @@ class IngressServiceClient(
         val credentials = authHeader(IngressAdmin(true))
         return service.createIngress(request, credentials)
     }
+
+    /**
+     * Updates the existing ingress with the given ingressID. Only inactive ingress can be updated
+     */
+    @JvmOverloads
+    fun updateIngress(
+        ingressID: String,
+        name: String? = null,
+        roomName: String? = null,
+        participantIdentity: String? = null,
+        participantName: String? = null,
+        audioOptions: LivekitIngress.IngressAudioOptions? = null,
+        videoOptions: LivekitIngress.IngressVideoOptions? = null,
+    ): Call<LivekitIngress.IngressInfo> {
+        val request = with(LivekitIngress.UpdateIngressRequest.newBuilder()) {
+            this.ingressId = ingressID
+
+            if (name != null) {
+                this.name = name
+            }
+
+            if (roomName != null) {
+                this.roomName = roomName
+            }
+
+            if (participantIdentity == null) {
+                this.participantIdentity = participantIdentity
+            }
+
+
+            if (participantName != null) {
+                this.participantName = participantName
+            }
+
+            if (audioOptions != null) {
+                this.audio = audioOptions
+            }
+
+            if (videoOptions != null) {
+                this.video = videoOptions
+            }
+            build()
+        }
+        val credentials = authHeader(IngressAdmin(true))
+        return service.updateIngress(request, credentials)
+    }
+
 
     /**
      * List ingress
@@ -67,6 +114,13 @@ class IngressServiceClient(
         }
     }
 
+    fun deleteIngress(ingressID: String): Call<LivekitIngress.IngressInfo> {
+        val request = LivekitIngress.DeleteIngressRequest.newBuilder()
+            .setIngressId(ingressID)
+            .build()
+        val credentials = authHeader(IngressAdmin(true))
+        return service.deleteIngress(request, credentials)
+    }
 
     private fun authHeader(vararg videoGrants: VideoGrant): String {
         val accessToken = AccessToken(apiKey, secret)
