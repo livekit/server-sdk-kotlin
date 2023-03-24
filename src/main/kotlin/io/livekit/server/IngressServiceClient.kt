@@ -130,4 +130,31 @@ class IngressServiceClient(
 
         return "Bearer $jwt"
     }
+
+    companion object {
+
+        @JvmStatic
+        @JvmOverloads
+        fun create(host: String, apiKey: String, secret: String, logging: Boolean = false): IngressServiceClient {
+
+            val okhttp = with(OkHttpClient.Builder()) {
+                if (logging) {
+                    val loggingInterceptor = HttpLoggingInterceptor()
+                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+                    addInterceptor(loggingInterceptor)
+                }
+                build()
+            }
+
+            val service = Retrofit.Builder()
+                .baseUrl(host)
+                .addConverterFactory(ProtoConverterFactory.create())
+                .client(okhttp)
+                .build()
+                .create(IngressService::class.java)
+
+            return IngressServiceClient(service, apiKey, secret)
+        }
+    }
+
 }
