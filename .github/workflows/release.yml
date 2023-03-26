@@ -15,7 +15,7 @@ jobs:
         working-directory: ./server-sdk-kotlin
     steps:
     - name: checkout server-sdk-kotlin
-      uses: actions/checkout@v2.3.4
+      uses: actions/checkout@v3
       with:
         path: ./server-sdk-kotlin
         submodules: recursive
