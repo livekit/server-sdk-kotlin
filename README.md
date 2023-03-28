@@ -75,7 +75,7 @@ public class Main {
 
 Access tokens can be generated through the `io.livekit.server.AccessToken` class.
 
-```
+```java
 AccessToken token = new AccessToken("apiKey", "secret");
 
 // Fill in token information.
