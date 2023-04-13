@@ -1,10 +1,14 @@
-<!--BEGIN_BANNER_IMAGE--><!--END_BANNER_IMAGE-->
+<!--BEGIN_BANNER_IMAGE-->
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="/.github/banner_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="/.github/banner_light.png">
+    <img style="width:100%;" alt="The LiveKit icon, the name of the repository and some sample code in the background." src="/.github/banner_light.png">
+  </picture>
+  <!--END_BANNER_IMAGE-->
 
 # server-sdk-kotlin
 
-<!--BEGIN_DESCRIPTION-->
-Kotlin SDK for accessing [livekit-server](https://github.com/livekit/livekit) APIs. Currently for use in JVM environments.
-<!--END_DESCRIPTION-->
+<!--BEGIN_DESCRIPTION-->Use this SDK to manage <a href="https://livekit.io/">LiveKit</a> rooms and create access tokens from your Kotlin backend.<!--END_DESCRIPTION-->
 
 https://docs.livekit.io/guides/server-api/
 
@@ -94,4 +98,13 @@ System.out.println("New access token: " + token.toJwt())
 
 By default, tokens expire 6 hours after generation. You may override this by using `token.setTtl(long millis)`.
     
-<!--BEGIN_REPO_NAV--><!--END_REPO_NAV-->
+<!--BEGIN_REPO_NAV-->
+<br/><table>
+<thead><tr><th colspan="2">LiveKit Ecosystem</th></tr></thead>
+<tbody>
+<tr><td>Core Infra</td><td><a href="https://github.com/livekit/livekit">livekit</a> · <a href="https://github.com/livekit/egress">egress</a> · <a href="https://github.com/livekit/ingress">ingress</a> · <a href="https://github.com/livekit/livekit-cli">livekit-cli</a></td></tr><tr></tr>
+<tr><td>Client SDKs</td><td><a href="https://github.com/livekit/components-js">Components</a> · <a href="https://github.com/livekit/client-sdk-js">JavaScript</a> · <a href="https://github.com/livekit/client-sdk-rust">Rust</a> · <a href="https://github.com/livekit/client-sdk-swift">iOS/macOS</a> · <a href="https://github.com/livekit/client-sdk-android">Android</a> · <a href="https://github.com/livekit/client-sdk-flutter">Flutter</a> · <a href="https://github.com/livekit/client-sdk-unity-web">Unity (web)</a> · <a href="https://github.com/livekit/client-sdk-react-native">React Native (beta)</a></td></tr><tr></tr>
+<tr><td>Server SDKs</td><td><a href="https://github.com/livekit/server-sdk-js">Node.js</a> · <a href="https://github.com/livekit/server-sdk-go">Golang</a> · <a href="https://github.com/livekit/server-sdk-ruby">Ruby</a> · <b>Java/Kotlin</b></td></tr>
+</tbody>
+</table>
+<!--END_REPO_NAV-->
