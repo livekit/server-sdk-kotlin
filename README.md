@@ -1,6 +1,10 @@
+<!--BEGIN_BANNER_IMAGE--><!--END_BANNER_IMAGE-->
+
 # server-sdk-kotlin
 
+<!--BEGIN_DESCRIPTION-->
 Kotlin SDK for accessing [livekit-server](https://github.com/livekit/livekit) APIs. Currently for use in JVM environments.
+<!--END_DESCRIPTION-->
 
 https://docs.livekit.io/guides/server-api/
 
@@ -90,3 +94,4 @@ System.out.println("New access token: " + token.toJwt())
 
 By default, tokens expire 6 hours after generation. You may override this by using `token.setTtl(long millis)`.
     
+<!--BEGIN_REPO_NAV--><!--END_REPO_NAV-->
