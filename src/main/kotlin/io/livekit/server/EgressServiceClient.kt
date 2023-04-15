@@ -34,7 +34,7 @@ class EgressServiceClient(
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
             .setFile(output)
-            .setFileOutputs(0, output)
+            .addFileOutputs(output)
         return startRoomCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -61,7 +61,7 @@ class EgressServiceClient(
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
             .setSegments(output)
-            .setSegmentOutputs(0, output)
+            .addSegmentOutputs(output)
         return startRoomCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -88,7 +88,7 @@ class EgressServiceClient(
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
             .setStream(output)
-            .setStreamOutputs(0, output)
+            .addStreamOutputs(output)
         return startRoomCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -114,13 +114,13 @@ class EgressServiceClient(
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
         if (output.fileOutput != null) {
-            requestBuilder.setFileOutputs(0, output.fileOutput)
+            requestBuilder.addFileOutputs(output.fileOutput)
         }
         if (output.streamOutput != null) {
-            requestBuilder.setStreamOutputs(0, output.streamOutput)
+            requestBuilder.addStreamOutputs(output.streamOutput)
         }
         if (output.segmentOutput != null) {
-            requestBuilder.setSegmentOutputs(0, output.segmentOutput)
+            requestBuilder.addSegmentOutputs(output.segmentOutput)
         }
         return startRoomCompositeEgressImpl(
             requestBuilder,
@@ -174,7 +174,7 @@ class EgressServiceClient(
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
             .setFile(output)
-            .setFileOutputs(0, output)
+            .addFileOutputs(output)
         return startTrackCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -197,7 +197,7 @@ class EgressServiceClient(
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
             .setSegments(output)
-            .setSegmentOutputs(0, output)
+            .addSegmentOutputs(output)
         return startTrackCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -220,7 +220,7 @@ class EgressServiceClient(
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
             .setStream(output)
-            .setStreamOutputs(0, output)
+            .addStreamOutputs(output)
         return startTrackCompositeEgressImpl(
             requestBuilder,
             roomName,
@@ -242,13 +242,13 @@ class EgressServiceClient(
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
         if (output.fileOutput != null) {
-            requestBuilder.setFileOutputs(0, output.fileOutput)
+            requestBuilder.addFileOutputs(output.fileOutput)
         }
         if (output.streamOutput != null) {
-            requestBuilder.setStreamOutputs(0, output.streamOutput)
+            requestBuilder.addStreamOutputs(output.streamOutput)
         }
         if (output.segmentOutput != null) {
-            requestBuilder.setSegmentOutputs(0, output.segmentOutput)
+            requestBuilder.addSegmentOutputs(output.segmentOutput)
         }
         return startTrackCompositeEgressImpl(
             requestBuilder,
@@ -327,7 +327,7 @@ class EgressServiceClient(
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
             .setFile(output)
-            .setFileOutputs(0, output)
+            .addFileOutputs(output)
         return startWebEgressImpl(
             requestBuilder,
             url,
@@ -350,7 +350,7 @@ class EgressServiceClient(
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
             .setSegments(output)
-            .setSegmentOutputs(0, output)
+            .addSegmentOutputs(output)
         return startWebEgressImpl(
             requestBuilder,
             url,
@@ -373,7 +373,7 @@ class EgressServiceClient(
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
             .setStream(output)
-            .setStreamOutputs(0, output)
+            .addStreamOutputs(output)
         return startWebEgressImpl(
             requestBuilder,
             url,
@@ -395,13 +395,13 @@ class EgressServiceClient(
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
         if (output.fileOutput != null) {
-            requestBuilder.setFileOutputs(0, output.fileOutput)
+            requestBuilder.addFileOutputs(output.fileOutput)
         }
         if (output.streamOutput != null) {
-            requestBuilder.setStreamOutputs(0, output.streamOutput)
+            requestBuilder.addStreamOutputs(output.streamOutput)
         }
         if (output.segmentOutput != null) {
-            requestBuilder.setSegmentOutputs(0, output.segmentOutput)
+            requestBuilder.addSegmentOutputs(output.segmentOutput)
         }
         return startWebEgressImpl(
             requestBuilder,
