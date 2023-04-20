@@ -63,6 +63,18 @@ class CanSubscribe(value: Boolean) : VideoGrant("canSubscribe", value)
 class CanPublishData(value: Boolean) : VideoGrant("canPublishData", value)
 
 /**
+ * TrackSource types that a participant may publish.
+ * When set, it supersedes CanPublish. Only sources explicitly set here can be published
+ *
+ * Currently available sources:
+ * * "camera"
+ * * "microphone"
+ * * "screen_share"
+ * * "screen_share_audio"
+ */
+class CanPublishSources(value: List<String>) : VideoGrant("canPublishSources", value)
+
+/**
  * allow participant to update its own metadata
  */
 class CanUpdateOwnMetadata(value: Boolean) : VideoGrant("canUpdateOwnMetadata", value)
