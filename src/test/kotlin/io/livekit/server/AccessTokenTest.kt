@@ -25,6 +25,7 @@ class AccessTokenTest {
         token.sha256 = "gfedcba"
 
         token.addGrants(RoomName("room_name"))
+        token.addGrants(CanPublishSources(listOf("camera", "microphone")))
 
         val jwt = token.toJwt()
 
@@ -46,5 +47,6 @@ class AccessTokenTest {
         val videoGrants = claims["video"]?.asMap()
         assertNotNull(videoGrants)
         assertEquals("room_name", videoGrants["room"])
+        assertEquals(listOf("camera", "microphone"), videoGrants["canPublishSources"])
     }
 }
