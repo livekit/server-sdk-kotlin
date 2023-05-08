@@ -19,8 +19,8 @@ class IngressServiceClient(
     @JvmOverloads
     fun createIngress(
         name: String,
-        roomName: String,
-        participantIdentity: String,
+        roomName: String? = null,
+        participantIdentity: String? = null,
         participantName: String? = null,
         inputType: LivekitIngress.IngressInput? = LivekitIngress.IngressInput.RTMP_INPUT,
         audioOptions: LivekitIngress.IngressAudioOptions? = null,
@@ -28,8 +28,15 @@ class IngressServiceClient(
     ): Call<LivekitIngress.IngressInfo> {
         val request = with(LivekitIngress.CreateIngressRequest.newBuilder()) {
             this.name = name
-            this.participantIdentity = participantIdentity
             this.inputType = inputType
+            
+            if (roomName != null) {
+                this.roomName = roomName
+            }
+
+            if (participantIdentity != null) {
+                this.participantIdentity = participantIdentity
+            }
 
             if (participantName != null) {
                 this.participantName = participantName
