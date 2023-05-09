@@ -40,7 +40,7 @@ class WebhookReceiver(
         }
 
         val builder = LivekitWebhook.WebhookEvent.newBuilder()
-        JsonFormat.parser().merge(body, builder)
+        JsonFormat.parser().ignoringUnknownFields().merge(body, builder)
         return builder.build()
     }
 }
