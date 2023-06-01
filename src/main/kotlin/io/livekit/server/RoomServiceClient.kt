@@ -179,6 +179,7 @@ class RoomServiceClient(
      * Updates a participant's metadata or permissions
      * @param roomName
      * @param identity
+     * @param name optional, participant name to update
      * @param metadata optional, metadata to update
      * @param participantPermission optional, new permissions to assign to participant
      */
@@ -186,17 +187,21 @@ class RoomServiceClient(
     fun updateParticipant(
         roomName: String,
         identity: String,
+        name: String?,
         metadata: String? = null,
         participantPermission: LivekitModels.ParticipantPermission? = null,
     ): Call<LivekitModels.ParticipantInfo> {
         val request = with(LivekitRoom.UpdateParticipantRequest.newBuilder()) {
             this.room = roomName
             this.identity = identity
+            if (name != null){
+                this.name = name
+            }
             if (metadata != null) {
                 this.metadata = metadata
             }
             if (participantPermission != null) {
-                this.permission = permission
+                this.permission = participantPermission
             }
             build()
         }
