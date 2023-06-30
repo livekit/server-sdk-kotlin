@@ -99,6 +99,7 @@ tasks.dokkaJavadoc.configure {
 }
 val javadocJar = tasks.named<Jar>("javadocJar") {
     from(tasks.named("dokkaJavadoc"))
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 dependencies {
