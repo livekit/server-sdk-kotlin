@@ -40,7 +40,7 @@ class RoomServiceClient(
             if (nodeId != null) {
                 this.nodeId = nodeId
             }
-            if(metadata != null) {
+            if (metadata != null) {
                 this.metadata = metadata
             }
             build()
@@ -187,14 +187,14 @@ class RoomServiceClient(
     fun updateParticipant(
         roomName: String,
         identity: String,
-        name: String?,
+        name: String? = null,
         metadata: String? = null,
         participantPermission: LivekitModels.ParticipantPermission? = null,
     ): Call<LivekitModels.ParticipantInfo> {
         val request = with(LivekitRoom.UpdateParticipantRequest.newBuilder()) {
             this.room = roomName
             this.identity = identity
-            if (name != null){
+            if (name != null) {
                 this.name = name
             }
             if (metadata != null) {
@@ -281,9 +281,21 @@ class RoomServiceClient(
 
     companion object {
 
+        /**
+         * Create a RoomServiceClient.
+         *
+         * @param okHttpConfigurator provide this if you wish to customize the http client
+         * (e.g. proxy, timeout, certificate/auth settings).
+         */
         @JvmStatic
         @JvmOverloads
-        fun create(host: String, apiKey: String, secret: String, logging: Boolean = false): RoomServiceClient {
+        fun create(
+            host: String,
+            apiKey: String,
+            secret: String,
+            logging: Boolean = false,
+            okHttpConfigurator: OkHttpConfigurator? = null
+        ): RoomServiceClient {
 
             val okhttp = with(OkHttpClient.Builder()) {
                 if (logging) {
@@ -291,6 +303,7 @@ class RoomServiceClient(
                     loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
                     addInterceptor(loggingInterceptor)
                 }
+                okHttpConfigurator?.config(this)
                 build()
             }
             val service = Retrofit.Builder()
