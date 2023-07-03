@@ -9,6 +9,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import java.util.function.Consumer
 
 class RoomServiceClient(
     private val service: RoomService,
@@ -294,7 +295,7 @@ class RoomServiceClient(
             apiKey: String,
             secret: String,
             logging: Boolean = false,
-            okHttpConfigurator: OkHttpConfigurator? = null
+            okHttpConfigurator: Consumer<OkHttpClient.Builder>? = null
         ): RoomServiceClient {
 
             val okhttp = with(OkHttpClient.Builder()) {
@@ -303,7 +304,7 @@ class RoomServiceClient(
                     loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
                     addInterceptor(loggingInterceptor)
                 }
-                okHttpConfigurator?.config(this)
+                okHttpConfigurator?.accept(this)
                 build()
             }
             val service = Retrofit.Builder()
