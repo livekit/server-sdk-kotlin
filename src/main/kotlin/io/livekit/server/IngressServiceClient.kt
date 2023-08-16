@@ -26,6 +26,7 @@ class IngressServiceClient(
         audioOptions: LivekitIngress.IngressAudioOptions? = null,
         videoOptions: LivekitIngress.IngressVideoOptions? = null,
         bypassTranscoding: Boolean? = null,
+        url: String? = null,
     ): Call<LivekitIngress.IngressInfo> {
         val request = with(LivekitIngress.CreateIngressRequest.newBuilder()) {
             this.name = name
@@ -45,6 +46,10 @@ class IngressServiceClient(
 
             if (bypassTranscoding != null) {
                 this.bypassTranscoding = bypassTranscoding
+            }
+
+            if (url != null) {
+                this.url = url
             }
 
             if (audioOptions != null) {
