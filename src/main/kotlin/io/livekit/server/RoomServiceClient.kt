@@ -29,6 +29,7 @@ class RoomServiceClient(
         maxParticipants: Int? = null,
         nodeId: String? = null,
         metadata: String? = null,
+        minPlayoutDelay: Int? = null,
     ): Call<LivekitModels.Room> {
         val request = with(LivekitRoom.CreateRoomRequest.newBuilder()) {
             this.name = name
@@ -43,6 +44,9 @@ class RoomServiceClient(
             }
             if (metadata != null) {
                 this.metadata = metadata
+            }
+            if (minPlayoutDelay != null) {
+                this.minPlayoutDelay = minPlayoutDelay
             }
             build()
         }
@@ -255,12 +259,14 @@ class RoomServiceClient(
         data: ByteArray,
         kind: LivekitModels.DataPacket.Kind,
         destinationSids: List<String> = emptyList(),
+        destinationIdentities: List<String> = emptyList(),
     ): Call<Void> {
         val request = with(LivekitRoom.SendDataRequest.newBuilder()) {
             this.room = roomName
             this.data = ByteString.copyFrom(data)
             this.kind = kind
             addAllDestinationSids(destinationSids)
+            addAllDestinationIdentities(destinationIdentities)
             build()
         }
 
