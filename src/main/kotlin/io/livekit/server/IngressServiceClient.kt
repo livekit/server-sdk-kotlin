@@ -31,7 +31,7 @@ class IngressServiceClient(
         val request = with(LivekitIngress.CreateIngressRequest.newBuilder()) {
             this.name = name
             this.inputType = inputType
-            
+
             if (roomName != null) {
                 this.roomName = roomName
             }
@@ -120,12 +120,19 @@ class IngressServiceClient(
      * List ingress
      * @param roomName when null or empty, list all rooms.
      *                 otherwise returns rooms with matching room name
+     * @param ingressId when set, filters by ingressId
      */
     @JvmOverloads
-    fun listIngress(roomName: String? = null): Call<List<LivekitIngress.IngressInfo>> {
+    fun listIngress(
+        roomName: String? = null,
+        ingressId: String? = null
+    ): Call<List<LivekitIngress.IngressInfo>> {
         val request = with(LivekitIngress.ListIngressRequest.newBuilder()) {
             if (roomName != null) {
                 this.roomName = roomName
+            }
+            if (ingressId != null) {
+                this.ingressId = ingressId
             }
             build()
         }

@@ -20,6 +20,13 @@ interface EgressService {
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.Egress/StartParticipantEgress")
+    fun startParticipantEgress(
+        @Body request: LivekitEgress.ParticipantEgressRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitEgress.EgressInfo>
+
+    @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.Egress/StartTrackCompositeEgress")
     fun startTrackCompositeEgress(
         @Body request: LivekitEgress.TrackCompositeEgressRequest,

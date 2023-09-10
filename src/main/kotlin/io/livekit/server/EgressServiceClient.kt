@@ -163,6 +163,59 @@ class EgressServiceClient(
     }
 
     @JvmOverloads
+    fun startParticipantEgress(
+        roomName: String,
+        identity: String,
+        output: EncodedOutputs,
+        screenShare: Boolean = false,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.ParticipantEgressRequest.newBuilder()
+        if (output.fileOutput != null) {
+            requestBuilder.addFileOutputs(output.fileOutput)
+        }
+        if (output.streamOutput != null) {
+            requestBuilder.addStreamOutputs(output.streamOutput)
+        }
+        if (output.segmentOutput != null) {
+            requestBuilder.addSegmentOutputs(output.segmentOutput)
+        }
+        return startParticipantEgressImpl(
+            requestBuilder,
+            roomName,
+            identity,
+            screenShare,
+            optionsPreset,
+            optionsAdvanced
+        )
+    }
+
+    private fun startParticipantEgressImpl(
+        requestBuilder: LivekitEgress.ParticipantEgressRequest.Builder,
+        roomName: String,
+        identity: String,
+        screenShare: Boolean,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset?,
+        optionsAdvanced: LivekitEgress.EncodingOptions?
+    ): Call<LivekitEgress.EgressInfo> {
+        val request = with(requestBuilder) {
+            this.roomName = roomName
+            this.identity = identity
+            this.screenShare = screenShare
+            if (optionsPreset != null) {
+                this.preset = optionsPreset
+            } else if (optionsAdvanced != null) {
+                this.advanced = optionsAdvanced
+            }
+            build()
+        }
+        val credentials = authHeader(RoomRecord(true))
+
+        return service.startParticipantEgress(request, credentials)
+    }
+
+    @JvmOverloads
     fun startTrackCompositeEgress(
         roomName: String,
         output: LivekitEgress.EncodedFileOutput,
@@ -478,10 +531,20 @@ class EgressServiceClient(
     }
 
     @JvmOverloads
-    fun listEgress(roomName: String? = null): Call<List<LivekitEgress.EgressInfo>> {
+    fun listEgress(
+        roomName: String? = null,
+        egressId: String? = null,
+        active: Boolean? = null,
+    ): Call<List<LivekitEgress.EgressInfo>> {
         val request = with(LivekitEgress.ListEgressRequest.newBuilder()) {
             if (roomName != null) {
                 this.roomName = roomName
+            }
+            if (egressId != null) {
+                this.egressId = egressId
+            }
+            if (active != null) {
+                this.active = active
             }
             build()
         }

@@ -1,7 +1,7 @@
 package io.livekit.server
 
 object TestConstants {
-    const val HOST = "http://www.example.com"
-    const val KEY = "example_key"
-    const val SECRET = "example_secret"
+    const val HOST = "http://localhost:7880"
+    const val KEY = "devkey"
+    const val SECRET = "secret"
 }
