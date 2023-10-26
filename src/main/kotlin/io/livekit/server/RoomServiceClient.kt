@@ -30,6 +30,8 @@ class RoomServiceClient(
         nodeId: String? = null,
         metadata: String? = null,
         minPlayoutDelay: Int? = null,
+        maxPlayoutDelay: Int? = null,
+        syncStreams: Boolean? = null,
     ): Call<LivekitModels.Room> {
         val request = with(LivekitRoom.CreateRoomRequest.newBuilder()) {
             this.name = name
@@ -47,6 +49,12 @@ class RoomServiceClient(
             }
             if (minPlayoutDelay != null) {
                 this.minPlayoutDelay = minPlayoutDelay
+            }
+            if (maxPlayoutDelay != null) {
+                this.maxPlayoutDelay = maxPlayoutDelay
+            }
+            if (syncStreams != null) {
+                this.syncStreams = syncStreams
             }
             build()
         }
