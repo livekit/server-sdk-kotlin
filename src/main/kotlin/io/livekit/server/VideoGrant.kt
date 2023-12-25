@@ -53,12 +53,12 @@ class RoomName(value: String) : VideoGrant("room", value)
 class CanPublish(value: Boolean) : VideoGrant("canPublish", value)
 
 /**
- * allow participant to publish data to the room
+ * allow participant to subscribe to the room
  */
 class CanSubscribe(value: Boolean) : VideoGrant("canSubscribe", value)
 
 /**
- * allow participant to subscribe to tracks
+ * allow participant to publish data to tracks
  */
 class CanPublishData(value: Boolean) : VideoGrant("canPublishData", value)
 
