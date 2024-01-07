@@ -63,7 +63,7 @@ public class Main {
   public static void main(String[] args) throws IOException {
 
     RoomServiceClient client = RoomServiceClient.create(
-            "http://example.com", 
+            "http://example.com",
             "apiKey",
             "secret");
 
@@ -97,7 +97,7 @@ System.out.println("New access token: " + token.toJwt())
 ```
 
 By default, tokens expire 6 hours after generation. You may override this by using `token.setTtl(long millis)`.
-    
+
 <!--BEGIN_REPO_NAV-->
 <br/><table>
 <thead><tr><th colspan="2">LiveKit Ecosystem</th></tr></thead>
