@@ -27,6 +27,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.5.0"
     id("io.codearte.nexus-staging") version "0.30.0"
     id("com.google.protobuf") version "0.8.19"
+    id("com.diffplug.spotless") version "6.21.0"
 }
 
 
@@ -41,18 +42,54 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+spotless {
+    // optional: limit format enforcement to just the files changed by this feature branch
+    ratchetFrom("origin/main")
+
+    format("misc") {
+        // define the files to apply `misc` to
+        target("*.gradle", "*.md", ".gitignore")
+
+        // define the steps to apply to those files
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    java {
+        // apply a specific flavor of google-java-format
+        googleJavaFormat("1.17.0").aosp().reflowLongStrings()
+        // fix formatting of type annotations
+        formatAnnotations()
+        // make sure every file has the following copyright header.
+        // optionally, Spotless can set copyright years by digging
+        // through git history (see "license" section below)
+        licenseHeaderFile(rootProject.file("LicenseHeaderFile.txt"))
+        removeUnusedImports()
+        toggleOffOn()
+    }
+    kotlin {
+        target("src/*/java/**/*.kt", "src/*/kotlin/**/*.kt")
+        ktlint("0.50.0")
+            .setEditorConfigPath("$rootDir/.editorconfig")
+        licenseHeaderFile(rootProject.file("LicenseHeaderFile.txt"))
+            .named("license")
+        endWithNewline()
+        toggleOffOn()
+    }
+}
+
 val protoc_platform: String? by project
 val protoSrc = arrayOf(
-        "$projectDir/protocol/livekit_analytics.proto",
-        "$projectDir/protocol/livekit_egress.proto",
-        "$projectDir/protocol/livekit_ingress.proto",
-        "$projectDir/protocol/livekit_internal.proto",
-        "$projectDir/protocol/livekit_models.proto",
-        "$projectDir/protocol/livekit_room.proto",
-        "$projectDir/protocol/livekit_rpc_internal.proto",
-        "$projectDir/protocol/livekit_rtc.proto",
-        "$projectDir/protocol/livekit_webhook.proto",
-    )
+    "$projectDir/protocol/livekit_analytics.proto",
+    "$projectDir/protocol/livekit_egress.proto",
+    "$projectDir/protocol/livekit_ingress.proto",
+    "$projectDir/protocol/livekit_internal.proto",
+    "$projectDir/protocol/livekit_models.proto",
+    "$projectDir/protocol/livekit_room.proto",
+    "$projectDir/protocol/livekit_rpc_internal.proto",
+    "$projectDir/protocol/livekit_rtc.proto",
+    "$projectDir/protocol/livekit_webhook.proto",
+)
 val protobufVersion = "3.21.7"
 val protobufDep = "com.google.protobuf:protobuf-java:$protobufVersion"
 protobuf {
