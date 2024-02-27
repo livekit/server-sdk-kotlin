@@ -33,6 +33,7 @@ class EgressServiceClientTest {
             fileOutput = LivekitEgress.EncodedFileOutput.getDefaultInstance(),
             streamOutput = LivekitEgress.StreamOutput.getDefaultInstance(),
             segmentOutput = LivekitEgress.SegmentedFileOutput.getDefaultInstance(),
+            imageOutput = LivekitEgress.ImageOutput.getDefaultInstance(),
         )
     }
 
@@ -78,6 +79,14 @@ class EgressServiceClientTest {
     }
 
     @Test
+    fun startRoomCompositeEgressImage() {
+        client.startRoomCompositeEgress(
+            roomName = "room",
+            output = LivekitEgress.ImageOutput.getDefaultInstance()
+        )
+    }
+
+    @Test
     fun startRoomCompositeEgressEncodedOutputs() {
         client.startRoomCompositeEgress(
             roomName = "room",
@@ -116,6 +125,16 @@ class EgressServiceClientTest {
     }
 
     @Test
+    fun startTrackCompositeEgressImage() {
+        client.startTrackCompositeEgress(
+            roomName = "room",
+            output = LivekitEgress.ImageOutput.getDefaultInstance(),
+            audioTrackId = "audio",
+            videoTrackId = "video",
+        )
+    }
+
+    @Test
     fun startTrackCompositeEgressEncodedOutputs() {
         client.startTrackCompositeEgress(
             roomName = "room",
@@ -146,6 +165,14 @@ class EgressServiceClientTest {
         client.startWebEgress(
             url = "http://www.example.com",
             output = LivekitEgress.StreamOutput.getDefaultInstance(),
+        )
+    }
+
+    @Test
+    fun startWebEgressImage() {
+        client.startWebEgress(
+            url = "http://www.example.com",
+            output = LivekitEgress.ImageOutput.getDefaultInstance(),
         )
     }
 
