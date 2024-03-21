@@ -12,6 +12,8 @@ local.properties
 .idea/kotlinc.xml
 .idea/kotlinScripting.xml
 .idea/libraries/
+.idea/migrations.xml
+.idea/**/gradle.xml
 *.iws
 *.iml
 *.ipr

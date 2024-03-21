@@ -11,7 +11,7 @@ buildscript {
     dependencies {
         classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.19")
         classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0")
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.5.0")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.9.20")
     }
 }
 
@@ -21,10 +21,10 @@ repositories {
 apply(from = "gradle/gradle-mvn-push.gradle")
 
 plugins {
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version "1.9.0"
     `maven-publish`
     `java-library`
-    id("org.jetbrains.dokka") version "1.5.0"
+    id("org.jetbrains.dokka") version "1.9.20"
     id("io.codearte.nexus-staging") version "0.30.0"
     id("com.google.protobuf") version "0.8.19"
     id("com.diffplug.spotless") version "6.21.0"
