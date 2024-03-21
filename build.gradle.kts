@@ -80,15 +80,15 @@ spotless {
 
 val protoc_platform: String? by project
 val protoSrc = arrayOf(
-    "$projectDir/protocol/livekit_analytics.proto",
-    "$projectDir/protocol/livekit_egress.proto",
-    "$projectDir/protocol/livekit_ingress.proto",
-    "$projectDir/protocol/livekit_internal.proto",
-    "$projectDir/protocol/livekit_models.proto",
-    "$projectDir/protocol/livekit_room.proto",
-    "$projectDir/protocol/livekit_rpc_internal.proto",
-    "$projectDir/protocol/livekit_rtc.proto",
-    "$projectDir/protocol/livekit_webhook.proto",
+    "$projectDir/protocol/protobufs/livekit_analytics.proto",
+    "$projectDir/protocol/protobufs/livekit_egress.proto",
+    "$projectDir/protocol/protobufs/livekit_ingress.proto",
+    "$projectDir/protocol/protobufs/livekit_internal.proto",
+    "$projectDir/protocol/protobufs/livekit_models.proto",
+    "$projectDir/protocol/protobufs/livekit_room.proto",
+    "$projectDir/protocol/protobufs/livekit_rpc_internal.proto",
+    "$projectDir/protocol/protobufs/livekit_rtc.proto",
+    "$projectDir/protocol/protobufs/livekit_webhook.proto",
 )
 val protobufVersion = "3.21.7"
 val protobufDep = "com.google.protobuf:protobuf-java:$protobufVersion"
