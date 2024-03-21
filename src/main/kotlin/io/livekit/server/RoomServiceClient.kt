@@ -48,6 +48,7 @@ class RoomServiceClient(
         minPlayoutDelay: Int? = null,
         maxPlayoutDelay: Int? = null,
         syncStreams: Boolean? = null,
+        departureTimeout: Int? = null,
     ): Call<LivekitModels.Room> {
         val request = with(LivekitRoom.CreateRoomRequest.newBuilder()) {
             this.name = name
@@ -71,6 +72,9 @@ class RoomServiceClient(
             }
             if (syncStreams != null) {
                 this.syncStreams = syncStreams
+            }
+            if (departureTimeout != null) {
+                this.departureTimeout = departureTimeout
             }
             build()
         }
