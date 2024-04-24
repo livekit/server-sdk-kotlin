@@ -42,6 +42,7 @@ class IngressServiceClient(
         audioOptions: LivekitIngress.IngressAudioOptions? = null,
         videoOptions: LivekitIngress.IngressVideoOptions? = null,
         bypassTranscoding: Boolean? = null,
+        enableTranscoding: Boolean? = null,
         url: String? = null,
     ): Call<LivekitIngress.IngressInfo> {
         val request = with(LivekitIngress.CreateIngressRequest.newBuilder()) {
@@ -62,6 +63,10 @@ class IngressServiceClient(
 
             if (bypassTranscoding != null) {
                 this.bypassTranscoding = bypassTranscoding
+            }
+
+            if (enableTranscoding != null) {
+                this.enableTranscoding = enableTranscoding
             }
 
             if (url != null) {
@@ -94,6 +99,7 @@ class IngressServiceClient(
         audioOptions: LivekitIngress.IngressAudioOptions? = null,
         videoOptions: LivekitIngress.IngressVideoOptions? = null,
         bypassTranscoding: Boolean? = null,
+        enableTranscoding: Boolean? = null,
     ): Call<LivekitIngress.IngressInfo> {
         val request = with(LivekitIngress.UpdateIngressRequest.newBuilder()) {
             this.ingressId = ingressID
@@ -112,6 +118,10 @@ class IngressServiceClient(
 
             if (bypassTranscoding != null) {
                 this.bypassTranscoding = bypassTranscoding
+            }
+
+            if (enableTranscoding != null) {
+                this.enableTranscoding = enableTranscoding
             }
 
             if (participantName != null) {
