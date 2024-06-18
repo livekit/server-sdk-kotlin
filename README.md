@@ -27,7 +27,7 @@ This SDK is available as a Maven package through [Maven Central](https://search.
     <dependency>
         <groupId>io.livekit</groupId>
         <artifactId>livekit-server</artifactId>
-        <version>0.5.10</version>
+        <version>0.6.0</version>
     </dependency>
 </dependencies>
 ```
@@ -36,7 +36,7 @@ This SDK is available as a Maven package through [Maven Central](https://search.
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'io.livekit:livekit-server:0.5.10'
+    implementation 'io.livekit:livekit-server:0.6.0'
 }
 ```
 
