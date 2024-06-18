@@ -8,7 +8,7 @@
 
 <!--END_BANNER_IMAGE-->
 
-# server-sdk-kotlin
+# LiveKit Server SDK for Kotlin
 
 <!--BEGIN_DESCRIPTION-->
 Use this SDK to manage <a href="https://livekit.io/">LiveKit</a> rooms and create access tokens from your Kotlin backend.
