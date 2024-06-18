@@ -17,15 +17,17 @@
 package io.livekit.server
 
 import com.google.protobuf.ByteString
+import io.livekit.server.okhttp.OkHttpFactory
+import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitModels
 import livekit.LivekitRoom
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
 import java.util.function.Consumer
+import java.util.function.Supplier
 
 class RoomServiceClient(
     private val service: RoomService,
@@ -322,6 +324,13 @@ class RoomServiceClient(
          * @param okHttpConfigurator provide this if you wish to customize the http client
          * (e.g. proxy, timeout, certificate/auth settings).
          */
+        @Deprecated(
+            "Use RoomServiceClient.createClient()",
+            ReplaceWith(
+                "RoomServiceClient.createClient(host, apiKey, secret, OkHttpFactory(logging, okHttpConfigurator))",
+                "import io.livekit.server.okhttp.OkHttpFactory",
+            )
+        )
         @JvmStatic
         @JvmOverloads
         fun create(
@@ -331,15 +340,36 @@ class RoomServiceClient(
             logging: Boolean = false,
             okHttpConfigurator: Consumer<OkHttpClient.Builder>? = null
         ): RoomServiceClient {
-            val okhttp = with(OkHttpClient.Builder()) {
-                if (logging) {
-                    val loggingInterceptor = HttpLoggingInterceptor()
-                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-                    addInterceptor(loggingInterceptor)
-                }
-                okHttpConfigurator?.accept(this)
-                build()
-            }
+            return createClient(
+                host = host,
+                apiKey = apiKey,
+                secret = secret,
+                okHttpSupplier = OkHttpFactory(
+                    logging = logging,
+                    okHttpConfigurator = okHttpConfigurator,
+                )
+            )
+        }
+
+        /**
+         * Create a RoomServiceClient.
+         *
+         * @param okHttpSupplier provide an [OkHttpFactory] if you wish to customize the http client
+         * (e.g. proxy, timeout, certificate/auth settings), or supply your own OkHttpClient
+         * altogether to pool resources with [OkHttpHolder].
+         *
+         * @see OkHttpHolder
+         * @see OkHttpFactory
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun createClient(
+            host: String,
+            apiKey: String,
+            secret: String,
+            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory()
+        ): RoomServiceClient {
+            val okhttp = okHttpSupplier.get()
             val service = Retrofit.Builder()
                 .baseUrl(host)
                 .addConverterFactory(ProtoConverterFactory.create())

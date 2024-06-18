@@ -16,6 +16,7 @@
 
 package io.livekit.server
 
+import io.livekit.server.okhttp.OkHttpFactory
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -33,7 +34,7 @@ class IngressServiceClientTest {
 
     @BeforeTest
     fun setup() {
-        client = IngressServiceClient.create(HOST, KEY, SECRET, true)
+        client = IngressServiceClient.createClient(HOST, KEY, SECRET, OkHttpFactory(true))
     }
 
     @Test

@@ -16,8 +16,13 @@
 
 package io.livekit.server
 
+import io.livekit.server.okhttp.OkHttpFactory
 import livekit.LivekitModels
-import kotlin.test.*
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class RoomServiceClientTest {
 
@@ -34,7 +39,7 @@ class RoomServiceClientTest {
 
     @BeforeTest
     fun setup() {
-        client = RoomServiceClient.create(HOST, KEY, SECRET, true)
+        client = RoomServiceClient.createClient(HOST, KEY, SECRET, OkHttpFactory(true, null))
     }
 
     @Test
