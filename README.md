@@ -66,7 +66,7 @@ import retrofit2.Response;
 public class Main {
   public static void main(String[] args) throws IOException {
 
-    RoomServiceClient client = RoomServiceClient.create(
+    RoomServiceClient client = RoomServiceClient.createClient(
             "http://example.com",
             "apiKey",
             "secret");
