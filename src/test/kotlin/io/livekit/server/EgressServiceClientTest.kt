@@ -16,6 +16,7 @@
 
 package io.livekit.server
 
+import io.livekit.server.okhttp.OkHttpFactory
 import livekit.LivekitEgress
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -41,7 +42,7 @@ class EgressServiceClientTest {
 
     @BeforeTest
     fun setup() {
-        client = EgressServiceClient.create(HOST, KEY, SECRET, true)
+        client = EgressServiceClient.createClient(HOST, KEY, SECRET, OkHttpFactory(true))
     }
 
     @Test

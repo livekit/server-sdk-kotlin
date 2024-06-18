@@ -31,7 +31,7 @@ class WebhookReceiverTest {
         val testSecret = "ababababababababababababababababababababababababababababababa"
 
         val token = AccessToken(testApiKey, testSecret)
-        token.sha256 = "CoEQz1chqJ9bnZRcORddjplkvpjmPujmLTR42DbefYI="
+        token.sha256 = "1renMMRYeCXsy6M9bjJ90XA3M1q1byhUGNoD91aPuhM="
         val jwt = token.toJwt()
 
         val receiver = WebhookReceiver(testApiKey, testSecret)

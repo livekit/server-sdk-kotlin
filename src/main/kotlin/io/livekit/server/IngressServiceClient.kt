@@ -16,13 +16,15 @@
 
 package io.livekit.server
 
+import io.livekit.server.okhttp.OkHttpFactory
+import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitIngress
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import java.util.function.Supplier
 
 class IngressServiceClient(
     private val service: IngressService,
@@ -185,18 +187,46 @@ class IngressServiceClient(
     }
 
     companion object {
-
+        /**
+         * Create an IngressServiceClient.
+         */
+        @Deprecated(
+            "Use IngressServiceClient.createClient()",
+            ReplaceWith(
+                "IngressServiceClient.createClient(host, apiKey, secret, OkHttpFactory(logging))",
+                "import io.livekit.server.okhttp.OkHttpFactory",
+            )
+        )
         @JvmStatic
         @JvmOverloads
         fun create(host: String, apiKey: String, secret: String, logging: Boolean = false): IngressServiceClient {
-            val okhttp = with(OkHttpClient.Builder()) {
-                if (logging) {
-                    val loggingInterceptor = HttpLoggingInterceptor()
-                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-                    addInterceptor(loggingInterceptor)
-                }
-                build()
-            }
+            return createClient(
+                host = host,
+                apiKey = apiKey,
+                secret = secret,
+                okHttpSupplier = OkHttpFactory(logging = logging)
+            )
+        }
+
+        /**
+         * Create an IngressServiceClient.
+         *
+         * @param okHttpSupplier provide an [OkHttpFactory] if you wish to customize the http client
+         * (e.g. proxy, timeout, certificate/auth settings), or supply your own OkHttpClient
+         * altogether to pool resources with [OkHttpHolder].
+         *
+         * @see OkHttpHolder
+         * @see OkHttpFactory
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun createClient(
+            host: String,
+            apiKey: String,
+            secret: String,
+            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory()
+        ): IngressServiceClient {
+            val okhttp = okHttpSupplier.get()
 
             val service = Retrofit.Builder()
                 .baseUrl(host)

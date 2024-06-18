@@ -16,13 +16,15 @@
 
 package io.livekit.server
 
+import io.livekit.server.okhttp.OkHttpFactory
+import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitEgress
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import java.util.function.Supplier
 
 data class EncodedOutputs(
     val fileOutput: LivekitEgress.EncodedFileOutput?,
@@ -681,17 +683,49 @@ class EgressServiceClient(
 
     companion object {
 
+        @Deprecated(
+            "Use EgressServiceClient.createClient()",
+            ReplaceWith(
+                "EgressServiceClient.createClient(host, apiKey, secret, OkHttpFactory(logging))",
+                "import io.livekit.server.okhttp.OkHttpFactory",
+                "io.livekit.server.IngressServiceClient.createClient"
+            )
+        )
         @JvmStatic
         @JvmOverloads
-        fun create(host: String, apiKey: String, secret: String, logging: Boolean = false): EgressServiceClient {
-            val okhttp = with(OkHttpClient.Builder()) {
-                if (logging) {
-                    val loggingInterceptor = HttpLoggingInterceptor()
-                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-                    addInterceptor(loggingInterceptor)
-                }
-                build()
-            }
+        fun create(
+            host: String,
+            apiKey: String,
+            secret: String,
+            logging: Boolean = false
+        ): EgressServiceClient {
+            return createClient(
+                host = host,
+                apiKey = apiKey,
+                secret = secret,
+                okHttpSupplier = OkHttpFactory(logging = logging)
+            )
+        }
+
+        /**
+         * Create an EgressServiceClient.
+         *
+         * @param okHttpSupplier provide an [OkHttpFactory] if you wish to customize the http client
+         * (e.g. proxy, timeout, certificate/auth settings), or supply your own OkHttpClient
+         * altogether to pool resources with [OkHttpHolder].
+         *
+         * @see OkHttpHolder
+         * @see OkHttpFactory
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun createClient(
+            host: String,
+            apiKey: String,
+            secret: String,
+            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory()
+        ): EgressServiceClient {
+            val okhttp = okHttpSupplier.get()
 
             val service = Retrofit.Builder()
                 .baseUrl(host)
