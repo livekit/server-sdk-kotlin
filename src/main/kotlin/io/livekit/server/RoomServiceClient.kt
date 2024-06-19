@@ -290,6 +290,7 @@ class RoomServiceClient(
         kind: LivekitModels.DataPacket.Kind,
         destinationSids: List<String> = emptyList(),
         destinationIdentities: List<String> = emptyList(),
+        topic: String? = null,
     ): Call<Void> {
         val request = with(LivekitRoom.SendDataRequest.newBuilder()) {
             this.room = roomName
@@ -297,6 +298,9 @@ class RoomServiceClient(
             this.kind = kind
             addAllDestinationSids(destinationSids)
             addAllDestinationIdentities(destinationIdentities)
+            if (topic != null) {
+                this.topic = topic
+            }
             build()
         }
 
