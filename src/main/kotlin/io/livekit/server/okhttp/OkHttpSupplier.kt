@@ -15,7 +15,9 @@ class OkHttpHolder(val okHttp: OkHttpClient) : Supplier<OkHttpClient> {
 /**
  * Lazily creates and caches an [OkHttpClient] object.
  */
-class OkHttpFactory(
+class OkHttpFactory
+@JvmOverloads
+constructor(
     /**
      * When set to true, turns on body level logging.
      */
