@@ -19,6 +19,7 @@ package io.livekit.server
 import io.livekit.server.okhttp.OkHttpFactory
 import livekit.LivekitModels
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -98,6 +99,21 @@ class RoomServiceClientTest {
         assertTrue(response.isSuccessful)
         assertNotNull(participants)
         assertEquals(0, participants.size)
+    }
+
+    @Test
+    @Ignore("Requires manual participant")
+    fun updateParticipant() {
+        val participants = client.listParticipants(ROOM_NAME).execute().body()
+        if (participants != null) {
+            val participant = participants.first()
+
+            val newMetadata = "new_metadata"
+            val response = client.updateParticipant(ROOM_NAME, participant.identity, metadata = newMetadata).execute()
+            val updatedParticipant = response.body()!!
+            assertTrue(response.isSuccessful)
+            assertEquals(newMetadata, updatedParticipant.metadata)
+        }
     }
 
     @Test
