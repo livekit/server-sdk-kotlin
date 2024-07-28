@@ -41,7 +41,7 @@ interface RoomService {
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.RoomService/DeleteRoom")
-    fun deleteRoom(@Body request: LivekitRoom.DeleteRoomRequest, @Header("Authorization") authorization: String): Call<Void>
+    fun deleteRoom(@Body request: LivekitRoom.DeleteRoomRequest, @Header("Authorization") authorization: String): Call<Void?>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.RoomService/UpdateRoomMetadata")
@@ -66,7 +66,7 @@ interface RoomService {
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.RoomService/RemoveParticipant")
-    fun removeParticipant(@Body request: LivekitRoom.RoomParticipantIdentity, @Header("Authorization") authorization: String): Call<Void>
+    fun removeParticipant(@Body request: LivekitRoom.RoomParticipantIdentity, @Header("Authorization") authorization: String): Call<Void?>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.RoomService/MutePublishedTrack")
@@ -87,9 +87,9 @@ interface RoomService {
     fun updateSubscriptions(
         @Body request: LivekitRoom.UpdateSubscriptionsRequest,
         @Header("Authorization") authorization: String
-    ): Call<Void>
+    ): Call<Void?>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.RoomService/SendData")
-    fun sendData(@Body request: LivekitRoom.SendDataRequest, @Header("Authorization") authorization: String): Call<Void>
+    fun sendData(@Body request: LivekitRoom.SendDataRequest, @Header("Authorization") authorization: String): Call<Void?>
 }
