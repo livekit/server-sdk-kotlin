@@ -19,7 +19,7 @@ package io.livekit.server
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.Date
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -39,9 +39,11 @@ class AccessTokenTest {
         token.identity = "identity"
         token.metadata = "metadata"
         token.sha256 = "gfedcba"
+        token.attributes["key"] = "value"
 
         token.addGrants(RoomName("room_name"))
         token.addGrants(CanPublishSources(listOf("camera", "microphone")))
+        token.addSIPGrants(SIPAdmin(true))
 
         val jwt = token.toJwt()
 
@@ -59,10 +61,15 @@ class AccessTokenTest {
         assertEquals(token.metadata, claims["metadata"]?.asString())
         assertEquals(token.sha256, claims["sha256"]?.asString())
         assertEquals(token.expiration, decodedJWT.expiresAt)
+        assertEquals(token.attributes["key"], claims["attributes"]?.asMap()?.get("key"))
 
         val videoGrants = claims["video"]?.asMap()
         assertNotNull(videoGrants)
         assertEquals("room_name", videoGrants["room"])
         assertEquals(listOf("camera", "microphone"), videoGrants["canPublishSources"])
+
+        val sipGrants = claims["sip"]?.asMap()
+        assertNotNull(sipGrants)
+        assertEquals(true, sipGrants["admin"])
     }
 }

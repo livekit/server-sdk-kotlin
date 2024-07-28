@@ -20,7 +20,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
 import java.time.Instant
-import java.util.*
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 /**
@@ -36,6 +36,7 @@ class AccessToken(
     private val secret: String
 ) {
     private val videoGrants = mutableSetOf<VideoGrant>()
+    private val sipGrants = mutableSetOf<SIPGrant>()
 
     /**
      * Amount of time in milliseconds the created token is valid for.
@@ -79,6 +80,11 @@ class AccessToken(
     var sha256: String? = null
 
     /**
+     * Key/value attributes to attach to the participant
+     */
+    val attributes = mutableMapOf<String, String>()
+
+    /**
      * Add [VideoGrant] to this token.
      */
     fun addGrants(vararg grants: VideoGrant) {
@@ -96,8 +102,36 @@ class AccessToken(
         }
     }
 
+    /**
+     * Clear all previously added [VideoGrant]s.
+     */
     fun clearGrants() {
         videoGrants.clear()
+    }
+
+    /**
+     * Add [VideoGrant] to this token.
+     */
+    fun addSIPGrants(vararg grants: SIPGrant) {
+        for (grant in grants) {
+            sipGrants.add(grant)
+        }
+    }
+
+    /**
+     * Add [VideoGrant] to this token.
+     */
+    fun addSIPGrants(grants: Iterable<SIPGrant>) {
+        for (grant in grants) {
+            sipGrants.add(grant)
+        }
+    }
+
+    /**
+     * Clear all previously added [SIPGrant]s.
+     */
+    fun clearSIPGrants() {
+        sipGrants.clear()
     }
 
     fun toJwt(): String {
@@ -127,13 +161,20 @@ class AccessToken(
             }
             val claimsMap = mutableMapOf<String, Any>()
             val videoGrantsMap = videoGrants.associate { grant -> grant.toPair() }
+            val sipGrantsMap = sipGrants.associate { grant -> grant.toPair() }
 
             name?.let { claimsMap["name"] = it }
             metadata?.let { claimsMap["metadata"] = it }
             sha256?.let { claimsMap["sha256"] = it }
+            attributes.toMap().let { attributesCopy ->
+                if (attributesCopy.isNotEmpty()) {
+                    claimsMap["attributes"] = attributesCopy
+                }
+            }
             claimsMap["video"] = videoGrantsMap
+            claimsMap["sip"] = sipGrantsMap
 
-            claimsMap.forEach { key, value ->
+            claimsMap.forEach { (key, value) ->
                 withClaimAny(key, value)
             }
 

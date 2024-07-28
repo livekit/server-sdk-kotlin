@@ -109,3 +109,8 @@ class Hidden(value: Boolean) : VideoGrant("hidden", value)
  * indicates this participant is recording the room
  */
 class Recorder(value: Boolean) : VideoGrant("recorder", value)
+
+/**
+ * indicates this participant is allowed to connect to LiveKit as an Agent Framework worker
+ */
+class Agent(value: Boolean) : VideoGrant("agent", value)
