@@ -103,7 +103,7 @@ class RoomServiceClient(
         }
     }
 
-    fun deleteRoom(roomName: String): Call<Void> {
+    fun deleteRoom(roomName: String): Call<Void?> {
         val request = LivekitRoom.DeleteRoomRequest.newBuilder()
             .setRoom(roomName)
             .build()
@@ -170,7 +170,7 @@ class RoomServiceClient(
      * @param roomName
      * @param identity
      */
-    fun removeParticipant(roomName: String, identity: String): Call<Void> {
+    fun removeParticipant(roomName: String, identity: String): Call<Void?> {
         val request = LivekitRoom.RoomParticipantIdentity.newBuilder()
             .setRoom(roomName)
             .setIdentity(identity)
@@ -260,7 +260,7 @@ class RoomServiceClient(
         identity: String,
         trackSids: List<String>,
         subscribe: Boolean,
-    ): Call<Void> {
+    ): Call<Void?> {
         val request = with(LivekitRoom.UpdateSubscriptionsRequest.newBuilder()) {
             this.room = roomName
             this.identity = identity
@@ -291,7 +291,7 @@ class RoomServiceClient(
         destinationSids: List<String> = emptyList(),
         destinationIdentities: List<String> = emptyList(),
         topic: String? = null,
-    ): Call<Void> {
+    ): Call<Void?> {
         val request = with(LivekitRoom.SendDataRequest.newBuilder()) {
             this.room = roomName
             this.data = ByteString.copyFrom(data)
