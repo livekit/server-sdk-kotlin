@@ -217,6 +217,9 @@ class RoomServiceClient(
      * @param name optional, participant name to update
      * @param metadata optional, metadata to update
      * @param participantPermission optional, new permissions to assign to participant
+     * @param attributes attributes to update. It will make updates only to keys that
+     * are present in [attributes], and will not override others. To delete a value, 
+     * set the value to an empty string.
      */
     @JvmOverloads
     fun updateParticipant(
