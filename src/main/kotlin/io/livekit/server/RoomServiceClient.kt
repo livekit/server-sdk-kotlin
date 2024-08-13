@@ -217,6 +217,9 @@ class RoomServiceClient(
      * @param name optional, participant name to update
      * @param metadata optional, metadata to update
      * @param participantPermission optional, new permissions to assign to participant
+     * @param attributes attributes to update. It will make updates only to keys that
+     * are present in [attributes], and will not override others. To delete a value, 
+     * set the value to an empty string.
      */
     @JvmOverloads
     fun updateParticipant(
@@ -225,6 +228,7 @@ class RoomServiceClient(
         name: String? = null,
         metadata: String? = null,
         participantPermission: LivekitModels.ParticipantPermission? = null,
+        attributes: Map<String, String>? = null,
     ): Call<LivekitModels.ParticipantInfo> {
         val request = with(LivekitRoom.UpdateParticipantRequest.newBuilder()) {
             this.room = roomName
@@ -238,6 +242,10 @@ class RoomServiceClient(
             if (participantPermission != null) {
                 this.permission = participantPermission
             }
+            if (attributes != null) {
+                this.putAllAttributes(attributes)
+            }
+
             build()
         }
 

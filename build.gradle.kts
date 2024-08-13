@@ -80,6 +80,8 @@ spotless {
 
 val protoc_platform: String? by project
 val protoSrc = arrayOf(
+    "$projectDir/protocol/protobufs/livekit_agent.proto",
+    "$projectDir/protocol/protobufs/livekit_agent_dispatch.proto",
     "$projectDir/protocol/protobufs/livekit_analytics.proto",
     "$projectDir/protocol/protobufs/livekit_egress.proto",
     "$projectDir/protocol/protobufs/livekit_ingress.proto",
