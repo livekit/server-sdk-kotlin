@@ -40,11 +40,6 @@ dependencies {
 }
 ```
 
-Development snapshots are available through Sonatype: `https://s01.oss.sonatype.org/content/repositories/snapshots/`
-
-The current snapshot `VERSION_NAME` can be found in the root
-folder's [gradle.properties](https://github.com/livekit/server-sdk-kotlin/blob/main/gradle.properties).
-
 ## Usage
 
 ### Server API Access
