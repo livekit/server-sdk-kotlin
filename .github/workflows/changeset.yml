@@ -100,5 +100,5 @@ jobs:
     - name: Publish to sonatype
       run: ./gradlew publish
       
-    # - name: Close and release to maven
-    #   run: ./gradlew closeAndReleaseRepository
+    - name: Close and release to maven
+      run: ./gradlew closeAndReleaseRepository
