@@ -42,7 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.CHANGESET_GH_TOKEN }}
     outputs:
-      hasPublishedKotlin: ${{ steps.changesets.outputs.published == 'true' && contains(fromJson(steps.changesets.outputs.publishedPackages).*.name, 'kotlin') }}
+      hasPublishedKotlin: ${{ steps.changesets.outputs.published == 'true' }}
 
   debug-outputs:
     needs: release
@@ -51,6 +51,7 @@ jobs:
     steps:
       - name: "echo outputs"
         run: |
+          echo ${{ steps.changesets.outputs.publishedPackages }}
           echo ${{ needs.release.outputs.hasPublishedKotlin }}
 
   publish-kotlin:
