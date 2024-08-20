@@ -13,7 +13,6 @@
   "scripts": {
     "changeset": "changeset",
     "ci:publish": "changeset publish",
-    "ci:version": "changeset version && ./scripts/update_android_gradle_version.sh",
-    "release": "yarn build && changeset publish"
+    "ci:version": "changeset version && ./scripts/update_android_gradle_version.sh"
   }
 }

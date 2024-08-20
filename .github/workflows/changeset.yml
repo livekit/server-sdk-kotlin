@@ -37,7 +37,7 @@ jobs:
           version: pnpm ci:version
           publish: pnpm ci:publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CHANGESET_GH_TOKEN }}
     outputs:
       hasPublishedKotlin: ${{ steps.changesets.outputs.published == 'true' && contains(fromJson(steps.changesets.outputs.publishedPackages).*.name, 'kotlin') }}
 
