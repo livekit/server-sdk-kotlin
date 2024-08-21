@@ -1,5 +1,9 @@
 # Releasing
 
+1. Approve and merge the changeset PR.
+2. Confirm that the `publish` github action is completed successfully.
+
+## Old instructions
 1. In the top-level gradle.properties file, update the `VERSION_NAME` property. This will usually just be removing the `-SNAPSHOT` suffix.
 1. Commit and push changes.
 1. Tag the release: `git tag v[VERSION_NAME]`. Make sure there is a `v` prefix at the front of the tag. This indicates to the CI that this is a release tag.
