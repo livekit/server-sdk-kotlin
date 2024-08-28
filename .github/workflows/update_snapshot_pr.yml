@@ -1,0 +1,36 @@
+name: Manually create SNAPSHOT update PR
+
+on:
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-snapshot:
+    name: Update SNAPSHOT
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Update snapshot
+        id: update
+        run: echo "SNAPSHOT_VERSION=$(./ci/update_snapshot_version.sh)" >> "$GITHUB_OUTPUT"
+
+      - name: Log version
+        env:
+          SNAPSHOT_VERSION: ${{ steps.update.outputs.SNAPSHOT_VERSION }}
+        run: echo $SNAPSHOT_VERSION
+
+      - name: Create Update SNAPSHOT Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.CHANGESET_GH_TOKEN }}
+          branch: dl/update_snapshot_ver
+          title: Prepare snapshot version ${{ steps.update.outputs.SNAPSHOT_VERSION }}
+          commit-message: Prepare snapshot version ${{ steps.update.outputs.SNAPSHOT_VERSION }}
