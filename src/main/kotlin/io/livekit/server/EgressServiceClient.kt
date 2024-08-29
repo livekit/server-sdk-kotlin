@@ -33,6 +33,11 @@ data class EncodedOutputs(
     val imageOutput: LivekitEgress.ImageOutput?,
 )
 
+/**
+ * A client for interacting with the Egress service.
+ *
+ * See: [Egress Overview](https://docs.livekit.io/realtime/egress/overview/)
+ */
 class EgressServiceClient(
     private val service: EgressService,
     private val apiKey: String,

@@ -26,6 +26,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
 import java.util.function.Supplier
 
+/**
+ * A client for interacting with the Ingress service.
+ *
+ * See: [Ingress Reference](https://docs.livekit.io/realtime/ingress/overview/)
+ */
 class IngressServiceClient(
     private val service: IngressService,
     private val apiKey: String,

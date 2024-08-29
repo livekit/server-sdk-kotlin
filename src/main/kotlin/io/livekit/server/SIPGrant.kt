@@ -17,15 +17,14 @@
 package io.livekit.server
 
 /**
- * @link https://docs.livekit.io/guides/access-tokens/#video-grant
+ * See: [SIP Grants](https://docs.livekit.io/home/get-started/authentication/#SIP-grant)
  */
 sealed class SIPGrant(val key: String, val value: Any) {
     fun toPair() = key to value
 }
 
-
 /** Can manage sip resources */
-class SIPAdmin(value: Boolean) : SIPGrant("admin", value)
+class SIPAdmin(value: Boolean = true) : SIPGrant("admin", value)
 
 /** Can make outbound calls */
-class SIPCall(value: Boolean) : SIPGrant("call", value)
+class SIPCall(value: Boolean = true) : SIPGrant("call", value)

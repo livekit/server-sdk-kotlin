@@ -72,3 +72,10 @@ internal class TransformCall<T, R>(private val sourceCall: Call<T>, private val 
         }
     }
 }
+
+/**
+ * Inline operator to transform a call's response
+ */
+fun <T, R> Call<T>.withTransform(transform: (T) -> R): Call<R> {
+    return TransformCall(this, transform)
+}

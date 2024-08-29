@@ -16,7 +16,7 @@
 
 package io.livekit.server
 
-import livekit.LivekitEgress
+import livekit.LivekitSip
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -26,68 +26,68 @@ import retrofit2.http.POST
 /**
  * Retrofit Interface for accessing the EgressService Apis.
  */
-interface EgressService {
+interface SipService {
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartRoomCompositeEgress")
-    fun startRoomCompositeEgress(
-        @Body request: LivekitEgress.RoomCompositeEgressRequest,
+    @POST("/twirp/livekit.Egress/CreateSIPInboundTrunk")
+    fun createSipInboundTrunk(
+        @Body request: LivekitSip.CreateSIPInboundTrunkRequest,
         @Header("Authorization") authorization: String
-    ): Call<LivekitEgress.EgressInfo>
+    ): Call<LivekitSip.SIPInboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartParticipantEgress")
-    fun startParticipantEgress(
-        @Body request: LivekitEgress.ParticipantEgressRequest,
+    @POST("/twirp/livekit.Egress/CreateSIPOutboundTrunk")
+    fun createSipOutboundTrunk(
+        @Body request: LivekitSip.CreateSIPOutboundTrunkRequest,
         @Header("Authorization") authorization: String
-    ): Call<LivekitEgress.EgressInfo>
+    ): Call<LivekitSip.SIPOutboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartTrackCompositeEgress")
-    fun startTrackCompositeEgress(
-        @Body request: LivekitEgress.TrackCompositeEgressRequest,
+    @POST("/twirp/livekit.SIP/ListSIPInboundTrunk")
+    fun listSIPInboundTrunk(
+        @Body request: LivekitSip.ListSIPInboundTrunkRequest,
         @Header("Authorization") authorization: String
-    ): Call<LivekitEgress.EgressInfo>
+    ): Call<LivekitSip.ListSIPInboundTrunkResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartTrackEgress")
-    fun startTrackEgress(
-        @Body request: LivekitEgress.TrackEgressRequest,
+    @POST("/twirp/livekit.SIP/ListSIPOutboundTrunk")
+    fun listSipOutboundTrunk(
+        @Body request: LivekitSip.ListSIPOutboundTrunkRequest,
         @Header("Authorization") authorization: String
-    ): Call<LivekitEgress.EgressInfo>
+    ): Call<LivekitSip.ListSIPOutboundTrunkResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartWebEgress")
-    fun startWebEgress(
-        @Body request: LivekitEgress.WebEgressRequest,
+    @POST("/twirp/livekit.SIP/DeleteSIPTrunk")
+    fun deleteSipTrunk(
+        @Body request: LivekitSip.DeleteSIPTrunkRequest,
         @Header("Authorization") authorization: String
-    ): Call<LivekitEgress.EgressInfo>
+    ): Call<LivekitSip.SIPTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/UpdateLayout")
-    fun updateLayout(
-        @Body request: LivekitEgress.UpdateLayoutRequest,
+    @POST("/twirp/livekit.SIP/CreateSIPDispatchRule")
+    fun createSipDispatchRule(
+        @Body request: LivekitSip.CreateSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
-    ): Call<LivekitEgress.EgressInfo>
+    ): Call<LivekitSip.SIPDispatchRuleInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/UpdateStream")
-    fun updateStream(
-        @Body request: LivekitEgress.UpdateStreamRequest,
+    @POST("/twirp/livekit.SIP/ListSIPDispatchRule")
+    fun listSipDispatchRule(
+        @Body request: LivekitSip.ListSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
-    ): Call<LivekitEgress.EgressInfo>
+    ): Call<LivekitSip.ListSIPDispatchRuleResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/ListEgress")
-    fun listEgress(
-        @Body request: LivekitEgress.ListEgressRequest,
+    @POST("/twirp/livekit.SIP/CreateSIPDispatchRule")
+    fun deleteSipDispatchRule(
+        @Body request: LivekitSip.DeleteSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
-    ): Call<LivekitEgress.ListEgressResponse>
+    ): Call<LivekitSip.SIPDispatchRuleInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StopEgress")
-    fun stopEgress(
-        @Body request: LivekitEgress.StopEgressRequest,
+    @POST("/twirp/livekit.SIP/CreateSIPParticipant")
+    fun createSipParticipant(
+        @Body request: LivekitSip.CreateSIPParticipantRequest,
         @Header("Authorization") authorization: String
-    ): Call<LivekitEgress.EgressInfo>
+    ): Call<LivekitSip.SIPParticipantInfo>
 }
