@@ -29,6 +29,11 @@ import retrofit2.converter.protobuf.ProtoConverterFactory
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+/**
+ * A client for interacting managing LiveKit rooms and participants.
+ *
+ * See: [Managing Rooms](https://docs.livekit.io/realtime/server/managing-rooms/)
+ */
 class RoomServiceClient(
     private val service: RoomService,
     private val apiKey: String,
@@ -218,7 +223,7 @@ class RoomServiceClient(
      * @param metadata optional, metadata to update
      * @param participantPermission optional, new permissions to assign to participant
      * @param attributes attributes to update. It will make updates only to keys that
-     * are present in [attributes], and will not override others. To delete a value, 
+     * are present in [attributes], and will not override others. To delete a value,
      * set the value to an empty string.
      */
     @JvmOverloads

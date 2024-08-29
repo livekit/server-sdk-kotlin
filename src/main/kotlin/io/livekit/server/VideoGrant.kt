@@ -17,7 +17,7 @@
 package io.livekit.server
 
 /**
- * @link https://docs.livekit.io/guides/access-tokens/#video-grant
+ * See: [Video Grants](https://docs.livekit.io/home/get-started/authentication/#Video-grant)
  */
 sealed class VideoGrant(val key: String, val value: Any) {
     fun toPair() = key to value
