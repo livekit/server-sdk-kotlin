@@ -20,7 +20,7 @@ jobs:
 
       - name: Update snapshot
         id: update
-        run: echo "SNAPSHOT_VERSION=$(./ci/update_snapshot_version.sh)" >> "$GITHUB_OUTPUT"
+        run: echo "SNAPSHOT_VERSION=$(./scripts/update_snapshot_version.sh)" >> "$GITHUB_OUTPUT"
 
       - name: Log version
         env:
