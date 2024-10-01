@@ -251,6 +251,27 @@ class SipServiceClient(
         return service.createSipParticipant(request, credentials)
     }
 
+    /**
+     * Transfer a LiveKit SIP Participant to a different SIP peer.
+     *
+     * See: [SIP Participant](https://docs.livekit.io/sip/sip-participant/)
+     */
+    fun transferSipParticipant(
+        roomName: String,
+        participantIdentity: String,
+        transferTo: String,
+    ): Call<Void> {
+        val request = with(LivekitSip.TransferSIPParticipantRequest.newBuilder()) {
+            this.roomName = roomName
+            this.participantIdentity = participantIdentity
+            this.transferTo = transferTo
+            build()
+        }
+
+        val credentials = authHeader(listOf(RoomAdmin(true), RoomName(roomName)), listOf(SIPCall()))
+        return service.transferSipParticipant(request, credentials)
+    }
+
     companion object {
         /**
          * Create an SipServiceClient.

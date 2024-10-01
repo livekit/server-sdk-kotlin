@@ -16,6 +16,7 @@
 
 package io.livekit.server
 
+import com.google.protobuf.Empty
 import livekit.LivekitSip
 import retrofit2.Call
 import retrofit2.http.Body
@@ -24,19 +25,19 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 /**
- * Retrofit Interface for accessing the EgressService Apis.
+ * Retrofit Interface for accessing the SipService Apis.
  */
 interface SipService {
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/CreateSIPInboundTrunk")
+    @POST("/twirp/livekit.SIP/CreateSIPInboundTrunk")
     fun createSipInboundTrunk(
         @Body request: LivekitSip.CreateSIPInboundTrunkRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPInboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/CreateSIPOutboundTrunk")
+    @POST("/twirp/livekit.SIP/CreateSIPOutboundTrunk")
     fun createSipOutboundTrunk(
         @Body request: LivekitSip.CreateSIPOutboundTrunkRequest,
         @Header("Authorization") authorization: String
@@ -90,4 +91,13 @@ interface SipService {
         @Body request: LivekitSip.CreateSIPParticipantRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPParticipantInfo>
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.SIP/TransferSIPParticipant")
+    fun transferSipParticipant(
+        @Body request: LivekitSip.TransferSIPParticipant,
+        @Header("Authorization") authorization: String
+    ): Call<Empty:w
+    >
+
 }
