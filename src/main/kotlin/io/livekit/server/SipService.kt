@@ -95,9 +95,8 @@ interface SipService {
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.SIP/TransferSIPParticipant")
     fun transferSipParticipant(
-        @Body request: LivekitSip.TransferSIPParticipant,
+        @Body request: LivekitSip.TransferSIPParticipantRequest,
         @Header("Authorization") authorization: String
-    ): Call<Empty:w
-    >
+    ): Call<Empty>
 
 }

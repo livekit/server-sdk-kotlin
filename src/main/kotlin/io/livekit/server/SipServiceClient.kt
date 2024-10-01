@@ -26,6 +26,7 @@ import livekit.LivekitSip.SIPDispatchRuleIndividual
 import livekit.LivekitSip.SIPDispatchRuleInfo
 import livekit.LivekitSip.SIPParticipantInfo
 import livekit.LivekitSip.SIPTrunkInfo
+import com.google.protobuf.Empty
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -260,7 +261,7 @@ class SipServiceClient(
         roomName: String,
         participantIdentity: String,
         transferTo: String,
-    ): Call<Void> {
+    ): Call<Empty> {
         val request = with(LivekitSip.TransferSIPParticipantRequest.newBuilder()) {
             this.roomName = roomName
             this.participantIdentity = participantIdentity
