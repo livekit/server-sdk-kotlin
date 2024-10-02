@@ -261,7 +261,7 @@ class SipServiceClient(
         roomName: String,
         participantIdentity: String,
         transferTo: String,
-    ): Call<Empty> {
+    ): Call<Void?> {
         val request = with(LivekitSip.TransferSIPParticipantRequest.newBuilder()) {
             this.roomName = roomName
             this.participantIdentity = participantIdentity

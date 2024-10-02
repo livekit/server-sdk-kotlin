@@ -97,6 +97,6 @@ interface SipService {
     fun transferSipParticipant(
         @Body request: LivekitSip.TransferSIPParticipantRequest,
         @Header("Authorization") authorization: String
-    ): Call<Empty>
+    ): Call<Void?>
 
 }
