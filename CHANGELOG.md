@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.8.1
+
+### Patch Changes
+
+- Implement transferSipParticipant - [#83](https://github.com/livekit/server-sdk-kotlin/pull/83) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 0.8.0
 
 ### Minor Changes
