@@ -28,7 +28,7 @@ import retrofit2.Response
 internal class TransformCall<T, R>(private val sourceCall: Call<T>, private val transform: (T) -> R) :
     Call<R> {
     override fun clone(): Call<R> {
-        return TransformCall(sourceCall, transform)
+        return TransformCall(sourceCall.clone(), transform)
     }
 
     override fun execute(): Response<R> {
