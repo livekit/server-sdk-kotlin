@@ -16,7 +16,6 @@
 
 package io.livekit.server
 
-import com.google.protobuf.Empty
 import livekit.LivekitSip
 import retrofit2.Call
 import retrofit2.http.Body
@@ -79,7 +78,7 @@ interface SipService {
     ): Call<LivekitSip.ListSIPDispatchRuleResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/CreateSIPDispatchRule")
+    @POST("/twirp/livekit.SIP/DeleteSIPDispatchRule")
     fun deleteSipDispatchRule(
         @Body request: LivekitSip.DeleteSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
@@ -98,5 +97,4 @@ interface SipService {
         @Body request: LivekitSip.TransferSIPParticipantRequest,
         @Header("Authorization") authorization: String
     ): Call<Void?>
-
 }
