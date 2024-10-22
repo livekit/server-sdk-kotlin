@@ -248,11 +248,13 @@ class SipServiceClient(
                         this.playRingtone = true
                         this.playDialtone = true
                     }
+                }
                 opts.playDialtone?.let {
                     if (it) {
                         this.playRingtone = true
                         this.playDialtone = true
                     }
+                }
             }
             build()
         }
@@ -372,10 +374,10 @@ data class CreateSipParticipantOptions(
     var participantMetadata: String? = null,
     var dtmf: String? = null,
     var playRingtone: Boolean? = null, // deprecated, use playDialtone instead
-    var playDialtone Boolean? = null,
+    var playDialtone: Boolean? = null,
     var hidePhoneNumber: Boolean? = null,
 )
 
 data class TransferSipParticipantOptions(
-    var playDialtone Boolean? = null,
+    var playDialtone: Boolean? = null,
 )
