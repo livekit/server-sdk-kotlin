@@ -26,7 +26,6 @@ import livekit.LivekitSip.SIPDispatchRuleIndividual
 import livekit.LivekitSip.SIPDispatchRuleInfo
 import livekit.LivekitSip.SIPParticipantInfo
 import livekit.LivekitSip.SIPTrunkInfo
-import com.google.protobuf.Empty
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -242,8 +241,19 @@ class SipServiceClient(
                 opts.participantName?.let { this.participantName = it }
                 opts.participantMetadata?.let { this.participantMetadata = it }
                 opts.dtmf?.let { this.dtmf = it }
-                opts.playRingtone?.let { this.playRingtone = it }
                 opts.hidePhoneNumber?.let { this.hidePhoneNumber = it }
+                opts.playRingtone?.let {
+                    if (it) {
+                        this.playRingtone = true
+                        this.playDialtone = true
+                    }
+                }
+                opts.playDialtone?.let {
+                    if (it) {
+                        this.playRingtone = true
+                        this.playDialtone = true
+                    }
+                }
             }
             build()
         }
@@ -261,11 +271,16 @@ class SipServiceClient(
         roomName: String,
         participantIdentity: String,
         transferTo: String,
+        options: TransferSipParticipantOptions? = null,
     ): Call<Void?> {
         val request = with(LivekitSip.TransferSIPParticipantRequest.newBuilder()) {
             this.roomName = roomName
             this.participantIdentity = participantIdentity
             this.transferTo = transferTo
+
+            options?.let { opts ->
+                opts.playDialtone?.let { this.playDialtone = it }
+            }
             build()
         }
 
@@ -357,6 +372,11 @@ data class CreateSipParticipantOptions(
     var participantName: String? = null,
     var participantMetadata: String? = null,
     var dtmf: String? = null,
-    var playRingtone: Boolean? = null,
+    var playRingtone: Boolean? = null, // deprecated, use playDialtone instead
+    var playDialtone: Boolean? = null,
     var hidePhoneNumber: Boolean? = null,
+)
+
+data class TransferSipParticipantOptions(
+    var playDialtone: Boolean? = null,
 )
