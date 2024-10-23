@@ -16,7 +16,6 @@
 
 package io.livekit.server
 
-import com.google.protobuf.Empty
 import livekit.LivekitSip
 import retrofit2.Call
 import retrofit2.http.Body

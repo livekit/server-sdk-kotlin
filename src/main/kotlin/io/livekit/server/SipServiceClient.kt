@@ -26,7 +26,6 @@ import livekit.LivekitSip.SIPDispatchRuleIndividual
 import livekit.LivekitSip.SIPDispatchRuleInfo
 import livekit.LivekitSip.SIPParticipantInfo
 import livekit.LivekitSip.SIPTrunkInfo
-import com.google.protobuf.Empty
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
