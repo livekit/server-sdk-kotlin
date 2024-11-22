@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
  *
  * Once information is filled out, create the token string with [toJwt].
  *
- * https://docs.livekit.io/guides/access-tokens
+ * https://docs.livekit.io/home/get-started/authentication/
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class AccessToken(

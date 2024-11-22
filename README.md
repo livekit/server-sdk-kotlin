@@ -11,16 +11,17 @@
 # LiveKit Server SDK for Kotlin
 
 <!--BEGIN_DESCRIPTION-->
-Use this SDK to interact with <a href="https://livekit.io/">LiveKit</a> server APIs and create access tokens from your Kotlin backend.
-<!--END_DESCRIPTION-->
 
-https://docs.livekit.io/guides/server-api/
+Use this SDK to interact with <a href="https://livekit.io/">LiveKit</a> server APIs and create access tokens from your Kotlin backend.
+
+<!--END_DESCRIPTION-->
 
 ## Installation
 
 This SDK is available as a Maven package through [Maven Central](https://search.maven.org/search?q=g:io.livekit%20a:livekit-server).
 
 ### Maven
+
 ```xml title="pom.xml"
 
 <dependencies>
@@ -77,7 +78,6 @@ public class Main {
 
 `Call` adapters are also available through [Retrofit](https://github.com/square/retrofit/tree/master/retrofit-adapters) for other async constructs such as `CompletableFuture` and RxJava.
 
-
 ### Creating Access Tokens
 
 Access tokens can be generated through the `io.livekit.server.AccessToken` class.
@@ -98,7 +98,9 @@ System.out.println("New access token: " + token.toJwt())
 By default, tokens expire 6 hours after generation. You may override this by using `token.setTtl(long millis)`.
 
 <!--BEGIN_REPO_NAV-->
+
 <br/><table>
+
 <thead><tr><th colspan="2">LiveKit Ecosystem</th></tr></thead>
 <tbody>
 <tr><td>Realtime SDKs</td><td><a href="https://github.com/livekit/components-js">React Components</a> · <a href="https://github.com/livekit/client-sdk-js">Browser</a> · <a href="https://github.com/livekit/components-swift">Swift Components</a> · <a href="https://github.com/livekit/client-sdk-swift">iOS/macOS/visionOS</a> · <a href="https://github.com/livekit/client-sdk-android">Android</a> · <a href="https://github.com/livekit/client-sdk-flutter">Flutter</a> · <a href="https://github.com/livekit/client-sdk-react-native">React Native</a> · <a href="https://github.com/livekit/rust-sdks">Rust</a> · <a href="https://github.com/livekit/node-sdks">Node.js</a> · <a href="https://github.com/livekit/python-sdks">Python</a> · <a href="https://github.com/livekit/client-sdk-unity-web">Unity (web)</a> · <a href="https://github.com/livekit/client-sdk-unity">Unity (beta)</a></td></tr><tr></tr>
