@@ -23,18 +23,20 @@ import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitModels
 import livekit.LivekitRoom
 import okhttp3.OkHttpClient
+import okio.ByteString.Companion.toByteString
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import java.nio.ByteBuffer
 import java.util.function.Consumer
-import java.util.function.Supplier
+import java.util.UUID
 
 /**
  * A client for interacting managing LiveKit rooms and participants.
  *
  * See: [Managing Rooms](https://docs.livekit.io/realtime/server/managing-rooms/)
  */
-class RoomServiceClient(
+class RoomServiceClient(y
     private val service: RoomService,
     private val apiKey: String,
     private val secret: String,
@@ -305,6 +307,11 @@ class RoomServiceClient(
         destinationIdentities: List<String> = emptyList(),
         topic: String? = null,
     ): Call<Void?> {
+        val uuid = UUID.randomUUID()
+        val b = ByteBuffer.wrap(ByteArray(16))
+        b.putLong(uuid.mostSignificantBits)
+        b.putLong(uuid.leastSignificantBits)
+
         val request = with(LivekitRoom.SendDataRequest.newBuilder()) {
             this.room = roomName
             this.data = ByteString.copyFrom(data)
@@ -314,6 +321,7 @@ class RoomServiceClient(
             if (topic != null) {
                 this.topic = topic
             }
+            this.nonce = ByteString.copyFrom(b)
             build()
         }
 
