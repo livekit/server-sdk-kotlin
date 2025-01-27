@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,12 @@ import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitModels
 import livekit.LivekitRoom
 import okhttp3.OkHttpClient
-import okio.ByteString.Companion.toByteString
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
 import java.nio.ByteBuffer
-import java.util.function.Consumer
 import java.util.UUID
+import java.util.function.Consumer
 
 /**
  * A client for interacting managing LiveKit rooms and participants.
