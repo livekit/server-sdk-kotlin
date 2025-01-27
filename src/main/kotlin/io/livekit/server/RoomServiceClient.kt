@@ -36,7 +36,7 @@ import java.util.UUID
  *
  * See: [Managing Rooms](https://docs.livekit.io/realtime/server/managing-rooms/)
  */
-class RoomServiceClient(y
+class RoomServiceClient(
     private val service: RoomService,
     private val apiKey: String,
     private val secret: String,
