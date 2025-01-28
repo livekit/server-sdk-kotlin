@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import java.nio.ByteBuffer
+import java.util.UUID
 import java.util.function.Consumer
 import java.util.function.Supplier
 
@@ -305,6 +307,11 @@ class RoomServiceClient(
         destinationIdentities: List<String> = emptyList(),
         topic: String? = null,
     ): Call<Void?> {
+        val uuid = UUID.randomUUID()
+        val b = ByteBuffer.wrap(ByteArray(16))
+        b.putLong(uuid.mostSignificantBits)
+        b.putLong(uuid.leastSignificantBits)
+
         val request = with(LivekitRoom.SendDataRequest.newBuilder()) {
             this.room = roomName
             this.data = ByteString.copyFrom(data)
@@ -314,6 +321,7 @@ class RoomServiceClient(
             if (topic != null) {
                 this.topic = topic
             }
+            this.nonce = ByteString.copyFrom(b)
             build()
         }
 
