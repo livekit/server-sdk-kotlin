@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.8.4
+
+### Patch Changes
+
+- Update protocol and add nonce to SendDataRequest - [#97](https://github.com/livekit/server-sdk-kotlin/pull/97) ([@lukasIO](https://github.com/lukasIO))
+
 ## 0.8.3
 
 ### Patch Changes
