@@ -19,6 +19,7 @@ repositories {
     mavenCentral()
 }
 apply(from = "gradle/gradle-mvn-push.gradle")
+apply(plugin = "idea")
 
 plugins {
     kotlin("jvm") version "1.9.0"
@@ -29,7 +30,6 @@ plugins {
     id("com.google.protobuf") version "0.8.19"
     id("com.diffplug.spotless") version "6.21.0"
 }
-
 
 java {
     withJavadocJar()
