@@ -81,7 +81,7 @@ spotless {
 val protoc_platform: String? by project
 val protoSrc = File("$projectDir/protocol/protobufs/").listFiles { f -> f.isFile }
 
-val protobufVersion = "3.21.7"
+val protobufVersion = "3.25.6"
 val protobufDep = "com.google.protobuf:protobuf-java:$protobufVersion"
 protobuf {
     protoc {
