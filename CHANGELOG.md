@@ -1,5 +1,13 @@
 # server-sdk-kotlin
 
+## 0.8.5
+
+### Patch Changes
+
+- Update protobufVersion to 3.25.6 - [#103](https://github.com/livekit/server-sdk-kotlin/pull/103) ([@jmini](https://github.com/jmini))
+
+- Add ability to set room configuration on access token - [#105](https://github.com/livekit/server-sdk-kotlin/pull/105) ([@davidliu](https://github.com/davidliu))
+
 ## 0.8.4
 
 ### Patch Changes
