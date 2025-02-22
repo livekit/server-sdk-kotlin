@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package io.livekit.server
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
+import com.google.protobuf.MessageOrBuilder
+import livekit.LivekitRoom.RoomConfiguration
 import java.time.Instant
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -83,6 +85,18 @@ class AccessToken(
      * Key/value attributes to attach to the participant
      */
     val attributes = mutableMapOf<String, String>()
+
+    /**
+     * Use a named preset room configuration.
+     *
+     * Any options set in [roomConfiguration] will take precedence.
+     */
+    var roomPreset: String? = null
+
+    /**
+     * Configuration for when creating a room.
+     */
+    var roomConfiguration: RoomConfiguration? = null
 
     /**
      * Add [VideoGrant] to this token.
@@ -166,11 +180,14 @@ class AccessToken(
             name?.let { claimsMap["name"] = it }
             metadata?.let { claimsMap["metadata"] = it }
             sha256?.let { claimsMap["sha256"] = it }
+            roomPreset?.let { claimsMap["roomPreset"] = it }
             attributes.toMap().let { attributesCopy ->
                 if (attributesCopy.isNotEmpty()) {
                     claimsMap["attributes"] = attributesCopy
                 }
             }
+            roomConfiguration?.let { claimsMap["roomConfig"] = it.toMap() }
+
             claimsMap["video"] = videoGrantsMap
             claimsMap["sip"] = sipGrantsMap
 
@@ -201,4 +218,18 @@ internal fun JWTCreator.Builder.withClaimAny(name: String, value: Any) {
             withClaim(name, value as Map<String, *>)
         }
     }
+}
+
+internal fun MessageOrBuilder.toMap(): Map<String, *> {
+    val map = mutableMapOf<String, Any>()
+
+    for ((field, value) in allFields) {
+        if (value is MessageOrBuilder) {
+            map[field.name] = value.toMap()
+        } else {
+            map[field.name] = value
+        }
+    }
+
+    return map
 }
