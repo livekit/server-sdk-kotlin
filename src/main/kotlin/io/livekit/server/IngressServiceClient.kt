@@ -119,7 +119,7 @@ class IngressServiceClient(
                 this.roomName = roomName
             }
 
-            if (participantIdentity == null) {
+            if (participantIdentity != null) {
                 this.participantIdentity = participantIdentity
             }
 
