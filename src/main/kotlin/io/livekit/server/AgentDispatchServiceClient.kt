@@ -65,13 +65,13 @@ class AgentDispatchServiceClient(
     /**
      * Deletes an agent dispatch from a room.
      * @param room Name of the room to delete dispatch from
-     * @param dispatch_id ID of the dispatch to delete
+     * @param dispatchId ID of the dispatch to delete
      * @return Deleted agent dispatch
      */
-    fun deleteDispatch(room: String, dispatch_id: String): Call<LivekitAgentDispatch.AgentDispatch> {
+    fun deleteDispatch(room: String, dispatchId: String): Call<LivekitAgentDispatch.AgentDispatch> {
         val request = LivekitAgentDispatch.DeleteAgentDispatchRequest.newBuilder()
             .setRoom(room)
-            .setDispatchId(dispatch_id)
+            .setDispatchId(dispatchId)
             .build()
         val credentials = authHeader(RoomAdmin(true), RoomName(room))
         return service.deleteDispatch(request, credentials)
@@ -132,5 +132,4 @@ class AgentDispatchServiceClient(
             return AgentDispatchServiceClient(service, apiKey, secret)
         }
     }
-
 }

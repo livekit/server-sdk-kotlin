@@ -82,7 +82,7 @@ class AgentDispatchServiceClientTest {
 
         assertNotNull(dispatch?.id)
 
-        val deleteResp = client.deleteDispatch(room = ROOM_NAME, dispatch_id = dispatch?.id ?: "").execute()
+        val deleteResp = client.deleteDispatch(room = ROOM_NAME, dispatchId = dispatch?.id ?: "").execute()
         assertTrue(deleteResp.isSuccessful)
     }
 }
