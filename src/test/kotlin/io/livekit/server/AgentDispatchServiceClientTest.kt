@@ -48,7 +48,6 @@ class AgentDispatchServiceClientTest {
         client.createDispatch(
             room = ROOM_NAME,
             agentName = "agent",
-            metadata = METADATA,
         ).execute()
     }
 

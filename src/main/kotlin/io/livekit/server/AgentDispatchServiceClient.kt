@@ -47,7 +47,7 @@ class AgentDispatchServiceClient(
     fun createDispatch(
         room: String,
         agentName: String,
-        metadata: String?,
+        metadata: String? = null,
     ): Call<LivekitAgentDispatch.AgentDispatch> {
         val request = with(LivekitAgentDispatch.CreateAgentDispatchRequest.newBuilder()) {
             setRoom(room)
