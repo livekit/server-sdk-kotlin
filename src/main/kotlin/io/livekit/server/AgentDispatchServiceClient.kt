@@ -44,6 +44,7 @@ class AgentDispatchServiceClient(
      * @param metadata Optional metadata to attach to the dispatch
      * @return Created agent dispatch
      */
+    @JvmOverloads
     fun createDispatch(
         room: String,
         agentName: String,
