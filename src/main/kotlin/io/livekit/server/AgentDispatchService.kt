@@ -41,13 +41,10 @@ interface AgentDispatchService {
         @Header("Authorization") authorization: String,
     ): Call<LivekitAgentDispatch.AgentDispatch>
 
-
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.AgentDispatchService/ListDispatch")
     fun listDispatch(
         @Body request: LivekitAgentDispatch.ListAgentDispatchRequest,
         @Header("Authorization") authorization: String,
     ): Call<LivekitAgentDispatch.ListAgentDispatchResponse>
-
-
 }
