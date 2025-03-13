@@ -1,5 +1,15 @@
 # server-sdk-kotlin
 
+## 0.9.0
+
+### Minor Changes
+
+- Implement AgentDispatchService - [#113](https://github.com/livekit/server-sdk-kotlin/pull/113) ([@akkawell](https://github.com/akkawell))
+
+### Patch Changes
+
+- Fix: updateIngress incorrectly sets participantIdentity to null - [#108](https://github.com/livekit/server-sdk-kotlin/pull/108) ([@juancarmore](https://github.com/juancarmore))
+
 ## 0.8.5
 
 ### Patch Changes
