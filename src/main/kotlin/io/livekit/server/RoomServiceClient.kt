@@ -189,6 +189,19 @@ class RoomServiceClient(
         return service.removeParticipant(request, credentials)
     }
 
+    fun forwardParticipant(roomName: String, identity: String, destinationRoomName: String): Call<LivekitRoom.ForwardParticipantResponse> {
+        val request = LivekitRoom.ForwardParticipantRequest.newBuilder()
+            .setRoom(roomName)
+            .setIdentity(identity)
+            .setDestinationRoom(destinationRoomName)
+            .build()
+        val credentials = authHeader(
+            RoomAdmin(true),
+            RoomName(roomName),
+        )
+        return service.forwardParticipant(request, credentials)
+    }
+
     /**
      * Mutes a track that the participant has published.
      * @param roomName
