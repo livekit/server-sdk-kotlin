@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,10 @@ interface RoomService {
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.RoomService/RemoveParticipant")
     fun removeParticipant(@Body request: LivekitRoom.RoomParticipantIdentity, @Header("Authorization") authorization: String): Call<Void?>
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.RoomService/ForwardParticipant")
+    fun forwardParticipant(@Body request: LivekitRoom.ForwardParticipantRequest, @Header("Authorization") authorization: String): Call<LivekitRoom.ForwardParticipantResponse>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.RoomService/MutePublishedTrack")
