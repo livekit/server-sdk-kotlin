@@ -43,6 +43,20 @@ interface SipService {
     ): Call<LivekitSip.SIPOutboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.SIP/UpdateSIPInboundTrunk")
+    fun updateSipInboundTrunk(
+        @Body request: LivekitSip.UpdateSIPInboundTrunkRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.SIPInboundTrunkInfo>
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.SIP/UpdateSIPOutboundTrunk")
+    fun updateSipOutboundTrunk(
+        @Body request: LivekitSip.UpdateSIPOutboundTrunkRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.SIPOutboundTrunkInfo>
+
+    @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.SIP/ListSIPInboundTrunk")
     fun listSIPInboundTrunk(
         @Body request: LivekitSip.ListSIPInboundTrunkRequest,
@@ -67,6 +81,12 @@ interface SipService {
     @POST("/twirp/livekit.SIP/CreateSIPDispatchRule")
     fun createSipDispatchRule(
         @Body request: LivekitSip.CreateSIPDispatchRuleRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.SIPDispatchRuleInfo>
+
+    @POST("/twirp/livekit.SIP/UpdateSIPDispatchRule")
+    fun updateSipDispatchRule(
+        @Body request: LivekitSip.UpdateSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPDispatchRuleInfo>
 
