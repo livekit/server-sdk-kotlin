@@ -198,6 +198,7 @@ class RoomServiceClient(
         val credentials = authHeader(
             RoomAdmin(true),
             RoomName(roomName),
+            DestinationRoomName(destinationRoomName),
         )
         return service.forwardParticipant(request, credentials)
     }

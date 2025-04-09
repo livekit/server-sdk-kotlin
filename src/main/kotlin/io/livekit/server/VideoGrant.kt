@@ -63,6 +63,8 @@ class Room(value: String) : VideoGrant("room", value)
  */
 class RoomName(value: String) : VideoGrant("room", value)
 
+class DestinationRoomName(value: String) : VideoGrant("destinationRoom", value)
+
 /**
  * allow participant to publish tracks
  */
