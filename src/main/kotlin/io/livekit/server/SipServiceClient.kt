@@ -123,28 +123,13 @@ class SipServiceClient(
 
             update = with(LivekitSip.SIPInboundTrunkUpdate.newBuilder()) {
                 options?.let { opt ->
-                    opt.name?.let { this.name = opt.name }
-                    opt.authUsername?.let { this.authUsername = opt.authUsername }
-                    opt.authPassword?.let { this.authPassword = opt.authPassword }
-                    opt.metadata?.let { this.metadata = opt.metadata }
-                    opt.numbers?.let {
-                        this.numbers = with(ListUpdate.newBuilder()) {
-                            this.addAllSet(opt.numbers)
-                            build()
-                        }
-                    }
-                    opt.allowedNumbers?.let {
-                        this.allowedNumbers = with(ListUpdate.newBuilder()) {
-                            this.addAllSet(opt.allowedNumbers)
-                            build()
-                        }
-                    }
-                    opt.allowedAddresses?.let {
-                        this.allowedAddresses = with(ListUpdate.newBuilder()) {
-                            this.addAllSet(opt.allowedAddresses)
-                            build()
-                        }
-                    }
+                    opt.name?.let { this.name = it }
+                    opt.authUsername?.let { this.authUsername = it }
+                    opt.authPassword?.let { this.authPassword = it }
+                    opt.metadata?.let { this.metadata = it }
+                    opt.numbers?.let { this.numbers = buildListUpdate(it) }
+                    opt.allowedNumbers?.let { this.allowedNumbers = buildListUpdate(it) }
+                    opt.allowedAddresses?.let { this.allowedAddresses = buildListUpdate(it) }
                 }
                 build()
             }
@@ -168,18 +153,13 @@ class SipServiceClient(
 
             update = with(LivekitSip.SIPOutboundTrunkUpdate.newBuilder()) {
                 options?.let { opt ->
-                    opt.name?.let { this.name = opt.name }
-                    opt.address?.let { this.address = opt.address }
-                    opt.metadata?.let { this.metadata = opt.metadata }
-                    opt.transport?.let { this.transport = opt.transport }
-                    opt.authUsername?.let { this.authUsername = opt.authUsername }
-                    opt.authPassword?.let { this.authPassword = opt.authPassword }
-                    opt.numbers?.let {
-                        this.numbers = with(ListUpdate.newBuilder()) {
-                            this.addAllSet(opt.numbers)
-                            build()
-                        }
-                    }
+                    opt.name?.let { this.name = it }
+                    opt.address?.let { this.address = it }
+                    opt.metadata?.let { this.metadata = it }
+                    opt.transport?.let { this.transport = it }
+                    opt.authUsername?.let { this.authUsername = it }
+                    opt.authPassword?.let { this.authPassword = it }
+                    opt.numbers?.let { this.numbers = buildListUpdate(it) }
                 }
                 build()
             }
@@ -286,36 +266,27 @@ class SipServiceClient(
         val request = with(LivekitSip.UpdateSIPDispatchRuleRequest.newBuilder()) {
             update = with(LivekitSip.SIPDispatchRuleUpdate.newBuilder()) {
                 options?.let { opt ->
-                    opt.name?.let { this.name = opt.name }
-                    opt.metadata?.let { this.metadata = opt.metadata }
-                    opt.trunkIds?.let {
-                        this.trunkIds = with(ListUpdate.newBuilder()) {
-                            this.addAllSet(opt.trunkIds)
-                            build()
-                        }
-                    }
+                    opt.name?.let { this.name = it }
+                    opt.metadata?.let { this.metadata = it }
+                    opt.trunkIds?.let { this.trunkIds = buildListUpdate(it) }
                     opt.rule?.let {
                         this.rule = with(SIPDispatchRule.newBuilder()) {
-                            when (opt.rule) {
+                            when (it) {
                                 is SipDispatchRuleDirect -> {
                                     dispatchRuleDirect = with(SIPDispatchRuleDirect.newBuilder()) {
-                                        val rule = opt.rule as SipDispatchRuleDirect
-                                        roomName = rule.roomName
-                                        rule.pin?.let { this.pin = it }
+                                        roomName = it.roomName
+                                        it.pin?.let { this.pin = it }
                                         build()
                                     }
                                 }
 
                                 is SipDispatchRuleIndividual -> {
                                     dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
-                                        val rule = opt.rule as SipDispatchRuleIndividual
-                                        roomPrefix = rule.roomPrefix
-                                        rule.pin?.let { this.pin = it }
+                                        roomPrefix = it.roomPrefix
+                                        it.pin?.let { this.pin = it }
                                         build()
                                     }
                                 }
-
-                                null -> {}
                             }
                             build()
                         }
@@ -378,6 +349,7 @@ class SipServiceClient(
                 opts.participantMetadata?.let { this.participantMetadata = it }
                 opts.dtmf?.let { this.dtmf = it }
                 opts.hidePhoneNumber?.let { this.hidePhoneNumber = it }
+                opts.waitUntilAnswered?.let { this.waitUntilAnswered = it }
                 opts.playRingtone?.let {
                     if (it) {
                         this.playRingtone = true
@@ -422,6 +394,13 @@ class SipServiceClient(
 
         val credentials = authHeader(listOf(RoomAdmin(true), RoomName(roomName)), listOf(SIPCall()))
         return service.transferSipParticipant(request, credentials)
+    }
+
+    private fun buildListUpdate(values: List<String>): ListUpdate {
+        return with(ListUpdate.newBuilder()) {
+            this.addAllSet(values)
+            build()
+        }
     }
 
     companion object {
@@ -538,6 +517,7 @@ data class CreateSipParticipantOptions(
     var playRingtone: Boolean? = null, // deprecated, use playDialtone instead
     var playDialtone: Boolean? = null,
     var hidePhoneNumber: Boolean? = null,
+    var waitUntilAnswered: Boolean? = null,
 )
 
 data class TransferSipParticipantOptions(
