@@ -189,6 +189,14 @@ class RoomServiceClient(
         return service.removeParticipant(request, credentials)
     }
 
+    /**
+     * Forward a participant's track(s) to another room. Requires `roomAdmin` and `destinationRoom`. The forwarding will
+     * stop when the participant leaves the room or `RemoveParticipant` has been called in the destination room.
+     * A participant can be forwarded to multiple rooms. The destination room will be created if it does not exist.
+     * @param roomName
+     * @param identity
+     * @param destinationRoomName
+     */
     fun forwardParticipant(roomName: String, identity: String, destinationRoomName: String): Call<LivekitRoom.ForwardParticipantResponse> {
         val request = LivekitRoom.ForwardParticipantRequest.newBuilder()
             .setRoom(roomName)
