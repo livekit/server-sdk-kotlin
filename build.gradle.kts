@@ -22,7 +22,7 @@ apply(from = "gradle/gradle-mvn-push.gradle")
 apply(plugin = "idea")
 
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.25"
     `maven-publish`
     `java-library`
     id("org.jetbrains.dokka") version "1.9.20"
