@@ -133,8 +133,8 @@ val javadocJar = tasks.named<Jar>("javadocJar") {
 dependencies {
     protobuf(files(*protoSrc))
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    api("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-protobuf:2.9.0")
+    api("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-protobuf:2.11.0")
     implementation("com.auth0:java-jwt:4.2.1")
     api(protobufDep)
     api("com.google.protobuf:protobuf-java-util:$protobufVersion")
