@@ -212,6 +212,28 @@ class RoomServiceClient(
     }
 
     /**
+     * Move a participant from one room to another room.
+     * @param roomName
+     * @param identity
+     * @param destinationRoomName
+     */
+    fun moveParticipant(roomName: String, identity: String, destinationRoomName: String): Call<LivekitRoom.MoveParticipantResponse> {
+        val request = LivekitRoom.MoveParticipantRequest.newBuilder()
+            .setRoom(roomName)
+            .setIdentity(identity)
+            .setDestinationRoom(destinationRoomName)
+            .build()
+        val credentials = authHeader(
+            RoomAdmin(true),
+            RoomName(roomName),
+            DestinationRoomName(destinationRoomName),
+        )
+        return service.moveParticipant(request, credentials)
+    }
+
+
+
+    /**
      * Mutes a track that the participant has published.
      * @param roomName
      * @param identity
