@@ -231,8 +231,6 @@ class RoomServiceClient(
         return service.moveParticipant(request, credentials)
     }
 
-
-
     /**
      * Mutes a track that the participant has published.
      * @param roomName
