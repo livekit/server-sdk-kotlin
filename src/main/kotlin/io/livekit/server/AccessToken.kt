@@ -20,6 +20,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
 import com.google.protobuf.MessageOrBuilder
+import com.google.protobuf.ByteString
 import livekit.LivekitRoom.RoomConfiguration
 import java.time.Instant
 import java.util.Date
@@ -221,15 +222,37 @@ internal fun JWTCreator.Builder.withClaimAny(name: String, value: Any) {
 }
 
 internal fun MessageOrBuilder.toMap(): Map<String, *> {
-    val map = mutableMapOf<String, Any>()
+    val map = mutableMapOf<String, Any?>()
 
     for ((field, value) in allFields) {
-        if (value is MessageOrBuilder) {
-            map[field.name] = value.toMap()
-        } else {
-            map[field.name] = value
+        when (value) {
+            is MessageOrBuilder -> {
+                map[field.name] = value.toMap()
+            }
+            is List<*> -> {
+                map[field.name] = value.map { item ->
+                    when (item) {
+                        is MessageOrBuilder -> item.toMap()
+                        else -> if (isSupportedType(item)) item else item.toString()
+                    }
+                }
+            }
+            else -> {
+                map[field.name] = if (isSupportedType(value)) value else value.toString()
+            }
         }
     }
 
     return map
+}
+
+private fun isSupportedType(value: Any?): Boolean {
+    return value == null ||
+        value is Boolean ||
+        value is Int ||
+        value is Long ||
+        value is Double ||
+        value is String ||
+        value is Map<*, *> ||
+        value is List<*>
 }
