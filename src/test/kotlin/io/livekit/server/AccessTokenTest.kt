@@ -128,15 +128,6 @@ class AccessTokenTest {
     fun testEgressFileOutputConfiguration() {
         val roomConfig = with(RoomConfiguration.newBuilder()) {
             name = "test_room"
-            // agentDispatches = with(agentDispatchesBuilder) {
-            //     add(
-            //         LivekitRoom.Agent.newBuilder()
-            //             .setAgentName("test_agent")
-            //             .setMetadata("{\"user_id\": \"12345\"}")
-            //             .build()
-            //     )
-            //     buildPartial()
-            // }
             egress = with(egressBuilder) {
                 room = with(roomBuilder) {
                     roomName = "test_room"
