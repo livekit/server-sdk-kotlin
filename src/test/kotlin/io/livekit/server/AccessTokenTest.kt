@@ -18,6 +18,8 @@ package io.livekit.server
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import livekit.LivekitEgress
+import livekit.LivekitRoom
 import livekit.LivekitRoom.RoomConfiguration
 import org.junit.jupiter.api.Test
 import java.util.Date
@@ -120,5 +122,85 @@ class AccessTokenTest {
 
         assertEquals(roomConfig.emptyTimeout, map["empty_timeout"])
         assertEquals(roomConfig.egress.room.roomName, ((map["egress"] as Map<*, *>)["room"] as Map<*, *>)["room_name"])
+    }
+
+    @Test
+    fun testEgressFileOutputConfiguration() {
+        val roomConfig = with(RoomConfiguration.newBuilder()) {
+            name = "test_room"
+            // agentDispatches = with(agentDispatchesBuilder) {
+            //     add(
+            //         LivekitRoom.Agent.newBuilder()
+            //             .setAgentName("test_agent")
+            //             .setMetadata("{\"user_id\": \"12345\"}")
+            //             .build()
+            //     )
+            //     buildPartial()
+            // }
+            egress = with(egressBuilder) {
+                room = with(roomBuilder) {
+                    roomName = "test_room"
+                    addFileOutputs(
+                        LivekitEgress.EncodedFileOutput.newBuilder()
+                            .setFileType(LivekitEgress.EncodedFileType.MP4)
+                            .setFilepath("livekit/test.mp4")
+                            .setS3(
+                                LivekitEgress.S3Upload.newBuilder()
+                                    .setBucket("test-bucket")
+                                    .setRegion("us-west-2")
+                                    .setAccessKey("test-access-key")
+                                    .setSecret("test-secret")
+                                    .setEndpoint("https://s3.us-west-2.amazonaws.com")
+                                    .build()
+                            )
+                            .build()
+                    )
+                    buildPartial()
+                }
+                buildPartial()
+            }
+            build()
+        }
+
+        val token = AccessToken(KEY, SECRET)
+        token.roomConfiguration = roomConfig
+
+        // This should not throw an exception
+        val jwt = token.toJwt()
+        
+        // Verify the JWT can be decoded
+        val alg = Algorithm.HMAC256(SECRET)
+        val decodedJWT = JWT.require(alg)
+            .withIssuer(KEY)
+            .build()
+            .verify(jwt)
+
+        // Verify the room configuration was properly encoded
+        val claims = decodedJWT.claims
+        val roomConfigMap = claims["roomConfig"]?.asMap()
+        assertNotNull(roomConfigMap)
+        
+        val egressMap = roomConfigMap?.get("egress") as? Map<*, *>
+        assertNotNull(egressMap)
+        
+        val roomMap = egressMap?.get("room") as? Map<*, *>
+        assertNotNull(roomMap)
+        
+        val fileOutputs = roomMap?.get("file_outputs") as? List<*>
+        assertNotNull(fileOutputs)
+        assertEquals(1, fileOutputs?.size)
+        
+        val fileOutput = fileOutputs?.first() as? Map<*, *>
+        assertNotNull(fileOutput)
+        assertEquals("MP4", fileOutput?.get("file_type"))
+        assertEquals("livekit/test.mp4", fileOutput?.get("filepath"))
+        
+        val s3Config = fileOutput?.get("s3") as? Map<*, *>
+        assertNotNull(s3Config)
+        assertEquals("test-bucket", s3Config?.get("bucket"))
+        assertEquals("us-west-2", s3Config?.get("region"))
+        assertEquals("test-access-key", s3Config?.get("access_key"))
+        assertEquals("test-secret", s3Config?.get("secret"))
+        assertEquals("https://s3.us-west-2.amazonaws.com", s3Config?.get("endpoint"))
     }
 }
