@@ -221,16 +221,18 @@ internal fun JWTCreator.Builder.withClaimAny(name: String, value: Any) {
     }
 }
 
-internal fun MessageOrBuilder.toMap(): Map<String, *> = allFields.associate { (field, value) ->
-    field.name to when (value) {
-        is MessageOrBuilder -> value.toMap()
-        is List<*> -> value.map { item ->
-            when (item) {
-                is MessageOrBuilder -> item.toMap()
-                else -> if (isSupportedType(item)) item else item.toString()
+internal fun MessageOrBuilder.toMap(): Map<String, *> = buildMap {
+    for ((field, value) in allFields) {
+        put(field.name, when (value) {
+            is MessageOrBuilder -> value.toMap()
+            is List<*> -> value.map { item ->
+                when (item) {
+                    is MessageOrBuilder -> item.toMap()
+                    else -> if (isSupportedType(item)) item else item.toString()
+                }
             }
-        }
-        else -> if (isSupportedType(value)) value else value.toString()
+            else -> if (isSupportedType(value)) value else value.toString()
+        })
     }
 }
 
