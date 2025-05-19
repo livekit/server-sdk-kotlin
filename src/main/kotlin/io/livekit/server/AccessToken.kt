@@ -20,10 +20,10 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
 import com.google.protobuf.MessageOrBuilder
+import livekit.LivekitRoom.RoomConfiguration
 import java.time.Instant
 import java.util.Date
 import java.util.concurrent.TimeUnit
-import livekit.LivekitRoom.RoomConfiguration
 
 /**
  * Access tokens are required to connect to the server.
@@ -195,28 +195,28 @@ internal fun JWTCreator.Builder.withClaimAny(name: String, value: Any) {
 internal fun MessageOrBuilder.toMap(): Map<String, *> = buildMap {
     for ((field, value) in allFields) {
         put(
-                field.name,
-                when (value) {
-                    is MessageOrBuilder -> value.toMap()
-                    is List<*> ->
-                            value.map { item ->
-                                when (item) {
-                                    is MessageOrBuilder -> item.toMap()
-                                    else -> if (isSupportedType(item)) item else item.toString()
-                                }
-                            }
-                    else -> if (isSupportedType(value)) value else value.toString()
-                }
+            field.name,
+            when (value) {
+                is MessageOrBuilder -> value.toMap()
+                is List<*> ->
+                    value.map { item ->
+                        when (item) {
+                            is MessageOrBuilder -> item.toMap()
+                            else -> if (isSupportedType(item)) item else item.toString()
+                        }
+                    }
+                else -> if (isSupportedType(value)) value else value.toString()
+            }
         )
     }
 }
 
 private fun isSupportedType(value: Any?) =
-        value == null ||
-                value is Boolean ||
-                value is Int ||
-                value is Long ||
-                value is Double ||
-                value is String ||
-                value is Map<*, *> ||
-                value is List<*>
+    value == null ||
+        value is Boolean ||
+        value is Int ||
+        value is Long ||
+        value is Double ||
+        value is String ||
+        value is Map<*, *> ||
+        value is List<*>

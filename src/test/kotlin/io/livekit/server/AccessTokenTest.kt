@@ -19,7 +19,6 @@ package io.livekit.server
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import livekit.LivekitEgress
-import livekit.LivekitRoom
 import livekit.LivekitRoom.RoomConfiguration
 import org.junit.jupiter.api.Test
 import java.util.Date
@@ -158,7 +157,7 @@ class AccessTokenTest {
 
         // This should not throw an exception
         val jwt = token.toJwt()
-        
+
         // Verify the JWT can be decoded
         val alg = Algorithm.HMAC256(SECRET)
         val decodedJWT = JWT.require(alg)
@@ -170,22 +169,22 @@ class AccessTokenTest {
         val claims = decodedJWT.claims
         val roomConfigMap = claims["roomConfig"]?.asMap()
         assertNotNull(roomConfigMap)
-        
+
         val egressMap = roomConfigMap.get("egress") as? Map<*, *>
         assertNotNull(egressMap)
-        
+
         val roomMap = egressMap.get("room") as? Map<*, *>
         assertNotNull(roomMap)
-        
+
         val fileOutputs = roomMap.get("file_outputs") as? List<*>
         assertNotNull(fileOutputs)
         assertEquals(1, fileOutputs.size)
-        
+
         val fileOutput = fileOutputs.first() as? Map<*, *>
         assertNotNull(fileOutput)
         assertEquals("MP4", fileOutput.get("file_type"))
         assertEquals("livekit/test.mp4", fileOutput.get("filepath"))
-        
+
         val s3Config = fileOutput.get("s3") as? Map<*, *>
         assertNotNull(s3Config)
         assertEquals("test-bucket", s3Config.get("bucket"))
