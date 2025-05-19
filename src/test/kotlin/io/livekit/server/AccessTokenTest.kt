@@ -171,27 +171,27 @@ class AccessTokenTest {
         val roomConfigMap = claims["roomConfig"]?.asMap()
         assertNotNull(roomConfigMap)
         
-        val egressMap = roomConfigMap?.get("egress") as? Map<*, *>
+        val egressMap = roomConfigMap.get("egress") as? Map<*, *>
         assertNotNull(egressMap)
         
-        val roomMap = egressMap?.get("room") as? Map<*, *>
+        val roomMap = egressMap.get("room") as? Map<*, *>
         assertNotNull(roomMap)
         
-        val fileOutputs = roomMap?.get("file_outputs") as? List<*>
+        val fileOutputs = roomMap.get("file_outputs") as? List<*>
         assertNotNull(fileOutputs)
-        assertEquals(1, fileOutputs?.size)
+        assertEquals(1, fileOutputs.size)
         
-        val fileOutput = fileOutputs?.first() as? Map<*, *>
+        val fileOutput = fileOutputs.first() as? Map<*, *>
         assertNotNull(fileOutput)
-        assertEquals("MP4", fileOutput?.get("file_type"))
-        assertEquals("livekit/test.mp4", fileOutput?.get("filepath"))
+        assertEquals("MP4", fileOutput.get("file_type"))
+        assertEquals("livekit/test.mp4", fileOutput.get("filepath"))
         
-        val s3Config = fileOutput?.get("s3") as? Map<*, *>
+        val s3Config = fileOutput.get("s3") as? Map<*, *>
         assertNotNull(s3Config)
-        assertEquals("test-bucket", s3Config?.get("bucket"))
-        assertEquals("us-west-2", s3Config?.get("region"))
-        assertEquals("test-access-key", s3Config?.get("access_key"))
-        assertEquals("test-secret", s3Config?.get("secret"))
-        assertEquals("https://s3.us-west-2.amazonaws.com", s3Config?.get("endpoint"))
+        assertEquals("test-bucket", s3Config.get("bucket"))
+        assertEquals("us-west-2", s3Config.get("region"))
+        assertEquals("test-access-key", s3Config.get("access_key"))
+        assertEquals("test-secret", s3Config.get("secret"))
+        assertEquals("https://s3.us-west-2.amazonaws.com", s3Config.get("endpoint"))
     }
 }
