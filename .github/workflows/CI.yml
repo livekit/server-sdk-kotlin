@@ -57,6 +57,9 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew assemble
 
+    - name: Run unit tests (no livekit-server integration tests)
+      run: ./gradlew test --tests "io.livekit.server.AccessTokenTest"
+
     - name: get version name
       if: github.event_name == 'push'
       run: echo "::set-output name=version_name::$(cat gradle.properties | grep VERSION_NAME | cut -d "=" -f2)"
