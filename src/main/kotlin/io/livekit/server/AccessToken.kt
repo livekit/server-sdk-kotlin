@@ -33,10 +33,7 @@ import java.util.concurrent.TimeUnit
  * https://docs.livekit.io/home/get-started/authentication/
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class AccessToken(
-    private val apiKey: String,
-    private val secret: String
-) {
+class AccessToken(private val apiKey: String, private val secret: String) {
     private val videoGrants = mutableSetOf<VideoGrant>()
     private val sipGrants = mutableSetOf<SIPGrant>()
 
@@ -57,33 +54,25 @@ class AccessToken(
     var expiration: Date? = null
 
     /**
-     * Date specifying the time [before which this token is invalid](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-25#section-4.1.5).
+     * Date specifying the time
+     * [before which this token is invalid](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-25#section-4.1.5)
+     * .
      */
     var notBefore: Date? = null
 
-    /**
-     * Display name for the participant, available as `Participant.name`
-     */
+    /** Display name for the participant, available as `Participant.name` */
     var name: String? = null
 
-    /**
-     * Unique identity of the user, required for room join tokens
-     */
+    /** Unique identity of the user, required for room join tokens */
     var identity: String? = null
 
-    /**
-     * Custom metadata to be passed to participants
-     */
+    /** Custom metadata to be passed to participants */
     var metadata: String? = null
 
-    /**
-     * For verifying integrity of message body
-     */
+    /** For verifying integrity of message body */
     var sha256: String? = null
 
-    /**
-     * Key/value attributes to attach to the participant
-     */
+    /** Key/value attributes to attach to the participant */
     val attributes = mutableMapOf<String, String>()
 
     /**
@@ -93,57 +82,43 @@ class AccessToken(
      */
     var roomPreset: String? = null
 
-    /**
-     * Configuration for when creating a room.
-     */
+    /** Configuration for when creating a room. */
     var roomConfiguration: RoomConfiguration? = null
 
-    /**
-     * Add [VideoGrant] to this token.
-     */
+    /** Add [VideoGrant] to this token. */
     fun addGrants(vararg grants: VideoGrant) {
         for (grant in grants) {
             videoGrants.add(grant)
         }
     }
 
-    /**
-     * Add [VideoGrant] to this token.
-     */
+    /** Add [VideoGrant] to this token. */
     fun addGrants(grants: Iterable<VideoGrant>) {
         for (grant in grants) {
             videoGrants.add(grant)
         }
     }
 
-    /**
-     * Clear all previously added [VideoGrant]s.
-     */
+    /** Clear all previously added [VideoGrant]s. */
     fun clearGrants() {
         videoGrants.clear()
     }
 
-    /**
-     * Add [VideoGrant] to this token.
-     */
+    /** Add [VideoGrant] to this token. */
     fun addSIPGrants(vararg grants: SIPGrant) {
         for (grant in grants) {
             sipGrants.add(grant)
         }
     }
 
-    /**
-     * Add [VideoGrant] to this token.
-     */
+    /** Add [VideoGrant] to this token. */
     fun addSIPGrants(grants: Iterable<SIPGrant>) {
         for (grant in grants) {
             sipGrants.add(grant)
         }
     }
 
-    /**
-     * Clear all previously added [SIPGrant]s.
-     */
+    /** Clear all previously added [SIPGrant]s. */
     fun clearSIPGrants() {
         sipGrants.clear()
     }
@@ -191,9 +166,7 @@ class AccessToken(
             claimsMap["video"] = videoGrantsMap
             claimsMap["sip"] = sipGrantsMap
 
-            claimsMap.forEach { (key, value) ->
-                withClaimAny(key, value)
-            }
+            claimsMap.forEach { (key, value) -> withClaimAny(key, value) }
 
             val alg = Algorithm.HMAC256(secret)
 
@@ -214,22 +187,36 @@ internal fun JWTCreator.Builder.withClaimAny(name: String, value: Any) {
         is Instant -> withClaim(name, value)
         is List<*> -> withClaim(name, value)
         is Map<*, *> -> {
-            @Suppress("UNCHECKED_CAST")
-            withClaim(name, value as Map<String, *>)
+            @Suppress("UNCHECKED_CAST") withClaim(name, value as Map<String, *>)
         }
     }
 }
 
-internal fun MessageOrBuilder.toMap(): Map<String, *> {
-    val map = mutableMapOf<String, Any>()
-
+internal fun MessageOrBuilder.toMap(): Map<String, *> = buildMap {
     for ((field, value) in allFields) {
-        if (value is MessageOrBuilder) {
-            map[field.name] = value.toMap()
-        } else {
-            map[field.name] = value
-        }
+        put(
+            field.name,
+            when (value) {
+                is MessageOrBuilder -> value.toMap()
+                is List<*> ->
+                    value.map { item ->
+                        when (item) {
+                            is MessageOrBuilder -> item.toMap()
+                            else -> if (isSupportedType(item)) item else item.toString()
+                        }
+                    }
+                else -> if (isSupportedType(value)) value else value.toString()
+            }
+        )
     }
-
-    return map
 }
+
+private fun isSupportedType(value: Any?) =
+    value == null ||
+        value is Boolean ||
+        value is Int ||
+        value is Long ||
+        value is Double ||
+        value is String ||
+        value is Map<*, *> ||
+        value is List<*>
