@@ -1,5 +1,19 @@
 # server-sdk-kotlin
 
+## 0.10.0
+
+### Minor Changes
+
+- RoomService: MoveParticipant API - [#120](https://github.com/livekit/server-sdk-kotlin/pull/120) ([@anunaym14](https://github.com/anunaym14))
+
+- SIP Update APIs, Sync mode, Egress audio mixing - [#117](https://github.com/livekit/server-sdk-kotlin/pull/117) ([@anunaym14](https://github.com/anunaym14))
+
+- RoomService: implement forward participant api - [#115](https://github.com/livekit/server-sdk-kotlin/pull/115) ([@anunaym14](https://github.com/anunaym14))
+
+### Patch Changes
+
+- Support array values in AccessToken's roomConfiguration - [#121](https://github.com/livekit/server-sdk-kotlin/pull/121) ([@bcherry](https://github.com/bcherry))
+
 ## 0.9.0
 
 ### Minor Changes
