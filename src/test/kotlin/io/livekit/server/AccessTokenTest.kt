@@ -20,6 +20,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import livekit.LivekitEgress
 import livekit.LivekitRoom.RoomConfiguration
+import livekit.LivekitAgentDispatch
 import org.junit.jupiter.api.Test
 import java.util.Date
 import kotlin.test.assertEquals
@@ -127,28 +128,12 @@ class AccessTokenTest {
     fun testEgressFileOutputConfiguration() {
         val roomConfig = with(RoomConfiguration.newBuilder()) {
             name = "test_room"
-            egress = with(egressBuilder) {
-                room = with(roomBuilder) {
-                    roomName = "test_room"
-                    addFileOutputs(
-                        LivekitEgress.EncodedFileOutput.newBuilder()
-                            .setFileType(LivekitEgress.EncodedFileType.MP4)
-                            .setFilepath("livekit/test.mp4")
-                            .setS3(
-                                LivekitEgress.S3Upload.newBuilder()
-                                    .setBucket("test-bucket")
-                                    .setRegion("us-west-2")
-                                    .setAccessKey("test-access-key")
-                                    .setSecret("test-secret")
-                                    .setEndpoint("https://s3.us-west-2.amazonaws.com")
-                                    .build()
-                            )
-                            .build()
-                    )
-                    buildPartial()
-                }
-                buildPartial()
-            }
+            addAgents(
+                LivekitAgentDispatch.RoomAgentDispatch.newBuilder()
+                    .setAgentName("agent_name")
+                    .setMetadata("metadata")
+                    .build()
+            )
             build()
         }
 
@@ -170,27 +155,13 @@ class AccessTokenTest {
         val roomConfigMap = claims["roomConfig"]?.asMap()
         assertNotNull(roomConfigMap)
 
-        val egressMap = roomConfigMap.get("egress") as? Map<*, *>
-        assertNotNull(egressMap)
+        val agentsMap = roomConfigMap.get("agents") as? List<*>
+        assertNotNull(agentsMap)
+        assertEquals(1, agentsMap.size)
 
-        val roomMap = egressMap.get("room") as? Map<*, *>
-        assertNotNull(roomMap)
-
-        val fileOutputs = roomMap.get("file_outputs") as? List<*>
-        assertNotNull(fileOutputs)
-        assertEquals(1, fileOutputs.size)
-
-        val fileOutput = fileOutputs.first() as? Map<*, *>
-        assertNotNull(fileOutput)
-        assertEquals("MP4", fileOutput.get("file_type"))
-        assertEquals("livekit/test.mp4", fileOutput.get("filepath"))
-
-        val s3Config = fileOutput.get("s3") as? Map<*, *>
-        assertNotNull(s3Config)
-        assertEquals("test-bucket", s3Config.get("bucket"))
-        assertEquals("us-west-2", s3Config.get("region"))
-        assertEquals("test-access-key", s3Config.get("access_key"))
-        assertEquals("test-secret", s3Config.get("secret"))
-        assertEquals("https://s3.us-west-2.amazonaws.com", s3Config.get("endpoint"))
+        val agentMap = agentsMap.first() as? Map<*, *>
+        assertNotNull(agentMap)
+        assertEquals("agent_name", agentMap.get("agent_name"))
+        assertEquals("metadata", agentMap.get("metadata"))
     }
 }
