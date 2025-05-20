@@ -18,6 +18,7 @@ package io.livekit.server
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import livekit.LivekitAgentDispatch
 import livekit.LivekitRoom.RoomConfiguration
 import org.junit.jupiter.api.Test
 import java.util.Date
@@ -120,5 +121,46 @@ class AccessTokenTest {
 
         assertEquals(roomConfig.emptyTimeout, map["empty_timeout"])
         assertEquals(roomConfig.egress.room.roomName, ((map["egress"] as Map<*, *>)["room"] as Map<*, *>)["room_name"])
+    }
+
+    @Test
+    fun testArraysInRoomConfiguration() {
+        val roomConfig = with(RoomConfiguration.newBuilder()) {
+            name = "test_room"
+            addAgents(
+                LivekitAgentDispatch.RoomAgentDispatch.newBuilder()
+                    .setAgentName("agent_name")
+                    .setMetadata("metadata")
+                    .build()
+            )
+            build()
+        }
+
+        val token = AccessToken(KEY, SECRET)
+        token.roomConfiguration = roomConfig
+
+        // This should not throw an exception
+        val jwt = token.toJwt()
+
+        // Verify the JWT can be decoded
+        val alg = Algorithm.HMAC256(SECRET)
+        val decodedJWT = JWT.require(alg)
+            .withIssuer(KEY)
+            .build()
+            .verify(jwt)
+
+        // Verify the room configuration was properly encoded
+        val claims = decodedJWT.claims
+        val roomConfigMap = claims["roomConfig"]?.asMap()
+        assertNotNull(roomConfigMap)
+
+        val agentsMap = roomConfigMap.get("agents") as? List<*>
+        assertNotNull(agentsMap)
+        assertEquals(1, agentsMap.size)
+
+        val agentMap = agentsMap.first() as? Map<*, *>
+        assertNotNull(agentMap)
+        assertEquals("agent_name", agentMap.get("agent_name"))
+        assertEquals("metadata", agentMap.get("metadata"))
     }
 }
