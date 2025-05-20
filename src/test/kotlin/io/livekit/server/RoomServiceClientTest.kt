@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package io.livekit.server
 
 import io.livekit.server.okhttp.OkHttpFactory
 import livekit.LivekitModels
+import java.util.UUID
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -31,59 +33,68 @@ class RoomServiceClientTest {
         const val HOST = TestConstants.HOST
         const val KEY = TestConstants.KEY
         const val SECRET = TestConstants.SECRET
-
-        const val ROOM_NAME = "room_name"
-        const val METADATA = "metadata"
     }
 
     lateinit var client: RoomServiceClient
+    lateinit var roomName: String
 
     @BeforeTest
     fun setup() {
         client = RoomServiceClient.createClient(HOST, KEY, SECRET, OkHttpFactory(true, null))
+        roomName = "test_room_${UUID.randomUUID()}"
+    }
+
+    @AfterTest
+    fun cleanup() {
+        try {
+            client.deleteRoom(roomName).execute()
+        } catch (e: Exception) {
+            // Ignore cleanup errors
+        }
     }
 
     @Test
     fun createRoom() {
+        val metadata = "metadata"
         val response = client.createRoom(
-            name = ROOM_NAME,
-            metadata = METADATA,
+            name = roomName,
+            metadata = metadata,
         ).execute()
         val room = response.body()
 
         assertTrue(response.isSuccessful)
-        assertEquals(ROOM_NAME, room?.name)
-        assertEquals(METADATA, room?.metadata)
+        assertEquals(roomName, room?.name)
+        assertEquals(metadata, room?.metadata)
     }
 
     @Test
     fun listRooms() {
-        client.createRoom(ROOM_NAME).execute()
+        client.createRoom(roomName).execute()
         val response = client.listRooms(null).execute()
         val rooms = response.body()
 
         assertTrue(response.isSuccessful)
         assertNotNull(rooms)
-        assertTrue(rooms.any { room -> room.name == ROOM_NAME })
+        assertTrue(rooms.any { room -> room.name == roomName })
     }
 
     @Test
     fun deleteRoom() {
-        client.createRoom(ROOM_NAME).execute()
-        client.deleteRoom(ROOM_NAME).execute()
+        client.createRoom(roomName).execute()
+        client.deleteRoom(roomName).execute()
         val response = client.listRooms(null).execute()
         val rooms = response.body()
 
         assertTrue(response.isSuccessful)
         assertNotNull(rooms)
-        assertTrue(rooms.none { room -> room.name == ROOM_NAME })
+        assertTrue(rooms.none { room -> room.name == roomName })
     }
 
     @Test
     fun updateRoomMetadata() {
         val metadata = "NewMetadata"
-        client.createRoom(ROOM_NAME).execute()
-        val response = client.updateRoomMetadata(ROOM_NAME, metadata).execute()
+        client.createRoom(roomName).execute()
+        val response = client.updateRoomMetadata(roomName, metadata).execute()
         val room = response.body()
 
         assertTrue(response.isSuccessful)
@@ -93,8 +104,8 @@ class RoomServiceClientTest {
 
     @Test
     fun listParticipants() {
-        client.createRoom(ROOM_NAME).execute()
-        val response = client.listParticipants(ROOM_NAME).execute()
+        client.createRoom(roomName).execute()
+        val response = client.listParticipants(roomName).execute()
         val participants = response.body()
         assertTrue(response.isSuccessful)
         assertNotNull(participants)
@@ -104,12 +115,13 @@ class RoomServiceClientTest {
     @Test
     @Ignore("Requires manual participant")
     fun updateParticipant() {
-        val participants = client.listParticipants(ROOM_NAME).execute().body()
+        client.createRoom(roomName).execute()
+        val participants = client.listParticipants(roomName).execute().body()
         if (participants != null) {
             val participant = participants.first()
 
             val newMetadata = "new_metadata"
-            val response = client.updateParticipant(ROOM_NAME, participant.identity, metadata = newMetadata).execute()
+            val response = client.updateParticipant(roomName, participant.identity, metadata = newMetadata).execute()
             val updatedParticipant = response.body()!!
             assertTrue(response.isSuccessful)
             assertEquals(newMetadata, updatedParticipant.metadata)
@@ -118,13 +130,14 @@ class RoomServiceClientTest {
 
     @Test
     fun getParticipant() {
-        val response = client.getParticipant(ROOM_NAME, "fdsa").execute()
+        client.createRoom(roomName).execute()
+        client.getParticipant(roomName, "fdsa").execute()
     }
 
     @Test
     fun sendData() {
-        client.createRoom(ROOM_NAME).execute()
-        val response = client.sendData(ROOM_NAME, "data".toByteArray(), LivekitModels.DataPacket.Kind.RELIABLE).execute()
+        client.createRoom(roomName).execute()
+        val response = client.sendData(roomName, "data".toByteArray(), LivekitModels.DataPacket.Kind.RELIABLE).execute()
         assertTrue(response.isSuccessful)
     }
 }
