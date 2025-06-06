@@ -100,6 +100,7 @@ class SipServiceClient(
                     opt.metadata?.let { this.metadata = it }
                     opt.authUsername?.let { this.authUsername = it }
                     opt.authPassword?.let { this.authPassword = it }
+                    opt.destinationCountry?.let { this.destinationCountry = it }
                 }
                 build()
             }
@@ -160,6 +161,7 @@ class SipServiceClient(
                     opt.authUsername?.let { this.authUsername = it }
                     opt.authPassword?.let { this.authPassword = it }
                     opt.numbers?.let { this.numbers = buildListUpdate(it) }
+                    opt.destinationCountry?.let { this.destinationCountry = it }
                 }
                 build()
             }
@@ -449,6 +451,7 @@ data class CreateSipOutboundTrunkOptions(
     var transport: LivekitSip.SIPTransport = LivekitSip.SIPTransport.SIP_TRANSPORT_AUTO,
     var authUsername: String? = null,
     var authPassword: String? = null,
+    var destinationCountry: String? = null,
 )
 
 data class UpdateSipInboundTrunkOptions(
@@ -469,6 +472,7 @@ data class UpdateSipOutboundTrunkOptions(
     var transport: LivekitSip.SIPTransport? = null,
     var authUsername: String? = null,
     var authPassword: String? = null,
+    var destinationCountry: String? = null,
 )
 
 /**
