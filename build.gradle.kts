@@ -22,7 +22,7 @@ apply(from = "gradle/gradle-mvn-push.gradle")
 apply(plugin = "idea")
 
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.25"
     `maven-publish`
     `java-library`
     id("org.jetbrains.dokka") version "1.9.20"
@@ -81,7 +81,7 @@ spotless {
 val protoc_platform: String? by project
 val protoSrc = File("$projectDir/protocol/protobufs/").listFiles { f -> f.isFile }
 
-val protobufVersion = "3.25.6"
+val protobufVersion = "4.29.4"
 val protobufDep = "com.google.protobuf:protobuf-java:$protobufVersion"
 protobuf {
     protoc {
@@ -133,9 +133,9 @@ val javadocJar = tasks.named<Jar>("javadocJar") {
 dependencies {
     protobuf(files(*protoSrc))
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    api("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-protobuf:2.9.0")
-    implementation("com.auth0:java-jwt:4.2.1")
+    api("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-protobuf:2.11.0")
+    implementation("com.auth0:java-jwt:4.5.0")
     api(protobufDep)
     api("com.google.protobuf:protobuf-java-util:$protobufVersion")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
