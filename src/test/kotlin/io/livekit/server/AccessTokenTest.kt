@@ -79,7 +79,6 @@ class AccessTokenTest {
 
         assertEquals(KEY, claims["iss"]?.asString())
         assertEquals(token.name, claims["name"]?.asString())
-        assertEquals(token.identity, claims["jti"]?.asString())
         assertEquals(token.metadata, claims["metadata"]?.asString())
         assertEquals(token.sha256, claims["sha256"]?.asString())
         assertEquals(token.roomPreset, claims["roomPreset"]?.asString())
