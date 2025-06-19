@@ -141,7 +141,6 @@ class AccessToken(private val apiKey: String, private val secret: String) {
             val id = identity
             if (id != null) {
                 withSubject(id)
-                withJWTId(id)
             } else {
                 val hasRoomJoin = videoGrants.any { it is RoomJoin && it.value == true }
                 if (hasRoomJoin) {
