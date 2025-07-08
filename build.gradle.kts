@@ -10,7 +10,6 @@ buildscript {
     }
     dependencies {
         classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.19")
-        classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0")
         classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.9.20")
     }
 }
@@ -29,6 +28,7 @@ plugins {
     id("io.codearte.nexus-staging") version "0.30.0"
     id("com.google.protobuf") version "0.8.19"
     id("com.diffplug.spotless") version "6.21.0"
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 java {
@@ -147,10 +147,19 @@ tasks.test {
     useJUnitPlatform()
 }
 
-nexusStaging {
-    serverUrl = "https://s01.oss.sonatype.org/service/local/"
-    packageGroup = properties["GROUP"] as String
-    stagingProfileId = "16b57cbf143daa"
+group = properties["GROUP"].toString()
+version = properties["VERSION_NAME"].toString()
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            //only for users registered in Sonatype after 24 Feb 2021
+            username.set(properties["nexusUsername"].toString())
+            password.set(properties["nexusPassword"].toString())
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+        }
+    }
 }
 
 publishing {
