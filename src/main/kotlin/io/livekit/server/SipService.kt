@@ -84,6 +84,7 @@ interface SipService {
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPDispatchRuleInfo>
 
+    @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.SIP/UpdateSIPDispatchRule")
     fun updateSipDispatchRule(
         @Body request: LivekitSip.UpdateSIPDispatchRuleRequest,
