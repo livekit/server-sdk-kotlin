@@ -266,6 +266,7 @@ class SipServiceClient(
         options: UpdateSipDispatchRuleOptions? = null
     ): Call<LivekitSip.SIPDispatchRuleInfo> {
         val request = with(LivekitSip.UpdateSIPDispatchRuleRequest.newBuilder()) {
+            this.sipDispatchRuleId = sipDispatchRuleId
             update = with(LivekitSip.SIPDispatchRuleUpdate.newBuilder()) {
                 options?.let { opt ->
                     opt.name?.let { this.name = it }
