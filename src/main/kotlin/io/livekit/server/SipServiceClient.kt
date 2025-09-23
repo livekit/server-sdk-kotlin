@@ -40,8 +40,8 @@ import java.util.function.Supplier
  */
 class SipServiceClient(
     private val service: SipService,
-    private val apiKey: String,
-    private val secret: String,
+    apiKey: String,
+    secret: String,
 ) : ServiceClientBase(apiKey, secret) {
 
     /**
@@ -50,6 +50,7 @@ class SipServiceClient(
      * See: [SIP Inbound Trunk](https://docs.livekit.io/sip/trunk-inbound/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun createSipInboundTrunk(
         name: String,
         numbers: List<String>,
@@ -82,6 +83,7 @@ class SipServiceClient(
      * See: [SIP Outbound Trunk](https://docs.livekit.io/sip/trunk-outbound/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun createSipOutboundTrunk(
         name: String,
         address: String,
@@ -115,6 +117,7 @@ class SipServiceClient(
      * UpdateSIPInboundTrunk updates an existing SIP Inbound Trunk.
      */
     @JvmOverloads
+    @Suppress("unused")
     fun updateSipInboundTrunk(
         sipTrunkId: String,
         options: UpdateSipInboundTrunkOptions? = null
@@ -145,6 +148,7 @@ class SipServiceClient(
      * UpdateSIPOutboundTrunk updates an existing SIP Outbound Trunk.
      */
     @JvmOverloads
+    @Suppress("unused")
     fun updateSipOutboundTrunk(
         sipTrunkId: String,
         options: UpdateSipOutboundTrunkOptions? = null,
@@ -178,6 +182,7 @@ class SipServiceClient(
      * See: [SIP Inbound Trunk](https://docs.livekit.io/sip/trunk-inbound/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun listSipInboundTrunk(): Call<List<LivekitSip.SIPInboundTrunkInfo>> {
         val request = LivekitSip.ListSIPInboundTrunkRequest.newBuilder().build()
 
@@ -192,6 +197,7 @@ class SipServiceClient(
      * See: [SIP Outbound Trunk](https://docs.livekit.io/sip/trunk-outbound/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun listSipOutboundTrunk(): Call<List<LivekitSip.SIPOutboundTrunkInfo>> {
         val request = LivekitSip.ListSIPOutboundTrunkRequest.newBuilder().build()
 
@@ -204,6 +210,7 @@ class SipServiceClient(
      * Deletes a trunk.
      */
     @JvmOverloads
+    @Suppress("unused")
     fun deleteSipTrunk(sipTrunkId: String): Call<SIPTrunkInfo> {
         val request = with(LivekitSip.DeleteSIPTrunkRequest.newBuilder()) {
             this.sipTrunkId = sipTrunkId
@@ -220,6 +227,7 @@ class SipServiceClient(
      * See: [Dispatch Rules](https://docs.livekit.io/sip/dispatch-rule/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun createSipDispatchRule(
         rule: SipDispatchRule,
         options: CreateSipDispatchRuleOptions? = null
@@ -261,31 +269,33 @@ class SipServiceClient(
      * UpdateSIPDispatchRule updates an existing SIP Dispatch Rule.
      */
     @JvmOverloads
+    @Suppress("unused")
     fun updateSipDispatchRule(
         sipDispatchRuleId: String,
         options: UpdateSipDispatchRuleOptions? = null
     ): Call<LivekitSip.SIPDispatchRuleInfo> {
         val request = with(LivekitSip.UpdateSIPDispatchRuleRequest.newBuilder()) {
+            this.sipDispatchRuleId = sipDispatchRuleId
             update = with(LivekitSip.SIPDispatchRuleUpdate.newBuilder()) {
                 options?.let { opt ->
                     opt.name?.let { this.name = it }
                     opt.metadata?.let { this.metadata = it }
                     opt.trunkIds?.let { this.trunkIds = buildListUpdate(it) }
-                    opt.rule?.let {
+                    opt.rule?.let { optRule ->
                         this.rule = with(SIPDispatchRule.newBuilder()) {
-                            when (it) {
+                            when (optRule) {
                                 is SipDispatchRuleDirect -> {
                                     dispatchRuleDirect = with(SIPDispatchRuleDirect.newBuilder()) {
-                                        roomName = it.roomName
-                                        it.pin?.let { this.pin = it }
+                                        roomName = optRule.roomName
+                                        optRule.pin?.let { this.pin = it }
                                         build()
                                     }
                                 }
 
                                 is SipDispatchRuleIndividual -> {
                                     dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
-                                        roomPrefix = it.roomPrefix
-                                        it.pin?.let { this.pin = it }
+                                        roomPrefix = optRule.roomPrefix
+                                        optRule.pin?.let { this.pin = it }
                                         build()
                                     }
                                 }
@@ -308,6 +318,7 @@ class SipServiceClient(
      *
      * See: [Dispatch Rules](https://docs.livekit.io/sip/dispatch-rule/)
      */
+    @Suppress("unused")
     fun listSipDispatchRule(): Call<List<SIPDispatchRuleInfo>> {
         val request = LivekitSip.ListSIPDispatchRuleRequest.newBuilder().build()
         val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
@@ -320,6 +331,7 @@ class SipServiceClient(
      *
      * See: [Dispatch Rules](https://docs.livekit.io/sip/dispatch-rule/)
      */
+    @Suppress("unused")
     fun deleteSipDispatchRule(sipDispatchRuleId: String): Call<SIPDispatchRuleInfo> {
         val request = with(LivekitSip.DeleteSIPDispatchRuleRequest.newBuilder()) {
             this.sipDispatchRuleId = sipDispatchRuleId
@@ -334,6 +346,7 @@ class SipServiceClient(
      *
      * See: [SIP Participant](https://docs.livekit.io/sip/sip-participant/)
      */
+    @Suppress("unused")
     fun createSipParticipant(
         sipTrunkId: String,
         number: String,
@@ -377,6 +390,7 @@ class SipServiceClient(
      *
      * See: [SIP Participant](https://docs.livekit.io/sip/sip-participant/)
      */
+    @Suppress("unused")
     fun transferSipParticipant(
         roomName: String,
         participantIdentity: String,
