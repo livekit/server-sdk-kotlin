@@ -1,6 +1,6 @@
 {
   "name": "server-sdk-kotlin",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "main": "index.js",
   "repository": "https://github.com/livekit/server-sdk-kotlin.git",
   "license": "Apache License 2.0",
