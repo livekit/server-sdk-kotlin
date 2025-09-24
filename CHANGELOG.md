@@ -1,5 +1,13 @@
 # server-sdk-kotlin
 
+## 0.10.1
+
+### Patch Changes
+
+- Properly set rule id when updating dispatch rule - [#131](https://github.com/livekit/server-sdk-kotlin/pull/131) ([@davidliu](https://github.com/davidliu))
+
+- Add missing headers for SipService call - [#129](https://github.com/livekit/server-sdk-kotlin/pull/129) ([@davidliu](https://github.com/davidliu))
+
 ## 0.10.0
 
 ### Minor Changes
