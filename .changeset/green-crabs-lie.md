@@ -2,4 +2,4 @@
 "server-sdk-kotlin": minor
 ---
 
-feat(connector): initial service impl
+Added ConnectorService for connecting to external communication platforms
