@@ -29,10 +29,10 @@ jobs:
         path: ./server-sdk-kotlin
         submodules: recursive
 
-    - name: set up JDK 12
-      uses: actions/setup-java@v2
+    - name: set up JDK 17
+      uses: actions/setup-java@v5
       with:
-        java-version: '12'
+        java-version: '17'
         distribution: 'adopt'
 
     - uses: actions/cache@v4
