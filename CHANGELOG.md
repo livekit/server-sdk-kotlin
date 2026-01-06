@@ -1,5 +1,19 @@
 # server-sdk-kotlin
 
+## 0.11.0
+
+### Minor Changes
+
+- Update Kotlin to 2.3.0 - [#137](https://github.com/livekit/server-sdk-kotlin/pull/137) ([@davidliu](https://github.com/davidliu))
+
+- Update Retrofit to 3.0.0 - [#137](https://github.com/livekit/server-sdk-kotlin/pull/137) ([@davidliu](https://github.com/davidliu))
+
+- Added ConnectorService for connecting to external communication platforms - [#135](https://github.com/livekit/server-sdk-kotlin/pull/135) ([@anunaym14](https://github.com/anunaym14))
+
+- Update OkHttp to 5.3.2 - [#137](https://github.com/livekit/server-sdk-kotlin/pull/137) ([@davidliu](https://github.com/davidliu))
+
+- Update Java compilation target to Java 17 - [#137](https://github.com/livekit/server-sdk-kotlin/pull/137) ([@davidliu](https://github.com/davidliu))
+
 ## 0.10.1
 
 ### Patch Changes
