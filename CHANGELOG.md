@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.11.1
+
+### Patch Changes
+
+- Remove duplicate google protos - [#141](https://github.com/livekit/server-sdk-kotlin/pull/141) ([@davidliu](https://github.com/davidliu))
+
 ## 0.11.0
 
 ### Minor Changes
