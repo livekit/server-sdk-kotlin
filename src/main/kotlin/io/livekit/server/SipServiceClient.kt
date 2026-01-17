@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import io.livekit.server.okhttp.OkHttpFactory
 import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.retrofit.withTransform
 import livekit.LivekitModels.ListUpdate
+import livekit.LivekitRoom
 import livekit.LivekitSip
 import livekit.LivekitSip.SIPDispatchRule
 import livekit.LivekitSip.SIPDispatchRuleDirect
@@ -231,31 +232,38 @@ class SipServiceClient(
     fun createSipDispatchRule(
         rule: SipDispatchRule,
         options: CreateSipDispatchRuleOptions? = null
-    ): Call<LivekitSip.SIPDispatchRuleInfo> {
+    ): Call<SIPDispatchRuleInfo> {
         val request = with(LivekitSip.CreateSIPDispatchRuleRequest.newBuilder()) {
-            options?.let { opt ->
-                opt.trunkIds?.let { this.addAllTrunkIds(it) }
-                opt.hidePhoneNumber?.let { this.hidePhoneNumber = it }
-                opt.name?.let { this.name = it }
-                opt.metadata?.let { this.metadata = it }
-            }
-            this.rule = with(SIPDispatchRule.newBuilder()) {
-                when (rule) {
-                    is SipDispatchRuleDirect -> {
-                        dispatchRuleDirect = with(SIPDispatchRuleDirect.newBuilder()) {
-                            roomName = rule.roomName
-                            rule.pin?.let { this.pin = it }
-                            build()
+            this.dispatchRule = with(SIPDispatchRuleInfo.newBuilder()) {
+                options?.let { opt ->
+                    opt.trunkIds?.let { this.addAllTrunkIds(it) }
+                    opt.hidePhoneNumber?.let { this.hidePhoneNumber = it }
+                    opt.name?.let { this.name = it }
+                    opt.metadata?.let { this.metadata = it }
+                    opt.attributes?.let { this.putAllAttributes(it) }
+                    opt.roomPreset?.let { this.roomPreset = it }
+                    opt.roomConfig?.let { this.roomConfig = it }
+                }
+                build()
+                this.rule = with(SIPDispatchRule.newBuilder()) {
+                    when (rule) {
+                        is SipDispatchRuleDirect -> {
+                            dispatchRuleDirect = with(SIPDispatchRuleDirect.newBuilder()) {
+                                roomName = rule.roomName
+                                rule.pin?.let { this.pin = it }
+                                build()
+                            }
                         }
-                    }
 
-                    is SipDispatchRuleIndividual -> {
-                        dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
-                            roomPrefix = rule.roomPrefix
-                            rule.pin?.let { this.pin = it }
-                            build()
+                        is SipDispatchRuleIndividual -> {
+                            dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
+                                roomPrefix = rule.roomPrefix
+                                rule.pin?.let { this.pin = it }
+                                build()
+                            }
                         }
                     }
+                    build()
                 }
                 build()
             }
@@ -314,7 +322,7 @@ class SipServiceClient(
     }
 
     /**
-     * Creates a dispatch rule.
+     * Lists the dispatch rules.
      *
      * See: [Dispatch Rules](https://docs.livekit.io/sip/dispatch-rule/)
      */
@@ -514,10 +522,28 @@ data class SipDispatchRuleIndividual(
 ) : SipDispatchRule("individual")
 
 data class CreateSipDispatchRuleOptions(
+    /** Human-readable name for the Dispatch Rule. */
     var name: String? = null,
+    /**
+     * User-defined metadata for the Dispatch Rule.
+     * Participants created by this rule will inherit this metadata.
+     */
     var metadata: String? = null,
     var trunkIds: List<String>? = null,
     var hidePhoneNumber: Boolean? = null,
+    /**
+     * User-defined attributes for the Dispatch Rule.
+     * Participants created by this rule will inherit these attributes.
+     */
+    var attributes: Map<String, String>? = null,
+    /**
+     * Cloud-only, config preset to use
+     */
+    var roomPreset: String? = null,
+    /**
+     * RoomConfiguration to use if the participant initiates the room
+     */
+    var roomConfig: LivekitRoom.RoomConfiguration? = null,
 )
 
 data class UpdateSipDispatchRuleOptions(
