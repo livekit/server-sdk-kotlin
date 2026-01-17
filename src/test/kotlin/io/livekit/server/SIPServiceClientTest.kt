@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 package io.livekit.server
 
 import io.livekit.server.okhttp.OkHttpFactory
+import livekit.LivekitRoom
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class SIPServiceClientTest {
     companion object {
@@ -52,5 +54,47 @@ class SIPServiceClientTest {
     @Test
     fun listSipDispatchRules() {
         client.listSipDispatchRule().execute()
+    }
+
+    @Test
+    fun createSipDispatchRule() {
+        run {
+            val response = client.createSipDispatchRule(
+                rule = SipDispatchRuleDirect(
+                    roomName = "room",
+                    pin = "1234"
+                ),
+                options = CreateSipDispatchRuleOptions(
+                    name = "test_dispatch_rule_name",
+                    metadata = "metadata",
+                    hidePhoneNumber = true,
+                    attributes = mapOf("abc" to "def"),
+                    roomPreset = "preset",
+                    roomConfig = with(LivekitRoom.RoomConfiguration.newBuilder()) {
+                        this.emptyTimeout = 10
+                        this.departureTimeout = 20
+                        build()
+                    }
+                ),
+            ).execute()
+
+            assertTrue(response.isSuccessful)
+            println(response.body())
+        }
+
+        run {
+            val response = client.listSipDispatchRule().execute()
+            assertTrue(response.isSuccessful)
+
+            val infos = response.body() ?: emptyList()
+            assertTrue(infos.isNotEmpty())
+            println(infos)
+
+            infos.forEach { info ->
+                val deleteResponse = client.deleteSipDispatchRule(info.sipDispatchRuleId).execute()
+                assertTrue(deleteResponse.isSuccessful)
+                println(deleteResponse.body())
+            }
+        }
     }
 }
