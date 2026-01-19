@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.12.0
+
+### Minor Changes
+
+- Add attributes, roomPreset, and roomConfig to CreateSipDispatchRuleOptions - [#145](https://github.com/livekit/server-sdk-kotlin/pull/145) ([@davidliu](https://github.com/davidliu))
+
 ## 0.11.1
 
 ### Patch Changes
