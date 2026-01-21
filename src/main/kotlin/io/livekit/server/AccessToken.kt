@@ -166,7 +166,6 @@ class AccessToken(
             val id = identity
             if (id != null) {
                 withSubject(id)
-                withJWTId(id)
             } else {
                 val hasRoomJoin = videoGrants.any { it is RoomJoin && it.value == true }
                 if (hasRoomJoin) {
@@ -220,16 +219,31 @@ internal fun JWTCreator.Builder.withClaimAny(name: String, value: Any) {
     }
 }
 
-internal fun MessageOrBuilder.toMap(): Map<String, *> {
-    val map = mutableMapOf<String, Any>()
-
+internal fun MessageOrBuilder.toMap(): Map<String, *> = buildMap {
     for ((field, value) in allFields) {
-        if (value is MessageOrBuilder) {
-            map[field.name] = value.toMap()
-        } else {
-            map[field.name] = value
-        }
+        put(
+            field.name,
+            when (value) {
+                is MessageOrBuilder -> value.toMap()
+                is List<*> ->
+                    value.map { item ->
+                        when (item) {
+                            is MessageOrBuilder -> item.toMap()
+                            else -> if (isSupportedType(item)) item else item.toString()
+                        }
+                    }
+                else -> if (isSupportedType(value)) value else value.toString()
+            }
+        )
     }
-
-    return map
 }
+
+private fun isSupportedType(value: Any?) =
+    value == null ||
+        value is Boolean ||
+        value is Int ||
+        value is Long ||
+        value is Double ||
+        value is String ||
+        value is Map<*, *> ||
+        value is List<*>
