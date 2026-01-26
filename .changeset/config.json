@@ -8,7 +8,7 @@
   "fixed": [],
   "linked": [],
   "access": "public",
-  "baseBranch": "main",
+  "baseBranch": "release/v0.9",
   "updateInternalDependencies": "patch",
   "ignore": [],
   "privatePackages": { "version": true, "tag": true }
