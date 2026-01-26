@@ -113,7 +113,7 @@ jobs:
         NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
 
     - name: Publish to sonatype
-      run: ./gradlew publishMavenPublicationToSonatypeRepository closeAndReleaseSonatypeRepository -Dorg.gradle.parallel=false
+      run: ./gradlew publishMavenPublicationToSonatypeRepository closeAndReleaseSonatypeStagingRepository -Dorg.gradle.parallel=false
   
   update-snapshot:
     needs: release
