@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.12.1
+
+### Patch Changes
+
+- Update "com.auth0:java-jwt" to version 4.5.1 - [#153](https://github.com/livekit/server-sdk-kotlin/pull/153) ([@jmini](https://github.com/jmini))
+
 ## 0.12.0
 
 ### Minor Changes
