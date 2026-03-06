@@ -149,7 +149,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-protobuf:3.0.0")
-    implementation("com.auth0:java-jwt:4.5.0")
+    implementation("com.auth0:java-jwt:4.5.1")
     api(protobufDep)
     api("com.google.protobuf:protobuf-java-util:$protobufVersion")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
