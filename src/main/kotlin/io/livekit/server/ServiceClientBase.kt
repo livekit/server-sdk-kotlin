@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,14 @@
 
 package io.livekit.server
 
+import java.time.Duration
 import java.util.concurrent.TimeUnit
+
+internal fun Duration.toProto(): com.google.protobuf.Duration =
+    com.google.protobuf.Duration.newBuilder()
+        .setSeconds(seconds)
+        .setNanos(nano)
+        .build()
 
 open class ServiceClientBase(
     private val apiKey: String,

@@ -90,6 +90,7 @@ sourceSets {
             exclude("agent/*")
             exclude("infra/*")
             exclude("rpc/*")
+            exclude("livekit_agent_simulation.proto")
         }
     }
 }
