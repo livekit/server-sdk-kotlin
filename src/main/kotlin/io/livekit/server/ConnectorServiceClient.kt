@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 LiveKit, Inc.
+ * Copyright 2025-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import java.time.Duration
 import java.util.function.Supplier
 
 /**
@@ -74,15 +75,24 @@ class ConnectorServiceClient(
      * Disconnect an active WhatsApp call.
      *
      * @param whatsappCallId The call ID sent by Meta
-     * @param whatsappApiKey The API key of the business disconnecting the call
+     * @param whatsappApiKey The API key of the business disconnecting the call.
+     * Required when [disconnectReason] is [LivekitConnectorWhatsapp.DisconnectWhatsAppCallRequest.DisconnectReason.BUSINESS_INITIATED];
+     * may be empty for [LivekitConnectorWhatsapp.DisconnectWhatsAppCallRequest.DisconnectReason.USER_INITIATED].
+     * @param disconnectReason The reason for disconnecting the call. Defaults to
+     * [LivekitConnectorWhatsapp.DisconnectWhatsAppCallRequest.DisconnectReason.BUSINESS_INITIATED].
      */
+    @JvmOverloads
     fun disconnectWhatsAppCall(
         whatsappCallId: String,
         whatsappApiKey: String,
+        disconnectReason: LivekitConnectorWhatsapp.DisconnectWhatsAppCallRequest.DisconnectReason? = null,
     ): Call<LivekitConnectorWhatsapp.DisconnectWhatsAppCallResponse> {
         val request = with(LivekitConnectorWhatsapp.DisconnectWhatsAppCallRequest.newBuilder()) {
             this.whatsappCallId = whatsappCallId
             this.whatsappApiKey = whatsappApiKey
+            if (disconnectReason != null) {
+                this.disconnectReason = disconnectReason
+            }
             build()
         }
 
@@ -119,6 +129,7 @@ class ConnectorServiceClient(
      * @param whatsappCloudApiVersion WhatsApp Cloud API version (e.g., "23.0", "24.0")
      * @param whatsappCallId The call ID sent by Meta
      * @param sdp The session description from Meta
+     * @param waitUntilAnswered If true, block until the call is answered before returning.
      * @param options Additional options for the call
      */
     @JvmOverloads
@@ -128,6 +139,7 @@ class ConnectorServiceClient(
         whatsappCloudApiVersion: String,
         whatsappCallId: String,
         sdp: LivekitRtc.SessionDescription,
+        waitUntilAnswered: Boolean = false,
         options: WhatsAppCallOptions? = null,
     ): Call<LivekitConnectorWhatsapp.AcceptWhatsAppCallResponse> {
         val request = with(LivekitConnectorWhatsapp.AcceptWhatsAppCallRequest.newBuilder()) {
@@ -136,6 +148,7 @@ class ConnectorServiceClient(
             this.whatsappCloudApiVersion = whatsappCloudApiVersion
             this.whatsappCallId = whatsappCallId
             this.sdp = sdp
+            this.waitUntilAnswered = waitUntilAnswered
             applyOptions(options)
             build()
         }
@@ -224,6 +237,7 @@ private fun LivekitConnectorWhatsapp.DialWhatsAppCallRequest.Builder.applyOption
         opt.participantMetadata?.let { this.participantMetadata = it }
         opt.participantAttributes?.let { this.putAllParticipantAttributes(it) }
         opt.destinationCountry?.let { this.destinationCountry = it }
+        opt.ringingTimeout?.let { this.ringingTimeout = it.toProto() }
     }
 }
 
@@ -237,6 +251,7 @@ private fun LivekitConnectorWhatsapp.AcceptWhatsAppCallRequest.Builder.applyOpti
         opt.participantMetadata?.let { this.participantMetadata = it }
         opt.participantAttributes?.let { this.putAllParticipantAttributes(it) }
         opt.destinationCountry?.let { this.destinationCountry = it }
+        opt.ringingTimeout?.let { this.ringingTimeout = it.toProto() }
     }
 }
 
@@ -272,6 +287,8 @@ data class WhatsAppCallOptions(
     var destinationCountry: String? = null,
     /** An arbitrary string useful for tracking and logging purposes */
     var whatsappBizOpaqueCallbackData: String? = null,
+    /** Max time for the callee to answer the call. */
+    var ringingTimeout: Duration? = null,
 )
 
 /**

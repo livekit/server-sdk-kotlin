@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 LiveKit, Inc.
+ * Copyright 2025-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ class AgentDispatchServiceClient(
      * @param room Name of the room to create dispatch in
      * @param agentName Name of the agent to dispatch
      * @param metadata Optional metadata to attach to the dispatch
+     * @param restartPolicy Optional restart policy for the dispatched job (cloud only). Defaults to [LivekitAgentDispatch.JobRestartPolicy.JRP_ON_FAILURE].
      * @return Created agent dispatch
      */
     @JvmOverloads
@@ -49,12 +50,16 @@ class AgentDispatchServiceClient(
         room: String,
         agentName: String,
         metadata: String? = null,
+        restartPolicy: LivekitAgentDispatch.JobRestartPolicy? = null,
     ): Call<LivekitAgentDispatch.AgentDispatch> {
         val request = with(LivekitAgentDispatch.CreateAgentDispatchRequest.newBuilder()) {
             setRoom(room)
             setAgentName(agentName)
             if (metadata != null) {
                 setMetadata(metadata)
+            }
+            if (restartPolicy != null) {
+                setRestartPolicy(restartPolicy)
             }
             build()
         }
