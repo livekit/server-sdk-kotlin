@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.13.0
+
+### Minor Changes
+
+- Update agent dispatch and connector clients for new proto fields: `restartPolicy` on `createDispatch`, `disconnectReason` on `disconnectWhatsAppCall`, `waitUntilAnswered` on `acceptWhatsAppCall`, and `ringingTimeout` on `WhatsAppCallOptions` - [#157](https://github.com/livekit/server-sdk-kotlin/pull/157) ([@anunaym14](https://github.com/anunaym14))
+
 ## 0.12.1
 
 ### Patch Changes
