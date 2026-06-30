@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import java.nio.ByteBuffer
+import java.util.UUID
 import java.util.function.Consumer
 import java.util.function.Supplier
 
@@ -190,6 +192,48 @@ class RoomServiceClient(
     }
 
     /**
+     * Forward a participant's track(s) to another room. Requires `roomAdmin` and `destinationRoom`. The forwarding will
+     * stop when the participant leaves the room or `RemoveParticipant` has been called in the destination room.
+     * A participant can be forwarded to multiple rooms. The destination room will be created if it does not exist.
+     * @param roomName
+     * @param identity
+     * @param destinationRoomName
+     */
+    fun forwardParticipant(roomName: String, identity: String, destinationRoomName: String): Call<LivekitRoom.ForwardParticipantResponse> {
+        val request = LivekitRoom.ForwardParticipantRequest.newBuilder()
+            .setRoom(roomName)
+            .setIdentity(identity)
+            .setDestinationRoom(destinationRoomName)
+            .build()
+        val credentials = authHeader(
+            RoomAdmin(true),
+            RoomName(roomName),
+            DestinationRoomName(destinationRoomName),
+        )
+        return service.forwardParticipant(request, credentials)
+    }
+
+    /**
+     * Move a participant from one room to another room.
+     * @param roomName
+     * @param identity
+     * @param destinationRoomName
+     */
+    fun moveParticipant(roomName: String, identity: String, destinationRoomName: String): Call<LivekitRoom.MoveParticipantResponse> {
+        val request = LivekitRoom.MoveParticipantRequest.newBuilder()
+            .setRoom(roomName)
+            .setIdentity(identity)
+            .setDestinationRoom(destinationRoomName)
+            .build()
+        val credentials = authHeader(
+            RoomAdmin(true),
+            RoomName(roomName),
+            DestinationRoomName(destinationRoomName),
+        )
+        return service.moveParticipant(request, credentials)
+    }
+
+    /**
      * Mutes a track that the participant has published.
      * @param roomName
      * @param identity
@@ -307,6 +351,11 @@ class RoomServiceClient(
         destinationIdentities: List<String> = emptyList(),
         topic: String? = null,
     ): Call<Void?> {
+        val uuid = UUID.randomUUID()
+        val b = ByteBuffer.wrap(ByteArray(16))
+        b.putLong(uuid.mostSignificantBits)
+        b.putLong(uuid.leastSignificantBits)
+
         val request = with(LivekitRoom.SendDataRequest.newBuilder()) {
             this.room = roomName
             this.data = ByteString.copyFrom(data)
@@ -316,6 +365,7 @@ class RoomServiceClient(
             if (topic != null) {
                 this.topic = topic
             }
+            this.nonce = ByteString.copyFrom(b)
             build()
         }
 
@@ -324,63 +374,6 @@ class RoomServiceClient(
             RoomName(roomName),
         )
         return service.sendData(request, credentials)
-    }
-
-    /**
-     * Forwards a participant's published tracks to another room. The participant
-     * stays connected to the original room. Requires `roomAdmin` and the
-     * `destinationRoom` permission.
-     *
-     * @param roomName room to forward the participant from
-     * @param identity identity of the participant to forward
-     * @param destinationRoom room to forward the participant to
-     */
-    fun forwardParticipant(
-        roomName: String,
-        identity: String,
-        destinationRoom: String,
-    ): Call<LivekitRoom.ForwardParticipantResponse> {
-        val request = with(LivekitRoom.ForwardParticipantRequest.newBuilder()) {
-            this.room = roomName
-            this.identity = identity
-            this.destinationRoom = destinationRoom
-            build()
-        }
-
-        val credentials = authHeader(
-            RoomAdmin(true),
-            RoomName(roomName),
-            DestinationRoom(destinationRoom),
-        )
-        return service.forwardParticipant(request, credentials)
-    }
-
-    /**
-     * Moves a connected participant to a different room. Cloud-only. Requires
-     * `roomAdmin` and the `destinationRoom` permission.
-     *
-     * @param roomName room to move the participant from
-     * @param identity identity of the participant to move
-     * @param destinationRoom room to move the participant to
-     */
-    fun moveParticipant(
-        roomName: String,
-        identity: String,
-        destinationRoom: String,
-    ): Call<LivekitRoom.MoveParticipantResponse> {
-        val request = with(LivekitRoom.MoveParticipantRequest.newBuilder()) {
-            this.room = roomName
-            this.identity = identity
-            this.destinationRoom = destinationRoom
-            build()
-        }
-
-        val credentials = authHeader(
-            RoomAdmin(true),
-            RoomName(roomName),
-            DestinationRoom(destinationRoom),
-        )
-        return service.moveParticipant(request, credentials)
     }
 
     private fun authHeader(vararg videoGrants: VideoGrant): String {

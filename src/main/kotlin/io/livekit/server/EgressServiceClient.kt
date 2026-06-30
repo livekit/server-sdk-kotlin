@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,12 @@ data class EncodedOutputs(
     val imageOutput: LivekitEgress.ImageOutput?,
 )
 
+enum class AudioMixing {
+    DEFAULT_MIXING,
+    DUAL_CHANNEL_AGENT,
+    DUAL_CHANNEL_ALTERNATE
+}
+
 /**
  * A client for interacting with the Egress service.
  *
@@ -55,7 +61,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        customBaseUrl: String = ""
+        customBaseUrl: String = "",
+        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
@@ -69,7 +76,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            customBaseUrl
+            customBaseUrl,
+            audioMixing
         )
     }
 
@@ -82,7 +90,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        customBaseUrl: String = ""
+        customBaseUrl: String = "",
+        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
@@ -96,7 +105,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            customBaseUrl
+            customBaseUrl,
+            audioMixing
         )
     }
 
@@ -109,7 +119,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        customBaseUrl: String = ""
+        customBaseUrl: String = "",
+        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
@@ -123,7 +134,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            customBaseUrl
+            customBaseUrl,
+            audioMixing
         )
     }
 
@@ -136,7 +148,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        customBaseUrl: String = ""
+        customBaseUrl: String = "",
+        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING,
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
@@ -149,7 +162,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            customBaseUrl
+            customBaseUrl,
+            audioMixing
         )
     }
 
@@ -162,7 +176,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        customBaseUrl: String = ""
+        customBaseUrl: String = "",
+        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING,
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
         if (output.fileOutput != null) {
@@ -186,7 +201,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            customBaseUrl
+            customBaseUrl,
+            audioMixing
         )
     }
 
@@ -198,8 +214,15 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions?,
         audioOnly: Boolean,
         videoOnly: Boolean,
-        customBaseUrl: String
+        customBaseUrl: String,
+        audioMixing: AudioMixing
     ): Call<LivekitEgress.EgressInfo> {
+        val protoAudioMixing = when (audioMixing) {
+            AudioMixing.DEFAULT_MIXING -> LivekitEgress.AudioMixing.DEFAULT_MIXING
+            AudioMixing.DUAL_CHANNEL_AGENT -> LivekitEgress.AudioMixing.DUAL_CHANNEL_AGENT
+            AudioMixing.DUAL_CHANNEL_ALTERNATE -> LivekitEgress.AudioMixing.DUAL_CHANNEL_ALTERNATE
+        }
+
         val request = with(requestBuilder) {
             this.roomName = roomName
             this.layout = layout
@@ -211,6 +234,7 @@ class EgressServiceClient(
             this.audioOnly = audioOnly
             this.videoOnly = videoOnly
             this.customBaseUrl = customBaseUrl
+            this.audioMixing = protoAudioMixing
             build()
         }
         val credentials = authHeader(RoomRecord(true))

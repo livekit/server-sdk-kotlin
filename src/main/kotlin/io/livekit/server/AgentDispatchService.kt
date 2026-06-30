@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,20 +31,20 @@ interface AgentDispatchService {
     @POST("/twirp/livekit.AgentDispatchService/CreateDispatch")
     fun createDispatch(
         @Body request: LivekitAgentDispatch.CreateAgentDispatchRequest,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
     ): Call<LivekitAgentDispatch.AgentDispatch>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.AgentDispatchService/DeleteDispatch")
     fun deleteDispatch(
         @Body request: LivekitAgentDispatch.DeleteAgentDispatchRequest,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
     ): Call<LivekitAgentDispatch.AgentDispatch>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.AgentDispatchService/ListDispatch")
     fun listDispatch(
         @Body request: LivekitAgentDispatch.ListAgentDispatchRequest,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
     ): Call<LivekitAgentDispatch.ListAgentDispatchResponse>
 }

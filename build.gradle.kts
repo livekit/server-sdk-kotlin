@@ -1,8 +1,8 @@
 import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.proto
 import com.google.protobuf.gradle.protoc
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.net.URL
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.net.URI
 
 buildscript {
     repositories {
@@ -11,7 +11,6 @@ buildscript {
     }
     dependencies {
         classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.19")
-        classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0")
         classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.9.20")
     }
 }
@@ -20,27 +19,30 @@ repositories {
     mavenCentral()
 }
 apply(from = "gradle/gradle-mvn-push.gradle")
+apply(plugin = "idea")
 
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "2.3.0"
     `maven-publish`
     `java-library`
     id("org.jetbrains.dokka") version "1.9.20"
     id("io.codearte.nexus-staging") version "0.30.0"
     id("com.google.protobuf") version "0.8.19"
     id("com.diffplug.spotless") version "6.21.0"
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
-
 
 java {
     withJavadocJar()
     withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
 }
 
 spotless {
@@ -112,7 +114,7 @@ sourceSets {
     }
 }
 
-val protobufVersion = "3.21.7"
+val protobufVersion = "4.29.4"
 val protobufDep = "com.google.protobuf:protobuf-java:$protobufVersion"
 protobuf {
     protoc {
@@ -138,9 +140,9 @@ fun org.jetbrains.dokka.gradle.DokkaTask.configureDokkaTask() {
 
                 // URL showing where the source code can be accessed through the web browser
                 remoteUrl.set(
-                    URL(
+                    URI(
                         "https://github.com/livekit/server-sdk-kotlin/tree/main/src/main/kotlin"
-                    )
+                    ).toURL()
                 )
                 // Suffix which is used to append the line number to the URL. Use #L for GitHub
                 remoteLineSuffix.set("#L")
@@ -162,10 +164,11 @@ val javadocJar = tasks.named<Jar>("javadocJar") {
 }
 
 dependencies {
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    api("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-protobuf:2.9.0")
-    implementation("com.auth0:java-jwt:4.2.1")
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:5.3.2"))
+    implementation("com.squareup.okhttp3:logging-interceptor")
+    api("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-protobuf:3.0.0")
+    implementation("com.auth0:java-jwt:4.5.1")
     api(protobufDep)
     api("com.google.protobuf:protobuf-java-util:$protobufVersion")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
@@ -177,10 +180,19 @@ tasks.test {
     useJUnitPlatform()
 }
 
-nexusStaging {
-    serverUrl = "https://s01.oss.sonatype.org/service/local/"
-    packageGroup = properties["GROUP"] as String
-    stagingProfileId = "16b57cbf143daa"
+group = properties["GROUP"].toString()
+version = properties["VERSION_NAME"].toString()
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            //only for users registered in Sonatype after 24 Feb 2021
+            username.set(properties["nexusUsername"].toString())
+            password.set(properties["nexusPassword"].toString())
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+        }
+    }
 }
 
 publishing {

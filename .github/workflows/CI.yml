@@ -29,13 +29,13 @@ jobs:
         path: ./server-sdk-kotlin
         submodules: recursive
 
-    - name: set up JDK 12
-      uses: actions/setup-java@v2
+    - name: set up JDK 17
+      uses: actions/setup-java@v5
       with:
-        java-version: '12'
+        java-version: '17'
         distribution: 'adopt'
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       with:
         path: |
           ~/.gradle/caches
@@ -56,6 +56,9 @@ jobs:
 
     - name: Build with Gradle
       run: ./gradlew assemble
+
+    - name: Run unit tests (no livekit-server integration tests)
+      run: ./gradlew test --tests "io.livekit.server.AccessTokenTest"
 
     - name: get version name
       if: github.event_name == 'push'

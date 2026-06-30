@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,20 @@ interface SipService {
     ): Call<LivekitSip.SIPOutboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.SIP/UpdateSIPInboundTrunk")
+    fun updateSipInboundTrunk(
+        @Body request: LivekitSip.UpdateSIPInboundTrunkRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.SIPInboundTrunkInfo>
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.SIP/UpdateSIPOutboundTrunk")
+    fun updateSipOutboundTrunk(
+        @Body request: LivekitSip.UpdateSIPOutboundTrunkRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.SIPOutboundTrunkInfo>
+
+    @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.SIP/ListSIPInboundTrunk")
     fun listSIPInboundTrunk(
         @Body request: LivekitSip.ListSIPInboundTrunkRequest,
@@ -62,20 +76,6 @@ interface SipService {
         @Body request: LivekitSip.DeleteSIPTrunkRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPTrunkInfo>
-
-    @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/UpdateSIPInboundTrunk")
-    fun updateSipInboundTrunk(
-        @Body request: LivekitSip.UpdateSIPInboundTrunkRequest,
-        @Header("Authorization") authorization: String
-    ): Call<LivekitSip.SIPInboundTrunkInfo>
-
-    @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/UpdateSIPOutboundTrunk")
-    fun updateSipOutboundTrunk(
-        @Body request: LivekitSip.UpdateSIPOutboundTrunkRequest,
-        @Header("Authorization") authorization: String
-    ): Call<LivekitSip.SIPOutboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.SIP/CreateSIPDispatchRule")

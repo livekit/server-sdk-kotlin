@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2025-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,95 +29,95 @@ import retrofit2.converter.protobuf.ProtoConverterFactory
 import java.util.function.Supplier
 
 /**
- * A client for interacting with the Agent Dispatch service.
+ * A client for explicit agent dispatch.
  *
- * Explicit dispatch requires your agent to be registered with an `agentName`.
- *
- * See: [Dispatching agents](https://docs.livekit.io/agents/build/dispatch/)
+ * See: [Dispatching agents](https://docs.livekit.io/agents/build/dispatch/#explicit-agent-dispatch)
  */
 class AgentDispatchServiceClient(
     private val service: AgentDispatchService,
     private val apiKey: String,
     private val secret: String,
 ) {
+
     /**
-     * Create an explicit dispatch for an agent to join a room.
-     *
-     * @param roomName name of the room to dispatch the agent to
-     * @param agentName name of the agent to dispatch
-     * @param metadata optional custom data to send along with the job (distinct
-     *   from room and participant metadata)
-     * @param restartPolicy controls whether the job is restarted when it fails (cloud only)
-     * @param deployment optional deployment to dispatch to; leave empty to target production
+     * Creates an agent dispatch in a room.
+     * @param room Name of the room to create dispatch in
+     * @param agentName Name of the agent to dispatch
+     * @param metadata Optional metadata to attach to the dispatch
+     * @param restartPolicy Optional restart policy for the dispatched job (cloud only). Defaults to [LivekitAgentDispatch.JobRestartPolicy.JRP_ON_FAILURE].
+     * @param deployment Optional deployment to dispatch to; leave empty to target production (cloud only).
+     * @return Created agent dispatch
      */
     @JvmOverloads
     fun createDispatch(
-        roomName: String,
+        room: String,
         agentName: String,
         metadata: String? = null,
         restartPolicy: LivekitAgentDispatch.JobRestartPolicy? = null,
         deployment: String? = null,
     ): Call<LivekitAgentDispatch.AgentDispatch> {
         val request = with(LivekitAgentDispatch.CreateAgentDispatchRequest.newBuilder()) {
-            this.room = roomName
-            this.agentName = agentName
-            metadata?.let { this.metadata = it }
-            restartPolicy?.let { this.restartPolicy = it }
-            deployment?.let { this.deployment = it }
+            setRoom(room)
+            setAgentName(agentName)
+            if (metadata != null) {
+                setMetadata(metadata)
+            }
+            if (restartPolicy != null) {
+                setRestartPolicy(restartPolicy)
+            }
+            if (deployment != null) {
+                setDeployment(deployment)
+            }
             build()
         }
-        val credentials = authHeader(RoomAdmin(true), RoomName(roomName))
+        val credentials = authHeader(RoomAdmin(true), RoomName(room))
         return service.createDispatch(request, credentials)
     }
 
     /**
-     * Delete an explicit dispatch for an agent in a room.
-     *
-     * @param dispatchId id of the dispatch to delete
-     * @param roomName name of the room the dispatch is for
+     * Deletes an agent dispatch from a room.
+     * @param room Name of the room to delete dispatch from
+     * @param dispatchId ID of the dispatch to delete
+     * @return Deleted agent dispatch
      */
-    fun deleteDispatch(dispatchId: String, roomName: String): Call<LivekitAgentDispatch.AgentDispatch> {
-        val request = with(LivekitAgentDispatch.DeleteAgentDispatchRequest.newBuilder()) {
-            this.dispatchId = dispatchId
-            this.room = roomName
-            build()
-        }
-        val credentials = authHeader(RoomAdmin(true), RoomName(roomName))
+    fun deleteDispatch(room: String, dispatchId: String): Call<LivekitAgentDispatch.AgentDispatch> {
+        val request = LivekitAgentDispatch.DeleteAgentDispatchRequest.newBuilder()
+            .setRoom(room)
+            .setDispatchId(dispatchId)
+            .build()
+        val credentials = authHeader(RoomAdmin(true), RoomName(room))
         return service.deleteDispatch(request, credentials)
     }
 
     /**
-     * Get an agent dispatch by ID.
-     *
-     * @param dispatchId id of the dispatch to get
-     * @param roomName name of the room the dispatch is for
-     * @return the matching dispatch, or null if none was found
+     * List all agent dispatches in a room.
+     * @param room Name of the room to list dispatches from
+     * @return List of agent dispatches
      */
-    fun getDispatch(dispatchId: String, roomName: String): Call<LivekitAgentDispatch.AgentDispatch?> {
-        val request = with(LivekitAgentDispatch.ListAgentDispatchRequest.newBuilder()) {
-            this.dispatchId = dispatchId
-            this.room = roomName
-            build()
-        }
-        val credentials = authHeader(RoomAdmin(true), RoomName(roomName))
+    fun listDispatch(room: String): Call<List<LivekitAgentDispatch.AgentDispatch>> {
+        val request = LivekitAgentDispatch.ListAgentDispatchRequest.newBuilder()
+            .setRoom(room)
+            .build()
+        val credentials = authHeader(RoomAdmin(true), RoomName(room))
         return TransformCall(service.listDispatch(request, credentials)) {
-            it.agentDispatchesList.firstOrNull()
+            it.agentDispatchesList
         }
     }
 
     /**
-     * List all agent dispatches for a room.
-     *
-     * @param roomName name of the room to list dispatches for
+     * Get an agent dispatch by ID.
+     * @param room Name of the room the dispatch is for
+     * @param dispatchId ID of the dispatch to get
+     * @return The matching dispatch, or null if none was found
      */
-    fun listDispatch(roomName: String): Call<List<LivekitAgentDispatch.AgentDispatch>> {
-        val request = with(LivekitAgentDispatch.ListAgentDispatchRequest.newBuilder()) {
-            this.room = roomName
-            build()
-        }
-        val credentials = authHeader(RoomAdmin(true), RoomName(roomName))
+    fun getDispatch(room: String, dispatchId: String): Call<LivekitAgentDispatch.AgentDispatch?> {
+        val request = LivekitAgentDispatch.ListAgentDispatchRequest.newBuilder()
+            .setRoom(room)
+            .setDispatchId(dispatchId)
+            .build()
+        val credentials = authHeader(RoomAdmin(true), RoomName(room))
         return TransformCall(service.listDispatch(request, credentials)) {
-            it.agentDispatchesList
+            it.agentDispatchesList.firstOrNull()
         }
     }
 
@@ -131,8 +131,9 @@ class AgentDispatchServiceClient(
     }
 
     companion object {
+
         /**
-         * Create an AgentDispatchServiceClient.
+         * Create a new [AgentDispatchServiceClient] with the given host, api key, and secret.
          *
          * @param okHttpSupplier provide an [OkHttpFactory] if you wish to customize the http client
          * (e.g. proxy, timeout, certificate/auth settings), or supply your own OkHttpClient
@@ -153,7 +154,6 @@ class AgentDispatchServiceClient(
             val okhttp = okHttpSupplier.get().newBuilder()
                 .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
                 .build()
-
             val service = Retrofit.Builder()
                 .baseUrl(host)
                 .addConverterFactory(ProtoConverterFactory.create())

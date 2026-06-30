@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import io.livekit.server.okhttp.FailoverConfig
 import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.retrofit.withTransform
+import livekit.LivekitModels.ListUpdate
+import livekit.LivekitRoom
 import livekit.LivekitSip
 import livekit.LivekitSip.SIPDispatchRule
 import livekit.LivekitSip.SIPDispatchRuleDirect
@@ -41,8 +43,8 @@ import java.util.function.Supplier
  */
 class SipServiceClient(
     private val service: SipService,
-    private val apiKey: String,
-    private val secret: String,
+    apiKey: String,
+    secret: String,
 ) : ServiceClientBase(apiKey, secret) {
 
     /**
@@ -51,6 +53,7 @@ class SipServiceClient(
      * See: [SIP Inbound Trunk](https://docs.livekit.io/sip/trunk-inbound/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun createSipInboundTrunk(
         name: String,
         numbers: List<String>,
@@ -83,6 +86,7 @@ class SipServiceClient(
      * See: [SIP Outbound Trunk](https://docs.livekit.io/sip/trunk-outbound/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun createSipOutboundTrunk(
         name: String,
         address: String,
@@ -101,6 +105,7 @@ class SipServiceClient(
                     opt.metadata?.let { this.metadata = it }
                     opt.authUsername?.let { this.authUsername = it }
                     opt.authPassword?.let { this.authPassword = it }
+                    opt.destinationCountry?.let { this.destinationCountry = it }
                 }
                 build()
             }
@@ -112,11 +117,75 @@ class SipServiceClient(
     }
 
     /**
+     * UpdateSIPInboundTrunk updates an existing SIP Inbound Trunk.
+     */
+    @JvmOverloads
+    @Suppress("unused")
+    fun updateSipInboundTrunk(
+        sipTrunkId: String,
+        options: UpdateSipInboundTrunkOptions? = null
+    ): Call<LivekitSip.SIPInboundTrunkInfo> {
+        val request = with(LivekitSip.UpdateSIPInboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+
+            update = with(LivekitSip.SIPInboundTrunkUpdate.newBuilder()) {
+                options?.let { opt ->
+                    opt.name?.let { this.name = it }
+                    opt.authUsername?.let { this.authUsername = it }
+                    opt.authPassword?.let { this.authPassword = it }
+                    opt.metadata?.let { this.metadata = it }
+                    opt.numbers?.let { this.numbers = buildListUpdate(it) }
+                    opt.allowedNumbers?.let { this.allowedNumbers = buildListUpdate(it) }
+                    opt.allowedAddresses?.let { this.allowedAddresses = buildListUpdate(it) }
+                }
+                build()
+            }
+            build()
+        }
+
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipInboundTrunk(request, credentials)
+    }
+
+    /**
+     * UpdateSIPOutboundTrunk updates an existing SIP Outbound Trunk.
+     */
+    @JvmOverloads
+    @Suppress("unused")
+    fun updateSipOutboundTrunk(
+        sipTrunkId: String,
+        options: UpdateSipOutboundTrunkOptions? = null,
+    ): Call<LivekitSip.SIPOutboundTrunkInfo> {
+        val request = with(LivekitSip.UpdateSIPOutboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+
+            update = with(LivekitSip.SIPOutboundTrunkUpdate.newBuilder()) {
+                options?.let { opt ->
+                    opt.name?.let { this.name = it }
+                    opt.address?.let { this.address = it }
+                    opt.metadata?.let { this.metadata = it }
+                    opt.transport?.let { this.transport = it }
+                    opt.authUsername?.let { this.authUsername = it }
+                    opt.authPassword?.let { this.authPassword = it }
+                    opt.numbers?.let { this.numbers = buildListUpdate(it) }
+                    opt.destinationCountry?.let { this.destinationCountry = it }
+                }
+                build()
+            }
+            build()
+        }
+
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipOutboundTrunk(request, credentials)
+    }
+
+    /**
      * List inbound trunks.
      *
      * See: [SIP Inbound Trunk](https://docs.livekit.io/sip/trunk-inbound/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun listSipInboundTrunk(): Call<List<LivekitSip.SIPInboundTrunkInfo>> {
         val request = LivekitSip.ListSIPInboundTrunkRequest.newBuilder().build()
 
@@ -131,6 +200,7 @@ class SipServiceClient(
      * See: [SIP Outbound Trunk](https://docs.livekit.io/sip/trunk-outbound/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun listSipOutboundTrunk(): Call<List<LivekitSip.SIPOutboundTrunkInfo>> {
         val request = LivekitSip.ListSIPOutboundTrunkRequest.newBuilder().build()
 
@@ -143,6 +213,7 @@ class SipServiceClient(
      * Deletes a trunk.
      */
     @JvmOverloads
+    @Suppress("unused")
     fun deleteSipTrunk(sipTrunkId: String): Call<SIPTrunkInfo> {
         val request = with(LivekitSip.DeleteSIPTrunkRequest.newBuilder()) {
             this.sipTrunkId = sipTrunkId
@@ -159,34 +230,42 @@ class SipServiceClient(
      * See: [Dispatch Rules](https://docs.livekit.io/sip/dispatch-rule/)
      */
     @JvmOverloads
+    @Suppress("unused")
     fun createSipDispatchRule(
         rule: SipDispatchRule,
         options: CreateSipDispatchRuleOptions? = null
-    ): Call<LivekitSip.SIPDispatchRuleInfo> {
+    ): Call<SIPDispatchRuleInfo> {
         val request = with(LivekitSip.CreateSIPDispatchRuleRequest.newBuilder()) {
-            options?.let { opt ->
-                opt.trunkIds?.let { this.addAllTrunkIds(it) }
-                opt.hidePhoneNumber?.let { this.hidePhoneNumber = it }
-                opt.name?.let { this.name = it }
-                opt.metadata?.let { this.metadata = it }
-            }
-            this.rule = with(SIPDispatchRule.newBuilder()) {
-                when (rule) {
-                    is SipDispatchRuleDirect -> {
-                        dispatchRuleDirect = with(SIPDispatchRuleDirect.newBuilder()) {
-                            roomName = rule.roomName
-                            rule.pin?.let { this.pin = it }
-                            build()
+            this.dispatchRule = with(SIPDispatchRuleInfo.newBuilder()) {
+                options?.let { opt ->
+                    opt.trunkIds?.let { this.addAllTrunkIds(it) }
+                    opt.hidePhoneNumber?.let { this.hidePhoneNumber = it }
+                    opt.name?.let { this.name = it }
+                    opt.metadata?.let { this.metadata = it }
+                    opt.attributes?.let { this.putAllAttributes(it) }
+                    opt.roomPreset?.let { this.roomPreset = it }
+                    opt.roomConfig?.let { this.roomConfig = it }
+                }
+                build()
+                this.rule = with(SIPDispatchRule.newBuilder()) {
+                    when (rule) {
+                        is SipDispatchRuleDirect -> {
+                            dispatchRuleDirect = with(SIPDispatchRuleDirect.newBuilder()) {
+                                roomName = rule.roomName
+                                rule.pin?.let { this.pin = it }
+                                build()
+                            }
                         }
-                    }
 
-                    is SipDispatchRuleIndividual -> {
-                        dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
-                            roomPrefix = rule.roomPrefix
-                            rule.pin?.let { this.pin = it }
-                            build()
+                        is SipDispatchRuleIndividual -> {
+                            dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
+                                roomPrefix = rule.roomPrefix
+                                rule.pin?.let { this.pin = it }
+                                build()
+                            }
                         }
                     }
+                    build()
                 }
                 build()
             }
@@ -197,127 +276,59 @@ class SipServiceClient(
     }
 
     /**
-     * Updates an existing SIP inbound trunk, replacing it entirely with [trunk].
-     *
-     * @param sipTrunkId ID of the SIP inbound trunk to update
-     * @param trunk the full trunk definition to replace it with
+     * UpdateSIPDispatchRule updates an existing SIP Dispatch Rule.
      */
-    fun updateSipInboundTrunk(
-        sipTrunkId: String,
-        trunk: LivekitSip.SIPInboundTrunkInfo,
-    ): Call<LivekitSip.SIPInboundTrunkInfo> {
-        val request = with(LivekitSip.UpdateSIPInboundTrunkRequest.newBuilder()) {
-            this.sipTrunkId = sipTrunkId
-            this.replace = trunk
-            build()
-        }
-        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
-        return service.updateSipInboundTrunk(request, credentials)
-    }
-
-    /**
-     * Updates specific fields of an existing SIP inbound trunk. Only the fields
-     * set in [update] are changed.
-     *
-     * @param sipTrunkId ID of the SIP inbound trunk to update
-     * @param update the fields to update
-     */
-    fun updateSipInboundTrunkFields(
-        sipTrunkId: String,
-        update: LivekitSip.SIPInboundTrunkUpdate,
-    ): Call<LivekitSip.SIPInboundTrunkInfo> {
-        val request = with(LivekitSip.UpdateSIPInboundTrunkRequest.newBuilder()) {
-            this.sipTrunkId = sipTrunkId
-            this.update = update
-            build()
-        }
-        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
-        return service.updateSipInboundTrunk(request, credentials)
-    }
-
-    /**
-     * Updates an existing SIP outbound trunk, replacing it entirely with [trunk].
-     *
-     * @param sipTrunkId ID of the SIP outbound trunk to update
-     * @param trunk the full trunk definition to replace it with
-     */
-    fun updateSipOutboundTrunk(
-        sipTrunkId: String,
-        trunk: LivekitSip.SIPOutboundTrunkInfo,
-    ): Call<LivekitSip.SIPOutboundTrunkInfo> {
-        val request = with(LivekitSip.UpdateSIPOutboundTrunkRequest.newBuilder()) {
-            this.sipTrunkId = sipTrunkId
-            this.replace = trunk
-            build()
-        }
-        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
-        return service.updateSipOutboundTrunk(request, credentials)
-    }
-
-    /**
-     * Updates specific fields of an existing SIP outbound trunk. Only the fields
-     * set in [update] are changed.
-     *
-     * @param sipTrunkId ID of the SIP outbound trunk to update
-     * @param update the fields to update
-     */
-    fun updateSipOutboundTrunkFields(
-        sipTrunkId: String,
-        update: LivekitSip.SIPOutboundTrunkUpdate,
-    ): Call<LivekitSip.SIPOutboundTrunkInfo> {
-        val request = with(LivekitSip.UpdateSIPOutboundTrunkRequest.newBuilder()) {
-            this.sipTrunkId = sipTrunkId
-            this.update = update
-            build()
-        }
-        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
-        return service.updateSipOutboundTrunk(request, credentials)
-    }
-
-    /**
-     * Updates an existing SIP dispatch rule, replacing it entirely with [rule].
-     *
-     * @param sipDispatchRuleId ID of the SIP dispatch rule to update
-     * @param rule the full dispatch rule definition to replace it with
-     */
+    @JvmOverloads
+    @Suppress("unused")
     fun updateSipDispatchRule(
         sipDispatchRuleId: String,
-        rule: LivekitSip.SIPDispatchRuleInfo,
+        options: UpdateSipDispatchRuleOptions? = null
     ): Call<LivekitSip.SIPDispatchRuleInfo> {
         val request = with(LivekitSip.UpdateSIPDispatchRuleRequest.newBuilder()) {
             this.sipDispatchRuleId = sipDispatchRuleId
-            this.replace = rule
+            update = with(LivekitSip.SIPDispatchRuleUpdate.newBuilder()) {
+                options?.let { opt ->
+                    opt.name?.let { this.name = it }
+                    opt.metadata?.let { this.metadata = it }
+                    opt.trunkIds?.let { this.trunkIds = buildListUpdate(it) }
+                    opt.rule?.let { optRule ->
+                        this.rule = with(SIPDispatchRule.newBuilder()) {
+                            when (optRule) {
+                                is SipDispatchRuleDirect -> {
+                                    dispatchRuleDirect = with(SIPDispatchRuleDirect.newBuilder()) {
+                                        roomName = optRule.roomName
+                                        optRule.pin?.let { this.pin = it }
+                                        build()
+                                    }
+                                }
+
+                                is SipDispatchRuleIndividual -> {
+                                    dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
+                                        roomPrefix = optRule.roomPrefix
+                                        optRule.pin?.let { this.pin = it }
+                                        build()
+                                    }
+                                }
+                            }
+                            build()
+                        }
+                    }
+                }
+                build()
+            }
             build()
         }
+
         val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
         return service.updateSipDispatchRule(request, credentials)
     }
 
     /**
-     * Updates specific fields of an existing SIP dispatch rule. Only the fields
-     * set in [update] are changed.
-     *
-     * @param sipDispatchRuleId ID of the SIP dispatch rule to update
-     * @param update the fields to update
-     */
-    fun updateSipDispatchRuleFields(
-        sipDispatchRuleId: String,
-        update: LivekitSip.SIPDispatchRuleUpdate,
-    ): Call<LivekitSip.SIPDispatchRuleInfo> {
-        val request = with(LivekitSip.UpdateSIPDispatchRuleRequest.newBuilder()) {
-            this.sipDispatchRuleId = sipDispatchRuleId
-            this.update = update
-            build()
-        }
-        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
-        return service.updateSipDispatchRule(request, credentials)
-    }
-
-    /**
-     * Creates a dispatch rule.
+     * Lists the dispatch rules.
      *
      * See: [Dispatch Rules](https://docs.livekit.io/sip/dispatch-rule/)
      */
+    @Suppress("unused")
     fun listSipDispatchRule(): Call<List<SIPDispatchRuleInfo>> {
         val request = LivekitSip.ListSIPDispatchRuleRequest.newBuilder().build()
         val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
@@ -330,6 +341,7 @@ class SipServiceClient(
      *
      * See: [Dispatch Rules](https://docs.livekit.io/sip/dispatch-rule/)
      */
+    @Suppress("unused")
     fun deleteSipDispatchRule(sipDispatchRuleId: String): Call<SIPDispatchRuleInfo> {
         val request = with(LivekitSip.DeleteSIPDispatchRuleRequest.newBuilder()) {
             this.sipDispatchRuleId = sipDispatchRuleId
@@ -344,6 +356,7 @@ class SipServiceClient(
      *
      * See: [SIP Participant](https://docs.livekit.io/sip/sip-participant/)
      */
+    @Suppress("unused")
     fun createSipParticipant(
         sipTrunkId: String,
         number: String,
@@ -361,6 +374,7 @@ class SipServiceClient(
                 opts.participantMetadata?.let { this.participantMetadata = it }
                 opts.dtmf?.let { this.dtmf = it }
                 opts.hidePhoneNumber?.let { this.hidePhoneNumber = it }
+                opts.waitUntilAnswered?.let { this.waitUntilAnswered = it }
                 opts.playRingtone?.let {
                     if (it) {
                         this.playRingtone = true
@@ -390,6 +404,7 @@ class SipServiceClient(
      *
      * See: [SIP Participant](https://docs.livekit.io/sip/sip-participant/)
      */
+    @Suppress("unused")
     fun transferSipParticipant(
         roomName: String,
         participantIdentity: String,
@@ -410,6 +425,13 @@ class SipServiceClient(
         val credentials = authHeader(listOf(RoomAdmin(true), RoomName(roomName)), listOf(SIPCall()))
         // Transferring a call dials a phone, which takes longer than a normal request.
         return service.transferSipParticipant(request, credentials, SIP_DIAL_TIMEOUT_SECONDS.toString())
+    }
+
+    private fun buildListUpdate(values: List<String>): ListUpdate {
+        return with(ListUpdate.newBuilder()) {
+            this.addAllSet(values)
+            build()
+        }
     }
 
     companion object {
@@ -465,6 +487,28 @@ data class CreateSipOutboundTrunkOptions(
     var transport: LivekitSip.SIPTransport = LivekitSip.SIPTransport.SIP_TRANSPORT_AUTO,
     var authUsername: String? = null,
     var authPassword: String? = null,
+    var destinationCountry: String? = null,
+)
+
+data class UpdateSipInboundTrunkOptions(
+    var name: String? = null,
+    var numbers: List<String>? = null,
+    var metadata: String? = null,
+    var allowedAddresses: List<String>? = null,
+    var allowedNumbers: List<String>? = null,
+    var authUsername: String? = null,
+    var authPassword: String? = null,
+)
+
+data class UpdateSipOutboundTrunkOptions(
+    var name: String? = null,
+    var address: String? = null,
+    var numbers: List<String>? = null,
+    var metadata: String? = null,
+    var transport: LivekitSip.SIPTransport? = null,
+    var authUsername: String? = null,
+    var authPassword: String? = null,
+    var destinationCountry: String? = null,
 )
 
 /**
@@ -492,10 +536,35 @@ data class SipDispatchRuleIndividual(
 ) : SipDispatchRule("individual")
 
 data class CreateSipDispatchRuleOptions(
+    /** Human-readable name for the Dispatch Rule. */
     var name: String? = null,
+    /**
+     * User-defined metadata for the Dispatch Rule.
+     * Participants created by this rule will inherit this metadata.
+     */
     var metadata: String? = null,
     var trunkIds: List<String>? = null,
     var hidePhoneNumber: Boolean? = null,
+    /**
+     * User-defined attributes for the Dispatch Rule.
+     * Participants created by this rule will inherit these attributes.
+     */
+    var attributes: Map<String, String>? = null,
+    /**
+     * Cloud-only, config preset to use
+     */
+    var roomPreset: String? = null,
+    /**
+     * RoomConfiguration to use if the participant initiates the room
+     */
+    var roomConfig: LivekitRoom.RoomConfiguration? = null,
+)
+
+data class UpdateSipDispatchRuleOptions(
+    var trunkIds: List<String>? = null,
+    var name: String? = null,
+    var metadata: String? = null,
+    var rule: SipDispatchRule? = null,
 )
 
 data class CreateSipParticipantOptions(

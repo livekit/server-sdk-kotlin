@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2025 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package io.livekit.server
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
+import com.google.protobuf.MessageOrBuilder
+import livekit.LivekitRoom.RoomConfiguration
 import java.time.Instant
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -28,13 +30,10 @@ import java.util.concurrent.TimeUnit
  *
  * Once information is filled out, create the token string with [toJwt].
  *
- * https://docs.livekit.io/guides/access-tokens
+ * https://docs.livekit.io/home/get-started/authentication/
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class AccessToken(
-    private val apiKey: String,
-    private val secret: String
-) {
+class AccessToken(private val apiKey: String, private val secret: String) {
     private val videoGrants = mutableSetOf<VideoGrant>()
     private val sipGrants = mutableSetOf<SIPGrant>()
 
@@ -55,81 +54,71 @@ class AccessToken(
     var expiration: Date? = null
 
     /**
-     * Date specifying the time [before which this token is invalid](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-25#section-4.1.5).
+     * Date specifying the time
+     * [before which this token is invalid](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-25#section-4.1.5)
+     * .
      */
     var notBefore: Date? = null
 
-    /**
-     * Display name for the participant, available as `Participant.name`
-     */
+    /** Display name for the participant, available as `Participant.name` */
     var name: String? = null
 
-    /**
-     * Unique identity of the user, required for room join tokens
-     */
+    /** Unique identity of the user, required for room join tokens */
     var identity: String? = null
 
-    /**
-     * Custom metadata to be passed to participants
-     */
+    /** Custom metadata to be passed to participants */
     var metadata: String? = null
 
-    /**
-     * For verifying integrity of message body
-     */
+    /** For verifying integrity of message body */
     var sha256: String? = null
 
-    /**
-     * Key/value attributes to attach to the participant
-     */
+    /** Key/value attributes to attach to the participant */
     val attributes = mutableMapOf<String, String>()
 
     /**
-     * Add [VideoGrant] to this token.
+     * Use a named preset room configuration.
+     *
+     * Any options set in [roomConfiguration] will take precedence.
      */
+    var roomPreset: String? = null
+
+    /** Configuration for when creating a room. */
+    var roomConfiguration: RoomConfiguration? = null
+
+    /** Add [VideoGrant] to this token. */
     fun addGrants(vararg grants: VideoGrant) {
         for (grant in grants) {
             videoGrants.add(grant)
         }
     }
 
-    /**
-     * Add [VideoGrant] to this token.
-     */
+    /** Add [VideoGrant] to this token. */
     fun addGrants(grants: Iterable<VideoGrant>) {
         for (grant in grants) {
             videoGrants.add(grant)
         }
     }
 
-    /**
-     * Clear all previously added [VideoGrant]s.
-     */
+    /** Clear all previously added [VideoGrant]s. */
     fun clearGrants() {
         videoGrants.clear()
     }
 
-    /**
-     * Add [VideoGrant] to this token.
-     */
+    /** Add [VideoGrant] to this token. */
     fun addSIPGrants(vararg grants: SIPGrant) {
         for (grant in grants) {
             sipGrants.add(grant)
         }
     }
 
-    /**
-     * Add [VideoGrant] to this token.
-     */
+    /** Add [VideoGrant] to this token. */
     fun addSIPGrants(grants: Iterable<SIPGrant>) {
         for (grant in grants) {
             sipGrants.add(grant)
         }
     }
 
-    /**
-     * Clear all previously added [SIPGrant]s.
-     */
+    /** Clear all previously added [SIPGrant]s. */
     fun clearSIPGrants() {
         sipGrants.clear()
     }
@@ -152,7 +141,6 @@ class AccessToken(
             val id = identity
             if (id != null) {
                 withSubject(id)
-                withJWTId(id)
             } else {
                 val hasRoomJoin = videoGrants.any { it is RoomJoin && it.value == true }
                 if (hasRoomJoin) {
@@ -166,17 +154,18 @@ class AccessToken(
             name?.let { claimsMap["name"] = it }
             metadata?.let { claimsMap["metadata"] = it }
             sha256?.let { claimsMap["sha256"] = it }
+            roomPreset?.let { claimsMap["roomPreset"] = it }
             attributes.toMap().let { attributesCopy ->
                 if (attributesCopy.isNotEmpty()) {
                     claimsMap["attributes"] = attributesCopy
                 }
             }
+            roomConfiguration?.let { claimsMap["roomConfig"] = it.toMap() }
+
             claimsMap["video"] = videoGrantsMap
             claimsMap["sip"] = sipGrantsMap
 
-            claimsMap.forEach { (key, value) ->
-                withClaimAny(key, value)
-            }
+            claimsMap.forEach { (key, value) -> withClaimAny(key, value) }
 
             val alg = Algorithm.HMAC256(secret)
 
@@ -197,8 +186,36 @@ internal fun JWTCreator.Builder.withClaimAny(name: String, value: Any) {
         is Instant -> withClaim(name, value)
         is List<*> -> withClaim(name, value)
         is Map<*, *> -> {
-            @Suppress("UNCHECKED_CAST")
-            withClaim(name, value as Map<String, *>)
+            @Suppress("UNCHECKED_CAST") withClaim(name, value as Map<String, *>)
         }
     }
 }
+
+internal fun MessageOrBuilder.toMap(): Map<String, *> = buildMap {
+    for ((field, value) in allFields) {
+        put(
+            field.name,
+            when (value) {
+                is MessageOrBuilder -> value.toMap()
+                is List<*> ->
+                    value.map { item ->
+                        when (item) {
+                            is MessageOrBuilder -> item.toMap()
+                            else -> if (isSupportedType(item)) item else item.toString()
+                        }
+                    }
+                else -> if (isSupportedType(value)) value else value.toString()
+            }
+        )
+    }
+}
+
+private fun isSupportedType(value: Any?) =
+    value == null ||
+        value is Boolean ||
+        value is Int ||
+        value is Long ||
+        value is Double ||
+        value is String ||
+        value is Map<*, *> ||
+        value is List<*>
