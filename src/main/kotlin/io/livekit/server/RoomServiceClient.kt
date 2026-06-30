@@ -18,6 +18,8 @@ package io.livekit.server
 
 import com.google.protobuf.ByteString
 import io.livekit.server.okhttp.OkHttpFactory
+import io.livekit.server.okhttp.FailoverConfig
+import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitModels
@@ -324,6 +326,63 @@ class RoomServiceClient(
         return service.sendData(request, credentials)
     }
 
+    /**
+     * Forwards a participant's published tracks to another room. The participant
+     * stays connected to the original room. Requires `roomAdmin` and the
+     * `destinationRoom` permission.
+     *
+     * @param roomName room to forward the participant from
+     * @param identity identity of the participant to forward
+     * @param destinationRoom room to forward the participant to
+     */
+    fun forwardParticipant(
+        roomName: String,
+        identity: String,
+        destinationRoom: String,
+    ): Call<LivekitRoom.ForwardParticipantResponse> {
+        val request = with(LivekitRoom.ForwardParticipantRequest.newBuilder()) {
+            this.room = roomName
+            this.identity = identity
+            this.destinationRoom = destinationRoom
+            build()
+        }
+
+        val credentials = authHeader(
+            RoomAdmin(true),
+            RoomName(roomName),
+            DestinationRoom(destinationRoom),
+        )
+        return service.forwardParticipant(request, credentials)
+    }
+
+    /**
+     * Moves a connected participant to a different room. Cloud-only. Requires
+     * `roomAdmin` and the `destinationRoom` permission.
+     *
+     * @param roomName room to move the participant from
+     * @param identity identity of the participant to move
+     * @param destinationRoom room to move the participant to
+     */
+    fun moveParticipant(
+        roomName: String,
+        identity: String,
+        destinationRoom: String,
+    ): Call<LivekitRoom.MoveParticipantResponse> {
+        val request = with(LivekitRoom.MoveParticipantRequest.newBuilder()) {
+            this.room = roomName
+            this.identity = identity
+            this.destinationRoom = destinationRoom
+            build()
+        }
+
+        val credentials = authHeader(
+            RoomAdmin(true),
+            RoomName(roomName),
+            DestinationRoom(destinationRoom),
+        )
+        return service.moveParticipant(request, credentials)
+    }
+
     private fun authHeader(vararg videoGrants: VideoGrant): String {
         val accessToken = AccessToken(apiKey, secret)
         accessToken.addGrants(*videoGrants)
@@ -384,9 +443,12 @@ class RoomServiceClient(
             host: String,
             apiKey: String,
             secret: String,
-            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory()
+            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory(),
+            failover: Boolean = true
         ): RoomServiceClient {
-            val okhttp = okHttpSupplier.get()
+            val okhttp = okHttpSupplier.get().newBuilder()
+                .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
+                .build()
             val service = Retrofit.Builder()
                 .baseUrl(host)
                 .addConverterFactory(ProtoConverterFactory.create())

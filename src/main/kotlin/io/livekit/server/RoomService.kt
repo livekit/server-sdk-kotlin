@@ -92,4 +92,18 @@ interface RoomService {
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.RoomService/SendData")
     fun sendData(@Body request: LivekitRoom.SendDataRequest, @Header("Authorization") authorization: String): Call<Void?>
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.RoomService/ForwardParticipant")
+    fun forwardParticipant(
+        @Body request: LivekitRoom.ForwardParticipantRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitRoom.ForwardParticipantResponse>
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.RoomService/MoveParticipant")
+    fun moveParticipant(
+        @Body request: LivekitRoom.MoveParticipantRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitRoom.MoveParticipantResponse>
 }

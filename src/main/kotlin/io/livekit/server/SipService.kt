@@ -64,9 +64,30 @@ interface SipService {
     ): Call<LivekitSip.SIPTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.SIP/UpdateSIPInboundTrunk")
+    fun updateSipInboundTrunk(
+        @Body request: LivekitSip.UpdateSIPInboundTrunkRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.SIPInboundTrunkInfo>
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.SIP/UpdateSIPOutboundTrunk")
+    fun updateSipOutboundTrunk(
+        @Body request: LivekitSip.UpdateSIPOutboundTrunkRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.SIPOutboundTrunkInfo>
+
+    @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.SIP/CreateSIPDispatchRule")
     fun createSipDispatchRule(
         @Body request: LivekitSip.CreateSIPDispatchRuleRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.SIPDispatchRuleInfo>
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.SIP/UpdateSIPDispatchRule")
+    fun updateSipDispatchRule(
+        @Body request: LivekitSip.UpdateSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPDispatchRuleInfo>
 
@@ -88,13 +109,19 @@ interface SipService {
     @POST("/twirp/livekit.SIP/CreateSIPParticipant")
     fun createSipParticipant(
         @Body request: LivekitSip.CreateSIPParticipantRequest,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        // Per-request timeout override (seconds) consumed by RegionFailoverInterceptor
+        // (see TIMEOUT_HEADER); omitted when null. Used when dialing waits for an answer.
+        @Header("X-Lk-Request-Timeout") requestTimeout: String? = null
     ): Call<LivekitSip.SIPParticipantInfo>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.SIP/TransferSIPParticipant")
     fun transferSipParticipant(
         @Body request: LivekitSip.TransferSIPParticipantRequest,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        // Per-request timeout override (seconds) consumed by RegionFailoverInterceptor
+        // (see TIMEOUT_HEADER); omitted when null. Transferring always dials a phone.
+        @Header("X-Lk-Request-Timeout") requestTimeout: String? = null
     ): Call<Void?>
 }

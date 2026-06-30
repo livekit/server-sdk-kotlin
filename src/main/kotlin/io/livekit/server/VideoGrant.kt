@@ -64,6 +64,11 @@ class Room(value: String) : VideoGrant("room", value)
 class RoomName(value: String) : VideoGrant("room", value)
 
 /**
+ * destination room which this participant can be forwarded or moved to
+ */
+class DestinationRoom(value: String) : VideoGrant("destinationRoom", value)
+
+/**
  * allow participant to publish tracks
  */
 class CanPublish(value: Boolean) : VideoGrant("canPublish", value)

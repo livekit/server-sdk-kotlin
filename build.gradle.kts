@@ -1,4 +1,5 @@
 import com.google.protobuf.gradle.protobuf
+import com.google.protobuf.gradle.proto
 import com.google.protobuf.gradle.protoc
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URL
@@ -79,7 +80,37 @@ spotless {
 }
 
 val protoc_platform: String? by project
-val protoSrc = File("$projectDir/protocol/protobufs/").listFiles { f -> f.isFile }
+
+// The SDK vendors only the protos it needs (plus their transitive imports) from
+// the protocol submodule. The rpc/ and roomrpc/ trees are psrpc service defs that
+// import non-vendored options and aren't used here, so they're excluded. Using a
+// proto srcDir (rather than file extraction) preserves the directory layout so
+// imports like "logger/options.proto" resolve.
+val vendoredProtos = listOf(
+    "livekit_models.proto",
+    "livekit_room.proto",
+    "livekit_egress.proto",
+    "livekit_ingress.proto",
+    "livekit_sip.proto",
+    "livekit_agent.proto",
+    "livekit_agent_dispatch.proto",
+    "livekit_metrics.proto",
+    "livekit_webhook.proto",
+    "livekit_rtc.proto",
+    "livekit_connector.proto",
+    "livekit_connector_twilio.proto",
+    "livekit_connector_whatsapp.proto",
+    "logger/options.proto",
+)
+
+sourceSets {
+    main {
+        proto {
+            srcDir("protocol/protobufs")
+            setIncludes(vendoredProtos)
+        }
+    }
+}
 
 val protobufVersion = "3.21.7"
 val protobufDep = "com.google.protobuf:protobuf-java:$protobufVersion"
@@ -131,7 +162,6 @@ val javadocJar = tasks.named<Jar>("javadocJar") {
 }
 
 dependencies {
-    protobuf(files(*protoSrc))
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     api("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-protobuf:2.9.0")

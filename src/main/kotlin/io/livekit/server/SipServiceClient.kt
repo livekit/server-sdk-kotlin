@@ -17,6 +17,8 @@
 package io.livekit.server
 
 import io.livekit.server.okhttp.OkHttpFactory
+import io.livekit.server.okhttp.FailoverConfig
+import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.retrofit.withTransform
 import livekit.LivekitSip
@@ -195,6 +197,123 @@ class SipServiceClient(
     }
 
     /**
+     * Updates an existing SIP inbound trunk, replacing it entirely with [trunk].
+     *
+     * @param sipTrunkId ID of the SIP inbound trunk to update
+     * @param trunk the full trunk definition to replace it with
+     */
+    fun updateSipInboundTrunk(
+        sipTrunkId: String,
+        trunk: LivekitSip.SIPInboundTrunkInfo,
+    ): Call<LivekitSip.SIPInboundTrunkInfo> {
+        val request = with(LivekitSip.UpdateSIPInboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+            this.replace = trunk
+            build()
+        }
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipInboundTrunk(request, credentials)
+    }
+
+    /**
+     * Updates specific fields of an existing SIP inbound trunk. Only the fields
+     * set in [update] are changed.
+     *
+     * @param sipTrunkId ID of the SIP inbound trunk to update
+     * @param update the fields to update
+     */
+    fun updateSipInboundTrunkFields(
+        sipTrunkId: String,
+        update: LivekitSip.SIPInboundTrunkUpdate,
+    ): Call<LivekitSip.SIPInboundTrunkInfo> {
+        val request = with(LivekitSip.UpdateSIPInboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+            this.update = update
+            build()
+        }
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipInboundTrunk(request, credentials)
+    }
+
+    /**
+     * Updates an existing SIP outbound trunk, replacing it entirely with [trunk].
+     *
+     * @param sipTrunkId ID of the SIP outbound trunk to update
+     * @param trunk the full trunk definition to replace it with
+     */
+    fun updateSipOutboundTrunk(
+        sipTrunkId: String,
+        trunk: LivekitSip.SIPOutboundTrunkInfo,
+    ): Call<LivekitSip.SIPOutboundTrunkInfo> {
+        val request = with(LivekitSip.UpdateSIPOutboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+            this.replace = trunk
+            build()
+        }
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipOutboundTrunk(request, credentials)
+    }
+
+    /**
+     * Updates specific fields of an existing SIP outbound trunk. Only the fields
+     * set in [update] are changed.
+     *
+     * @param sipTrunkId ID of the SIP outbound trunk to update
+     * @param update the fields to update
+     */
+    fun updateSipOutboundTrunkFields(
+        sipTrunkId: String,
+        update: LivekitSip.SIPOutboundTrunkUpdate,
+    ): Call<LivekitSip.SIPOutboundTrunkInfo> {
+        val request = with(LivekitSip.UpdateSIPOutboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+            this.update = update
+            build()
+        }
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipOutboundTrunk(request, credentials)
+    }
+
+    /**
+     * Updates an existing SIP dispatch rule, replacing it entirely with [rule].
+     *
+     * @param sipDispatchRuleId ID of the SIP dispatch rule to update
+     * @param rule the full dispatch rule definition to replace it with
+     */
+    fun updateSipDispatchRule(
+        sipDispatchRuleId: String,
+        rule: LivekitSip.SIPDispatchRuleInfo,
+    ): Call<LivekitSip.SIPDispatchRuleInfo> {
+        val request = with(LivekitSip.UpdateSIPDispatchRuleRequest.newBuilder()) {
+            this.sipDispatchRuleId = sipDispatchRuleId
+            this.replace = rule
+            build()
+        }
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipDispatchRule(request, credentials)
+    }
+
+    /**
+     * Updates specific fields of an existing SIP dispatch rule. Only the fields
+     * set in [update] are changed.
+     *
+     * @param sipDispatchRuleId ID of the SIP dispatch rule to update
+     * @param update the fields to update
+     */
+    fun updateSipDispatchRuleFields(
+        sipDispatchRuleId: String,
+        update: LivekitSip.SIPDispatchRuleUpdate,
+    ): Call<LivekitSip.SIPDispatchRuleInfo> {
+        val request = with(LivekitSip.UpdateSIPDispatchRuleRequest.newBuilder()) {
+            this.sipDispatchRuleId = sipDispatchRuleId
+            this.update = update
+            build()
+        }
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipDispatchRule(request, credentials)
+    }
+
+    /**
      * Creates a dispatch rule.
      *
      * See: [Dispatch Rules](https://docs.livekit.io/sip/dispatch-rule/)
@@ -254,12 +373,16 @@ class SipServiceClient(
                         this.playDialtone = true
                     }
                 }
+                opts.waitUntilAnswered?.let { this.waitUntilAnswered = it }
             }
             build()
         }
 
         val credentials = authHeader(emptyList(), listOf(SIPCall()))
-        return service.createSipParticipant(request, credentials)
+        // Waiting for the call to be answered dials a phone, which takes longer
+        // than a normal request.
+        val timeout = if (request.waitUntilAnswered) SIP_DIAL_TIMEOUT_SECONDS.toString() else null
+        return service.createSipParticipant(request, credentials, timeout)
     }
 
     /**
@@ -285,10 +408,15 @@ class SipServiceClient(
         }
 
         val credentials = authHeader(listOf(RoomAdmin(true), RoomName(roomName)), listOf(SIPCall()))
-        return service.transferSipParticipant(request, credentials)
+        // Transferring a call dials a phone, which takes longer than a normal request.
+        return service.transferSipParticipant(request, credentials, SIP_DIAL_TIMEOUT_SECONDS.toString())
     }
 
     companion object {
+        // Calls that dial a phone (CreateSIPParticipant with waitUntilAnswered,
+        // TransferSIPParticipant) take longer than a normal request.
+        private const val SIP_DIAL_TIMEOUT_SECONDS = 30
+
         /**
          * Create an SipServiceClient.
          *
@@ -305,9 +433,12 @@ class SipServiceClient(
             host: String,
             apiKey: String,
             secret: String,
-            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory()
+            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory(),
+            failover: Boolean = true
         ): SipServiceClient {
-            val okhttp = okHttpSupplier.get()
+            val okhttp = okHttpSupplier.get().newBuilder()
+                .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
+                .build()
 
             val service = Retrofit.Builder()
                 .baseUrl(host)
@@ -375,6 +506,9 @@ data class CreateSipParticipantOptions(
     var playRingtone: Boolean? = null, // deprecated, use playDialtone instead
     var playDialtone: Boolean? = null,
     var hidePhoneNumber: Boolean? = null,
+    // Wait for the call to be answered before returning. The request blocks until
+    // the call is answered or fails, with a longer timeout to allow for dialing.
+    var waitUntilAnswered: Boolean? = null,
 )
 
 data class TransferSipParticipantOptions(

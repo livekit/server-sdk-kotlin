@@ -17,6 +17,8 @@
 package io.livekit.server
 
 import io.livekit.server.okhttp.OkHttpFactory
+import io.livekit.server.okhttp.FailoverConfig
+import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitIngress
@@ -229,9 +231,12 @@ class IngressServiceClient(
             host: String,
             apiKey: String,
             secret: String,
-            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory()
+            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory(),
+            failover: Boolean = true
         ): IngressServiceClient {
-            val okhttp = okHttpSupplier.get()
+            val okhttp = okHttpSupplier.get().newBuilder()
+                .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
+                .build()
 
             val service = Retrofit.Builder()
                 .baseUrl(host)
