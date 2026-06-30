@@ -16,10 +16,10 @@
 
 package io.livekit.server
 
-import io.livekit.server.okhttp.OkHttpFactory
 import io.livekit.server.okhttp.FailoverConfig
-import io.livekit.server.okhttp.RegionFailoverInterceptor
+import io.livekit.server.okhttp.OkHttpFactory
 import io.livekit.server.okhttp.OkHttpHolder
+import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.retrofit.withTransform
 import livekit.LivekitModels.ListUpdate
 import livekit.LivekitRoom
