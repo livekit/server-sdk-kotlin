@@ -387,15 +387,19 @@ class SipServiceClient(
                         this.playDialtone = true
                     }
                 }
-                opts.waitUntilAnswered?.let { this.waitUntilAnswered = it }
+                opts.ringingTimeout?.let { this.ringingTimeout = secondsDuration(it) }
             }
             build()
         }
 
         val credentials = authHeader(emptyList(), listOf(SIPCall()))
-        // Waiting for the call to be answered dials a phone, which takes longer
-        // than a normal request.
-        val timeout = if (request.waitUntilAnswered) SIP_DIAL_TIMEOUT_SECONDS.toString() else null
+        // When waiting for an answer, dialing takes longer than a normal request
+        // and the request must outlast ringing; otherwise honor any user timeout.
+        val timeout = if (request.waitUntilAnswered) {
+            sipDialTimeout(options?.timeout, options?.ringingTimeout).toString()
+        } else {
+            options?.timeout?.toString()
+        }
         return service.createSipParticipant(request, credentials, timeout)
     }
 
@@ -418,13 +422,17 @@ class SipServiceClient(
 
             options?.let { opts ->
                 opts.playDialtone?.let { this.playDialtone = it }
+                opts.ringingTimeout?.let { this.ringingTimeout = secondsDuration(it) }
             }
             build()
         }
 
         val credentials = authHeader(listOf(RoomAdmin(true), RoomName(roomName)), listOf(SIPCall()))
-        // Transferring a call dials a phone, which takes longer than a normal request.
-        return service.transferSipParticipant(request, credentials, SIP_DIAL_TIMEOUT_SECONDS.toString())
+        // Transferring a call dials a phone, which takes longer than a normal
+        // request, so use a longer default unless the user specified a timeout, and
+        // keep the request alive past ringing so the destination can answer.
+        val timeout = sipDialTimeout(options?.timeout, options?.ringingTimeout).toString()
+        return service.transferSipParticipant(request, credentials, timeout)
     }
 
     private fun buildListUpdate(values: List<String>): ListUpdate {
@@ -434,10 +442,29 @@ class SipServiceClient(
         }
     }
 
+    // Request timeout (seconds) for a phone-dialing call: the user value (or the
+    // dial default) raised to stay at least RINGING_TIMEOUT_MARGIN_SECONDS above
+    // the ringing timeout, so the request doesn't abort before the call is answered.
+    private fun sipDialTimeout(timeout: Int?, ringingTimeout: Int?): Int {
+        var effective = timeout ?: SIP_DIAL_TIMEOUT_SECONDS
+        if (ringingTimeout != null) {
+            effective = maxOf(effective, ringingTimeout + RINGING_TIMEOUT_MARGIN_SECONDS)
+        }
+        return effective
+    }
+
+    private fun secondsDuration(seconds: Int): com.google.protobuf.Duration =
+        com.google.protobuf.Duration.newBuilder().setSeconds(seconds.toLong()).build()
+
     companion object {
         // Calls that dial a phone (CreateSIPParticipant with waitUntilAnswered,
         // TransferSIPParticipant) take longer than a normal request.
         private const val SIP_DIAL_TIMEOUT_SECONDS = 30
+
+        // A dialing request must outlast the ringing window, or it would abort
+        // before the call can be answered. Keep the request timeout at least this
+        // many seconds above the ringing timeout.
+        private const val RINGING_TIMEOUT_MARGIN_SECONDS = 2
 
         /**
          * Create an SipServiceClient.
@@ -578,8 +605,18 @@ data class CreateSipParticipantOptions(
     // Wait for the call to be answered before returning. The request blocks until
     // the call is answered or fails, with a longer timeout to allow for dialing.
     var waitUntilAnswered: Boolean? = null,
+    // Optional, maximum time for the call to ring in seconds.
+    var ringingTimeout: Int? = null,
+    // Optional request timeout in seconds. Defaults to a longer value when
+    // waitUntilAnswered is set (dialing takes time).
+    var timeout: Int? = null,
 )
 
 data class TransferSipParticipantOptions(
     var playDialtone: Boolean? = null,
+    // Optional, max time for the transfer destination to answer the call, in seconds.
+    var ringingTimeout: Int? = null,
+    // Optional request timeout in seconds. Defaults to a longer value since
+    // transferring dials a phone.
+    var timeout: Int? = null,
 )
