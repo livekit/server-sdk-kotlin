@@ -363,10 +363,18 @@ class SipServiceClient(
         roomName: String,
         options: CreateSipParticipantOptions? = null,
     ): Call<SIPParticipantInfo> {
+        val waitUntilAnswered = options?.waitUntilAnswered ?: false
+        // When waiting for an answer, pin the ring window explicitly so our request
+        // timeout doesn't depend on the server's default (which could change).
+        val ringingTimeout = options?.ringingTimeout
+            ?: DialTimeout.DEFAULT_RINGING_TIMEOUT_SECONDS.takeIf { waitUntilAnswered }
+
         val request = with(LivekitSip.CreateSIPParticipantRequest.newBuilder()) {
             this.sipTrunkId = sipTrunkId
             this.sipCallTo = number
             this.roomName = roomName
+            this.waitUntilAnswered = waitUntilAnswered
+            ringingTimeout?.let { this.ringingTimeout = secondsDuration(it) }
 
             options?.let { opts ->
                 opts.participantIdentity?.let { this.participantIdentity = it }
@@ -374,7 +382,6 @@ class SipServiceClient(
                 opts.participantMetadata?.let { this.participantMetadata = it }
                 opts.dtmf?.let { this.dtmf = it }
                 opts.hidePhoneNumber?.let { this.hidePhoneNumber = it }
-                opts.waitUntilAnswered?.let { this.waitUntilAnswered = it }
                 opts.playRingtone?.let {
                     if (it) {
                         this.playRingtone = true
@@ -387,7 +394,6 @@ class SipServiceClient(
                         this.playDialtone = true
                     }
                 }
-                opts.ringingTimeout?.let { this.ringingTimeout = secondsDuration(it) }
             }
             build()
         }
@@ -395,8 +401,8 @@ class SipServiceClient(
         val credentials = authHeader(emptyList(), listOf(SIPCall()))
         // When waiting for an answer, dialing takes longer than a normal request
         // and the request must outlast ringing; otherwise honor any user timeout.
-        val timeout = if (request.waitUntilAnswered) {
-            sipDialTimeout(options?.timeout, options?.ringingTimeout).toString()
+        val timeout = if (waitUntilAnswered) {
+            DialTimeout.resolve(options?.timeout, ringingTimeout).toString()
         } else {
             options?.timeout?.toString()
         }
@@ -415,23 +421,23 @@ class SipServiceClient(
         transferTo: String,
         options: TransferSipParticipantOptions? = null,
     ): Call<Void?> {
+        // Transferring a call dials a phone and must outlast ringing. Pin the ring
+        // window explicitly so our request timeout doesn't depend on the server default.
+        val ringingTimeout = options?.ringingTimeout ?: DialTimeout.DEFAULT_RINGING_TIMEOUT_SECONDS
         val request = with(LivekitSip.TransferSIPParticipantRequest.newBuilder()) {
             this.roomName = roomName
             this.participantIdentity = participantIdentity
             this.transferTo = transferTo
+            this.ringingTimeout = secondsDuration(ringingTimeout)
 
             options?.let { opts ->
                 opts.playDialtone?.let { this.playDialtone = it }
-                opts.ringingTimeout?.let { this.ringingTimeout = secondsDuration(it) }
             }
             build()
         }
 
         val credentials = authHeader(listOf(RoomAdmin(true), RoomName(roomName)), listOf(SIPCall()))
-        // Transferring a call dials a phone, which takes longer than a normal
-        // request, so use a longer default unless the user specified a timeout, and
-        // keep the request alive past ringing so the destination can answer.
-        val timeout = sipDialTimeout(options?.timeout, options?.ringingTimeout).toString()
+        val timeout = DialTimeout.resolve(options?.timeout, ringingTimeout).toString()
         return service.transferSipParticipant(request, credentials, timeout)
     }
 
@@ -442,30 +448,10 @@ class SipServiceClient(
         }
     }
 
-    // Request timeout (seconds) for a phone-dialing call: the user value (or the
-    // dial default) raised to stay at least RINGING_TIMEOUT_MARGIN_SECONDS above
-    // the ringing timeout, so the request doesn't abort before the call is answered.
-    private fun sipDialTimeout(timeout: Int?, ringingTimeout: Int?): Int {
-        var effective = timeout ?: SIP_DIAL_TIMEOUT_SECONDS
-        if (ringingTimeout != null) {
-            effective = maxOf(effective, ringingTimeout + RINGING_TIMEOUT_MARGIN_SECONDS)
-        }
-        return effective
-    }
-
     private fun secondsDuration(seconds: Int): com.google.protobuf.Duration =
         com.google.protobuf.Duration.newBuilder().setSeconds(seconds.toLong()).build()
 
     companion object {
-        // Calls that dial a phone (CreateSIPParticipant with waitUntilAnswered,
-        // TransferSIPParticipant) take longer than a normal request.
-        private const val SIP_DIAL_TIMEOUT_SECONDS = 30
-
-        // A dialing request must outlast the ringing window, or it would abort
-        // before the call can be answered. Keep the request timeout at least this
-        // many seconds above the ringing timeout.
-        private const val RINGING_TIMEOUT_MARGIN_SECONDS = 2
-
         /**
          * Create an SipServiceClient.
          *

@@ -156,7 +156,17 @@ class ConnectorServiceClient(
         }
 
         val credentials = authHeader(RoomCreate(true))
-        return service.acceptWhatsAppCall(request, credentials)
+        // Accept can block until the call is answered, so default the request
+        // timeout to the standard ring window; the caller overrides via
+        // options.timeout and should set it above the ringing_timeout passed to
+        // dialWhatsAppCall. Non-waiting returns promptly and uses the client default.
+        val defaultTimeout = Duration.ofSeconds(DialTimeout.DEFAULT_RINGING_TIMEOUT_SECONDS.toLong())
+        val timeoutSeconds = if (waitUntilAnswered) {
+            (options?.timeout ?: defaultTimeout).seconds.toInt()
+        } else {
+            options?.timeout?.seconds?.toInt()
+        }
+        return service.acceptWhatsAppCall(request, credentials, timeoutSeconds?.toString())
     }
 
     /**
@@ -294,6 +304,13 @@ data class WhatsAppCallOptions(
     var whatsappBizOpaqueCallbackData: String? = null,
     /** Max time for the callee to answer the call. */
     var ringingTimeout: Duration? = null,
+    /**
+     * Optional request timeout. When the call waits for an answer
+     * (`waitUntilAnswered`), defaults to a longer value (dialing takes time) and
+     * is raised, if needed, to stay above [ringingTimeout]; otherwise the client
+     * default applies.
+     */
+    var timeout: Duration? = null,
 )
 
 /**
