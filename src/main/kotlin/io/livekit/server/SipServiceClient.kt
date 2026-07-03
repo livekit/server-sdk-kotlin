@@ -585,24 +585,33 @@ data class CreateSipParticipantOptions(
     var participantName: String? = null,
     var participantMetadata: String? = null,
     var dtmf: String? = null,
-    var playRingtone: Boolean? = null, // deprecated, use playDialtone instead
+    /** deprecated, use playDialtone instead */
+    var playRingtone: Boolean? = null,
     var playDialtone: Boolean? = null,
     var hidePhoneNumber: Boolean? = null,
-    // Wait for the call to be answered before returning. The request blocks until
-    // the call is answered or fails, with a longer timeout to allow for dialing.
+    /**
+     * Wait for the call to be answered before returning. The request blocks until
+     * the call is answered or fails, with a longer timeout to allow for dialing.
+     */
     var waitUntilAnswered: Boolean? = null,
-    // Optional, maximum time for the call to ring in seconds.
+    /**
+     * Optional, maximum time for the call to ring in seconds.
+     */
     var ringingTimeout: Int? = null,
-    // Optional request timeout in seconds. Defaults to a longer value when
-    // waitUntilAnswered is set (dialing takes time).
+    /**
+     * Optional request timeout in seconds. Defaults to a longer value when
+     * waitUntilAnswered is set (dialing takes time).
+     */
     var timeout: Int? = null,
 )
 
 data class TransferSipParticipantOptions(
     var playDialtone: Boolean? = null,
-    // Optional, max time for the transfer destination to answer the call, in seconds.
+    /** Optional, max time for the transfer destination to answer the call, in seconds.*/
     var ringingTimeout: Int? = null,
-    // Optional request timeout in seconds. Defaults to a longer value since
-    // transferring dials a phone.
+    /**
+     * Optional request timeout in seconds. Defaults to a longer value since
+     * transferring dials a phone.
+     */
     var timeout: Int? = null,
 )
