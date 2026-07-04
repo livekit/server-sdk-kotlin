@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 LiveKit, Inc.
+ * Copyright 2025-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,10 @@ interface ConnectorService {
     @POST("/twirp/livekit.Connector/AcceptWhatsAppCall")
     fun acceptWhatsAppCall(
         @Body request: LivekitConnectorWhatsapp.AcceptWhatsAppCallRequest,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        // Per-request timeout override (seconds) consumed by RegionFailoverInterceptor
+        // (see TIMEOUT_HEADER); omitted when null. Used when dialing waits for an answer.
+        @Header("X-Lk-Request-Timeout") requestTimeout: String? = null
     ): Call<LivekitConnectorWhatsapp.AcceptWhatsAppCallResponse>
 
     @Headers("Content-Type: application/protobuf")

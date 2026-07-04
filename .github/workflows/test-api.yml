@@ -1,0 +1,64 @@
+name: Test API
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'NOTICE'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'NOTICE'
+
+jobs:
+  failover:
+    runs-on: ubuntu-latest
+    services:
+      mock-server:
+        image: livekit/test-server:latest
+        ports:
+          - 9999:9999
+          - 10000:10000
+          - 10001:10001
+          - 10002:10002
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Gradle 7.4.2 supports JDK up to 17.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Wait for mock server
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:9999/settings/regions >/dev/null && exit 0
+            sleep 1
+          done
+          echo "mock server did not become ready" && exit 1
+
+      - name: Run API tests
+        run: ./gradlew test --tests "io.livekit.server.api.*"

@@ -16,8 +16,10 @@
 
 package io.livekit.server
 
+import io.livekit.server.okhttp.FailoverConfig
 import io.livekit.server.okhttp.OkHttpFactory
 import io.livekit.server.okhttp.OkHttpHolder
+import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitAgentDispatch
 import okhttp3.OkHttpClient
@@ -43,6 +45,7 @@ class AgentDispatchServiceClient(
      * @param agentName Name of the agent to dispatch
      * @param metadata Optional metadata to attach to the dispatch
      * @param restartPolicy Optional restart policy for the dispatched job (cloud only). Defaults to [LivekitAgentDispatch.JobRestartPolicy.JRP_ON_FAILURE].
+     * @param deployment Optional deployment to dispatch to; leave empty to target production (cloud only).
      * @return Created agent dispatch
      */
     @JvmOverloads
@@ -51,6 +54,7 @@ class AgentDispatchServiceClient(
         agentName: String,
         metadata: String? = null,
         restartPolicy: LivekitAgentDispatch.JobRestartPolicy? = null,
+        deployment: String? = null,
     ): Call<LivekitAgentDispatch.AgentDispatch> {
         val request = with(LivekitAgentDispatch.CreateAgentDispatchRequest.newBuilder()) {
             setRoom(room)
@@ -60,6 +64,9 @@ class AgentDispatchServiceClient(
             }
             if (restartPolicy != null) {
                 setRestartPolicy(restartPolicy)
+            }
+            if (deployment != null) {
+                setDeployment(deployment)
             }
             build()
         }
@@ -97,6 +104,23 @@ class AgentDispatchServiceClient(
         }
     }
 
+    /**
+     * Get an agent dispatch by ID.
+     * @param room Name of the room the dispatch is for
+     * @param dispatchId ID of the dispatch to get
+     * @return The matching dispatch, or null if none was found
+     */
+    fun getDispatch(room: String, dispatchId: String): Call<LivekitAgentDispatch.AgentDispatch?> {
+        val request = LivekitAgentDispatch.ListAgentDispatchRequest.newBuilder()
+            .setRoom(room)
+            .setDispatchId(dispatchId)
+            .build()
+        val credentials = authHeader(RoomAdmin(true), RoomName(room))
+        return TransformCall(service.listDispatch(request, credentials)) {
+            it.agentDispatchesList.firstOrNull()
+        }
+    }
+
     private fun authHeader(vararg videoGrants: VideoGrant): String {
         val accessToken = AccessToken(apiKey, secret)
         accessToken.addGrants(*videoGrants)
@@ -125,8 +149,11 @@ class AgentDispatchServiceClient(
             apiKey: String,
             secret: String,
             okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory(),
+            failover: Boolean = true
         ): AgentDispatchServiceClient {
-            val okhttp = okHttpSupplier.get()
+            val okhttp = okHttpSupplier.get().newBuilder()
+                .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
+                .build()
             val service = Retrofit.Builder()
                 .baseUrl(host)
                 .addConverterFactory(ProtoConverterFactory.create())

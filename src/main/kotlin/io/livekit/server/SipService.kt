@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,13 +109,19 @@ interface SipService {
     @POST("/twirp/livekit.SIP/CreateSIPParticipant")
     fun createSipParticipant(
         @Body request: LivekitSip.CreateSIPParticipantRequest,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        // Per-request timeout override (seconds) consumed by RegionFailoverInterceptor
+        // (see TIMEOUT_HEADER); omitted when null. Used when dialing waits for an answer.
+        @Header("X-Lk-Request-Timeout") requestTimeout: String? = null
     ): Call<LivekitSip.SIPParticipantInfo>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.SIP/TransferSIPParticipant")
     fun transferSipParticipant(
         @Body request: LivekitSip.TransferSIPParticipantRequest,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        // Per-request timeout override (seconds) consumed by RegionFailoverInterceptor
+        // (see TIMEOUT_HEADER); omitted when null. Transferring always dials a phone.
+        @Header("X-Lk-Request-Timeout") requestTimeout: String? = null
     ): Call<Void?>
 }

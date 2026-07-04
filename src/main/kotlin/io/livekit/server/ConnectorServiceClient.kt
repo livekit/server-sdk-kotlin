@@ -16,8 +16,10 @@
 
 package io.livekit.server
 
+import io.livekit.server.okhttp.FailoverConfig
 import io.livekit.server.okhttp.OkHttpFactory
 import io.livekit.server.okhttp.OkHttpHolder
+import io.livekit.server.okhttp.RegionFailoverInterceptor
 import livekit.LivekitAgentDispatch
 import livekit.LivekitConnectorTwilio
 import livekit.LivekitConnectorWhatsapp
@@ -129,7 +131,7 @@ class ConnectorServiceClient(
      * @param whatsappCloudApiVersion WhatsApp Cloud API version (e.g., "23.0", "24.0")
      * @param whatsappCallId The call ID sent by Meta
      * @param sdp The session description from Meta
-     * @param waitUntilAnswered If true, block until the call is answered before returning.
+     * @param waitUntilAnswered If true, wait until the inbound party joins before returning.
      * @param options Additional options for the call
      */
     @JvmOverloads
@@ -154,7 +156,15 @@ class ConnectorServiceClient(
         }
 
         val credentials = authHeader(RoomCreate(true))
-        return service.acceptWhatsAppCall(request, credentials)
+        // When waiting for the inbound party to join, the request can block, so
+        // default its timeout to the standard ring window; the caller overrides via
+        // options.timeout. Otherwise the client default applies.
+        val timeoutSeconds = if (waitUntilAnswered) {
+            DialTimeout.resolve(options?.timeout?.seconds?.toInt(), null)
+        } else {
+            options?.timeout?.seconds?.toInt()
+        }
+        return service.acceptWhatsAppCall(request, credentials, timeoutSeconds?.toString())
     }
 
     /**
@@ -195,9 +205,12 @@ class ConnectorServiceClient(
             host: String,
             apiKey: String,
             secret: String,
-            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory()
+            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory(),
+            failover: Boolean = true
         ): ConnectorServiceClient {
-            val okhttp = okHttpSupplier.get()
+            val okhttp = okHttpSupplier.get().newBuilder()
+                .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
+                .build()
 
             val service = Retrofit.Builder()
                 .baseUrl(host)
@@ -251,7 +264,6 @@ private fun LivekitConnectorWhatsapp.AcceptWhatsAppCallRequest.Builder.applyOpti
         opt.participantMetadata?.let { this.participantMetadata = it }
         opt.participantAttributes?.let { this.putAllParticipantAttributes(it) }
         opt.destinationCountry?.let { this.destinationCountry = it }
-        opt.ringingTimeout?.let { this.ringingTimeout = it.toProto() }
     }
 }
 
@@ -289,6 +301,13 @@ data class WhatsAppCallOptions(
     var whatsappBizOpaqueCallbackData: String? = null,
     /** Max time for the callee to answer the call. */
     var ringingTimeout: Duration? = null,
+    /**
+     * Optional request timeout. When the call waits for an answer
+     * (`waitUntilAnswered`), defaults to a longer value (dialing takes time) and
+     * is raised, if needed, to stay above [ringingTimeout]; otherwise the client
+     * default applies.
+     */
+    var timeout: Duration? = null,
 )
 
 /**

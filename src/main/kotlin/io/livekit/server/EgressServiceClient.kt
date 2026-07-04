@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package io.livekit.server
 
+import io.livekit.server.okhttp.FailoverConfig
 import io.livekit.server.okhttp.OkHttpFactory
 import io.livekit.server.okhttp.OkHttpHolder
+import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitEgress
 import okhttp3.OkHttpClient
@@ -752,9 +754,12 @@ class EgressServiceClient(
             host: String,
             apiKey: String,
             secret: String,
-            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory()
+            okHttpSupplier: Supplier<OkHttpClient> = OkHttpFactory(),
+            failover: Boolean = true
         ): EgressServiceClient {
-            val okhttp = okHttpSupplier.get()
+            val okhttp = okHttpSupplier.get().newBuilder()
+                .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
+                .build()
 
             val service = Retrofit.Builder()
                 .baseUrl(host)

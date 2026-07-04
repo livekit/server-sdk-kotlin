@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,9 @@ class Room(value: String) : VideoGrant("room", value)
  */
 class RoomName(value: String) : VideoGrant("room", value)
 
+/**
+ * destination room which this participant can be forwarded or moved to
+ */
 class DestinationRoomName(value: String) : VideoGrant("destinationRoom", value)
 
 /**
