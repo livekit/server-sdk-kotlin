@@ -131,7 +131,7 @@ class ConnectorServiceClient(
      * @param whatsappCloudApiVersion WhatsApp Cloud API version (e.g., "23.0", "24.0")
      * @param whatsappCallId The call ID sent by Meta
      * @param sdp The session description from Meta
-     * @param waitUntilAnswered If true, block until the call is answered before returning.
+     * @param waitUntilAnswered If true, wait until the inbound party joins before returning.
      * @param options Additional options for the call
      */
     @JvmOverloads
@@ -156,11 +156,11 @@ class ConnectorServiceClient(
         }
 
         val credentials = authHeader(RoomCreate(true))
-        // Accept can block until the call is answered, so the request must outlast
-        // ringing; resolve the timeout the same way as dialing calls. Otherwise the
-        // request returns promptly and we honor any user timeout / the client default.
+        // When waiting for the inbound party to join, the request can block, so
+        // default its timeout to the standard ring window; the caller overrides via
+        // options.timeout. Otherwise the client default applies.
         val timeoutSeconds = if (waitUntilAnswered) {
-            DialTimeout.resolve(options?.timeout?.seconds?.toInt(), options?.ringingTimeout?.seconds?.toInt())
+            DialTimeout.resolve(options?.timeout?.seconds?.toInt(), null)
         } else {
             options?.timeout?.seconds?.toInt()
         }
@@ -264,7 +264,6 @@ private fun LivekitConnectorWhatsapp.AcceptWhatsAppCallRequest.Builder.applyOpti
         opt.participantMetadata?.let { this.participantMetadata = it }
         opt.participantAttributes?.let { this.putAllParticipantAttributes(it) }
         opt.destinationCountry?.let { this.destinationCountry = it }
-        opt.ringingTimeout?.let { this.ringingTimeout = it.toProto() }
     }
 }
 

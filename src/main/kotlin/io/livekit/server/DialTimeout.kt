@@ -17,10 +17,10 @@
 package io.livekit.server
 
 /**
- * Request-timeout handling shared by calls that dial a phone and wait for an
- * answer (SIP CreateSIPParticipant/TransferSIPParticipant, WhatsApp
+ * Request-timeout handling shared by calls that may block until a call is
+ * answered (SIP CreateSIPParticipant/TransferSIPParticipant, WhatsApp
  * AcceptWhatsAppCall). These take longer than a normal request, and the request
- * must outlast ringing or it would abort before the call can be answered.
+ * must outlast the wait or it would abort before the call can be answered.
  *
  * All values are in seconds, matching the internal request-timeout header.
  */
