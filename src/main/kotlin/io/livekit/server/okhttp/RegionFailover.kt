@@ -26,6 +26,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.io.InterruptedIOException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
@@ -159,7 +160,10 @@ internal class RegionFailoverInterceptor(private val config: FailoverConfig) : I
             try {
                 Thread.sleep(ms)
             } catch (e: InterruptedException) {
+                // Restore the interrupt flag and abort the failover loop so the
+                // caller can cancel its work instead of continuing to retry.
                 Thread.currentThread().interrupt()
+                throw InterruptedIOException("interrupted during failover backoff")
             }
         }
     }
