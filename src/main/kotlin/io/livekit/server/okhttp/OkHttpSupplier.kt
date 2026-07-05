@@ -47,6 +47,7 @@ constructor(
 
     val okHttp by lazy {
         with(OkHttpClient.Builder()) {
+            addInterceptor(UserAgentInterceptor())
             if (logging) {
                 val loggingInterceptor = HttpLoggingInterceptor()
                 loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)

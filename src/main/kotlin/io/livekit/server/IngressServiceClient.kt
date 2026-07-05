@@ -37,6 +37,7 @@ class IngressServiceClient(
     private val service: IngressService,
     private val apiKey: String,
     private val secret: String,
+    private val token: String? = null,
 ) {
     /**
      * Creates a new ingress. Default audio and video options will be used if none is provided.
@@ -185,6 +186,7 @@ class IngressServiceClient(
     }
 
     private fun authHeader(vararg videoGrants: VideoGrant): String {
+        token?.let { return "Bearer $it" }
         val accessToken = AccessToken(apiKey, secret)
         accessToken.addGrants(*videoGrants)
 

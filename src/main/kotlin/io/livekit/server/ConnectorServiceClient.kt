@@ -41,7 +41,8 @@ class ConnectorServiceClient(
     private val service: ConnectorService,
     apiKey: String,
     secret: String,
-) : ServiceClientBase(apiKey, secret) {
+    token: String? = null,
+) : ServiceClientBase(apiKey, secret, token = token) {
 
     /**
      * Dial an outbound WhatsApp call.

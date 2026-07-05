@@ -114,6 +114,29 @@ sourceSets {
     }
 }
 
+// Generate Version.kt so the SDK version (VERSION_NAME) is available at runtime
+// for the User-Agent header. Regenerated from gradle.properties on every build.
+val generateVersionKt by tasks.registering {
+    val versionName = properties["VERSION_NAME"].toString()
+    val outputDir = layout.buildDirectory.dir("generated/source/version")
+    inputs.property("versionName", versionName)
+    outputs.dir(outputDir)
+    doLast {
+        val pkg = outputDir.get().dir("io/livekit/server").asFile
+        pkg.mkdirs()
+        pkg.resolve("Version.kt").writeText(
+            """
+            |package io.livekit.server
+            |
+            |internal const val SDK_VERSION: String = "$versionName"
+            |
+            """.trimMargin(),
+        )
+    }
+}
+
+kotlin.sourceSets.getByName("main").kotlin.srcDir(generateVersionKt)
+
 val protobufVersion = "4.29.4"
 val protobufDep = "com.google.protobuf:protobuf-java:$protobufVersion"
 protobuf {

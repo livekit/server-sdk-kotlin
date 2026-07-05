@@ -45,7 +45,8 @@ class SipServiceClient(
     private val service: SipService,
     apiKey: String,
     secret: String,
-) : ServiceClientBase(apiKey, secret) {
+    token: String? = null,
+) : ServiceClientBase(apiKey, secret, token = token) {
 
     /**
      * Creates an inbound trunk to accept incoming calls.
@@ -377,6 +378,9 @@ class SipServiceClient(
             ringingTimeout?.let { this.ringingTimeout = secondsDuration(it) }
 
             options?.let { opts ->
+                opts.outboundConfig?.let { this.trunk = it }
+                opts.fromNumber?.let { this.sipNumber = it }
+                opts.displayName?.let { this.displayName = it }
                 opts.participantIdentity?.let { this.participantIdentity = it }
                 opts.participantName?.let { this.participantName = it }
                 opts.participantMetadata?.let { this.participantMetadata = it }
@@ -584,6 +588,12 @@ data class CreateSipParticipantOptions(
     var participantIdentity: String?,
     var participantName: String? = null,
     var participantMetadata: String? = null,
+    /** Inline outbound trunk configuration, used instead of a stored trunk ID. */
+    var outboundConfig: LivekitSip.SIPOutboundConfig? = null,
+    /** SIP From number. Required when using an inline [outboundConfig]. */
+    var fromNumber: String? = null,
+    /** Custom caller ID shown to the callee. Requires provider support. */
+    var displayName: String? = null,
     var dtmf: String? = null,
     /** deprecated, use playDialtone instead */
     var playRingtone: Boolean? = null,
