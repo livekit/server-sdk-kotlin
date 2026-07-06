@@ -22,11 +22,11 @@ import io.livekit.server.CreateSipParticipantOptions
 import io.livekit.server.EncodedOutputs
 import io.livekit.server.LiveKitAPI
 import io.livekit.server.RoomCreate
+import io.livekit.server.ServerError
 import io.livekit.server.SipCallError
 import io.livekit.server.SipDispatchRuleCallee
 import io.livekit.server.SipDispatchRuleDirect
 import io.livekit.server.TransferSipParticipantOptions
-import io.livekit.server.ServerError
 import io.livekit.server.UpdateSipDispatchRuleOptions
 import io.livekit.server.UpdateSipInboundTrunkOptions
 import io.livekit.server.UpdateSipOutboundTrunkOptions
@@ -95,7 +95,10 @@ class LiveKitApiTest {
         assertOk(api.room.mutePublishedTrack("test-room", "participant-42", "TR_video1", true))
         assertOk(
             api.room.updateParticipant(
-                "test-room", "participant-42", name = "Alice", metadata = "{}",
+                "test-room",
+                "participant-42",
+                name = "Alice",
+                metadata = "{}",
                 attributes = mapOf("seat" to "1A"),
             ),
         )
@@ -103,8 +106,11 @@ class LiveKitApiTest {
         assertOk(api.room.updateRoomMetadata("test-room", "{}"))
         assertOk(
             api.room.sendData(
-                "test-room", "hello".toByteArray(), LivekitModels.DataPacket.Kind.RELIABLE,
-                destinationIdentities = listOf("participant-42"), topic = "chat",
+                "test-room",
+                "hello".toByteArray(),
+                LivekitModels.DataPacket.Kind.RELIABLE,
+                destinationIdentities = listOf("participant-42"),
+                topic = "chat",
             ),
         )
     }
@@ -134,8 +140,11 @@ class LiveKitApiTest {
         val api = api()
         assertOk(
             api.ingress.createIngress(
-                name = "stream-input", roomName = "test-room", participantIdentity = "ingress-bot",
-                participantName = "Live Stream", inputType = livekit.LivekitIngress.IngressInput.RTMP_INPUT,
+                name = "stream-input",
+                roomName = "test-room",
+                participantIdentity = "ingress-bot",
+                participantName = "Live Stream",
+                inputType = livekit.LivekitIngress.IngressInput.RTMP_INPUT,
                 enableTranscoding = true,
             ),
         )
@@ -151,10 +160,14 @@ class LiveKitApiTest {
         assertOk(api.sip.createSipInboundTrunk("inbound", listOf("+15105550100")))
         assertOk(
             api.sip.createSipInboundTrunk(
-                "inbound-krisp", listOf("+15105550101"),
+                "inbound-krisp",
+                listOf("+15105550101"),
                 CreateSipInboundTrunkOptions(
-                    krispEnabled = true, ringingTimeout = 30, maxCallDuration = 3600,
-                    headers = mapOf("X-Custom" to "1"), headersToAttributes = mapOf("X-Custom" to "custom"),
+                    krispEnabled = true,
+                    ringingTimeout = 30,
+                    maxCallDuration = 3600,
+                    headers = mapOf("X-Custom" to "1"),
+                    headersToAttributes = mapOf("X-Custom" to "custom"),
                 ),
             ),
         )
@@ -195,7 +208,8 @@ class LiveKitApiTest {
         assertOk(api.connector.acceptWhatsAppCall("123456789012345", "wa-secret-key", "23.0", "wacid.HBgLABC", offer))
         assertOk(
             api.connector.disconnectWhatsAppCall(
-                "wacid.HBgLABC", "wa-secret-key",
+                "wacid.HBgLABC",
+                "wa-secret-key",
                 LivekitConnectorWhatsapp.DisconnectWhatsAppCallRequest.DisconnectReason.BUSINESS_INITIATED,
             ),
         )
@@ -237,7 +251,9 @@ class LiveKitApiTest {
     fun sipParticipant() {
         if (!MockControl.serverUp()) return
         val p = api().sip.createSipParticipant(
-            "ST_abc123", "+15105550100", "test-room",
+            "ST_abc123",
+            "+15105550100",
+            "test-room",
             CreateSipParticipantOptions(participantIdentity = "sip-caller", participantName = "SIP Caller"),
         ).execute().body()
         assertNotNull(p)
@@ -246,7 +262,9 @@ class LiveKitApiTest {
 
         // Inline outbound trunk config (no stored trunk id) + custom caller ID.
         val inline = api().sip.createSipParticipant(
-            "", "+15105550100", "test-room",
+            "",
+            "+15105550100",
+            "test-room",
             CreateSipParticipantOptions(
                 participantIdentity = "sip-inline",
                 outboundConfig = LivekitSip.SIPOutboundConfig.newBuilder()
@@ -261,13 +279,17 @@ class LiveKitApiTest {
         val waitApi = api(MockControl.json("delayMs" to 0))
         assertOk(
             waitApi.sip.createSipParticipant(
-                "ST_abc123", "+15105550100", "test-room",
+                "ST_abc123",
+                "+15105550100",
+                "test-room",
                 CreateSipParticipantOptions(participantIdentity = "sip-caller", waitUntilAnswered = true, ringingTimeout = 2),
             ),
         )
         assertOk(
             waitApi.sip.transferSipParticipant(
-                "test-room", "sip-caller", "tel:+15105550122",
+                "test-room",
+                "sip-caller",
+                "tel:+15105550122",
                 TransferSipParticipantOptions(ringingTimeout = 2),
             ),
         )
@@ -328,7 +350,9 @@ class LiveKitApiTest {
         if (!MockControl.serverUp()) return
         // ringingTimeout 1s -> ~3s dial budget; the mock delays the answer past it.
         val call = api(MockControl.json("delayMs" to 4000)).sip.createSipParticipant(
-            "ST_abc123", "+15105550100", "test-room",
+            "ST_abc123",
+            "+15105550100",
+            "test-room",
             CreateSipParticipantOptions(participantIdentity = "sip-caller", waitUntilAnswered = true, ringingTimeout = 1),
         )
         assertFailsWith<java.io.IOException> { call.execute() }

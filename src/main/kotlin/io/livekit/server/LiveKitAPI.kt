@@ -127,7 +127,10 @@ class LiveKitAPI internal constructor(
                 ingress = IngressServiceClient(retrofit.create(IngressService::class.java), apiKey, secret, token),
                 sip = SipServiceClient(retrofit.create(SipService::class.java), apiKey, secret, token),
                 agentDispatch = AgentDispatchServiceClient(
-                    retrofit.create(AgentDispatchService::class.java), apiKey, secret, token,
+                    retrofit.create(AgentDispatchService::class.java),
+                    apiKey,
+                    secret,
+                    token,
                 ),
                 connector = ConnectorServiceClient(retrofit.create(ConnectorService::class.java), apiKey, secret, token),
             )
