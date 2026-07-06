@@ -157,7 +157,7 @@ class AgentDispatchServiceClient(
                 .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
                 .build()
             val service = Retrofit.Builder()
-                .baseUrl(host)
+                .baseUrl(normalizeApiUrl(host))
                 .addConverterFactory(ProtoConverterFactory.create())
                 .client(okhttp)
                 .build()

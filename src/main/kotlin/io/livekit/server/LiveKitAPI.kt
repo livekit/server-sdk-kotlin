@@ -25,6 +25,21 @@ import retrofit2.converter.protobuf.ProtoConverterFactory
 import java.util.function.Supplier
 
 /**
+ * Normalizes a host into a base URL for the HTTP server APIs. LiveKit URLs are
+ * commonly `wss://` (or `ws://`); the server APIs are Twirp over HTTP, so the
+ * scheme is converted to `https://` (or `http://`). A trailing slash is added
+ * because Retrofit requires the base URL to end in `/`.
+ */
+internal fun normalizeApiUrl(host: String): String {
+    val http = when {
+        host.startsWith("wss://") -> "https://" + host.removePrefix("wss://")
+        host.startsWith("ws://") -> "http://" + host.removePrefix("ws://")
+        else -> host
+    }
+    return if (http.endsWith("/")) http else "$http/"
+}
+
+/**
  * A single entry point to every LiveKit server API, exposing each service.
  * The services share one underlying OkHttp client and Retrofit instance.
  *
@@ -101,9 +116,8 @@ class LiveKitAPI internal constructor(
             val okhttp = okHttpSupplier.get().newBuilder()
                 .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
                 .build()
-            val baseUrl = if (host.endsWith("/")) host else "$host/"
             val retrofit = Retrofit.Builder()
-                .baseUrl(baseUrl)
+                .baseUrl(normalizeApiUrl(host))
                 .addConverterFactory(ProtoConverterFactory.create())
                 .client(okhttp)
                 .build()

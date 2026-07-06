@@ -17,13 +17,19 @@
 package io.livekit.server.api
 
 import io.livekit.server.AccessToken
+import io.livekit.server.CreateSipInboundTrunkOptions
 import io.livekit.server.CreateSipParticipantOptions
+import io.livekit.server.EncodedOutputs
 import io.livekit.server.LiveKitAPI
 import io.livekit.server.RoomCreate
 import io.livekit.server.SipCallError
+import io.livekit.server.SipDispatchRuleCallee
 import io.livekit.server.SipDispatchRuleDirect
 import io.livekit.server.TransferSipParticipantOptions
 import io.livekit.server.ServerError
+import io.livekit.server.UpdateSipDispatchRuleOptions
+import io.livekit.server.UpdateSipInboundTrunkOptions
+import io.livekit.server.UpdateSipOutboundTrunkOptions
 import io.livekit.server.okhttp.OkHttpFactory
 import io.livekit.server.okhttp.OkHttpHolder
 import livekit.LivekitConnectorTwilio
@@ -31,6 +37,7 @@ import livekit.LivekitConnectorWhatsapp
 import livekit.LivekitEgress
 import livekit.LivekitModels
 import livekit.LivekitRtc
+import livekit.LivekitSip
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import java.util.function.Supplier
@@ -82,6 +89,7 @@ class LiveKitApiTest {
         assertOk(api.room.listParticipants("test-room"))
         assertOk(api.room.getParticipant("test-room", "participant-42"))
         assertOk(api.room.removeParticipant("test-room", "participant-42"))
+        assertOk(api.room.removeParticipant("test-room", "participant-99", revokeTokenTs = 1_700_000_000_000L))
         assertOk(api.room.forwardParticipant("test-room", "participant-42", "overflow-room"))
         assertOk(api.room.moveParticipant("test-room", "participant-42", "breakout-room"))
         assertOk(api.room.mutePublishedTrack("test-room", "participant-42", "TR_video1", true))
@@ -111,6 +119,9 @@ class LiveKitApiTest {
         val stream = LivekitEgress.StreamOutput.newBuilder()
             .setProtocol(LivekitEgress.StreamProtocol.RTMP).addUrls("rtmps://a.example.com/live/key").build()
         assertOk(api.egress.startWebEgress("https://example.com/scene", stream))
+        assertOk(api.egress.startParticipantEgress("test-room", "participant-42", EncodedOutputs(file, null, null, null)))
+        assertOk(api.egress.startTrackCompositeEgress("test-room", file, "TR_audio1", "TR_video1"))
+        assertOk(api.egress.startTrackEgress("test-room", "wss://example.com/ws", "TR_video1"))
         assertOk(api.egress.updateLayout("EG_abc123", "speaker"))
         assertOk(api.egress.updateStream("EG_abc123", addOutputUrls = listOf("rtmps://b.example.com/live/key")))
         assertOk(api.egress.listEgress(roomName = "test-room", egressId = "EG_abc123", active = true))
@@ -138,11 +149,38 @@ class LiveKitApiTest {
         if (!MockControl.serverUp()) return
         val api = api()
         assertOk(api.sip.createSipInboundTrunk("inbound", listOf("+15105550100")))
+        assertOk(
+            api.sip.createSipInboundTrunk(
+                "inbound-krisp", listOf("+15105550101"),
+                CreateSipInboundTrunkOptions(
+                    krispEnabled = true, ringingTimeout = 30, maxCallDuration = 3600,
+                    headers = mapOf("X-Custom" to "1"), headersToAttributes = mapOf("X-Custom" to "custom"),
+                ),
+            ),
+        )
         assertOk(api.sip.createSipOutboundTrunk("outbound", "sip.telco.example.com", listOf("+15105550100")))
         assertOk(api.sip.listSipInboundTrunk())
         assertOk(api.sip.listSipOutboundTrunk())
+        // field-level update + full replace for both trunk kinds
+        assertOk(api.sip.updateSipInboundTrunk("ST_abc123", UpdateSipInboundTrunkOptions(metadata = "{}")))
+        assertOk(
+            api.sip.updateSipInboundTrunk(
+                "ST_abc123",
+                LivekitSip.SIPInboundTrunkInfo.newBuilder().setName("inbound").build(),
+            ),
+        )
+        assertOk(api.sip.updateSipOutboundTrunk("ST_abc123", UpdateSipOutboundTrunkOptions(metadata = "{}")))
+        assertOk(
+            api.sip.updateSipOutboundTrunk(
+                "ST_abc123",
+                LivekitSip.SIPOutboundTrunkInfo.newBuilder()
+                    .setName("outbound").setAddress("sip.telco.example.com").build(),
+            ),
+        )
         assertOk(api.sip.deleteSipTrunk("ST_abc123"))
         assertOk(api.sip.createSipDispatchRule(SipDispatchRuleDirect(roomName = "support", pin = "1234")))
+        assertOk(api.sip.createSipDispatchRule(SipDispatchRuleCallee(roomPrefix = "call-", randomize = true)))
+        assertOk(api.sip.updateSipDispatchRule("SDR_abc123", UpdateSipDispatchRuleOptions(name = "rule")))
         assertOk(api.sip.listSipDispatchRule())
         assertOk(api.sip.deleteSipDispatchRule("SDR_abc123"))
     }
@@ -154,6 +192,7 @@ class LiveKitApiTest {
         val offer = LivekitRtc.SessionDescription.newBuilder().setType("offer").setSdp("v=0\r\n").build()
         assertOk(api.connector.dialWhatsAppCall("123456789012345", "+15105550100", "wa-secret-key", "23.0"))
         assertOk(api.connector.connectWhatsAppCall("wacid.HBgLABC", offer))
+        assertOk(api.connector.acceptWhatsAppCall("123456789012345", "wa-secret-key", "23.0", "wacid.HBgLABC", offer))
         assertOk(
             api.connector.disconnectWhatsAppCall(
                 "wacid.HBgLABC", "wa-secret-key",
@@ -204,6 +243,20 @@ class LiveKitApiTest {
         assertNotNull(p)
         assertEquals("test-room", p.roomName)
         assertEquals("sip-caller", p.participantIdentity)
+
+        // Inline outbound trunk config (no stored trunk id) + custom caller ID.
+        val inline = api().sip.createSipParticipant(
+            "", "+15105550100", "test-room",
+            CreateSipParticipantOptions(
+                participantIdentity = "sip-inline",
+                outboundConfig = LivekitSip.SIPOutboundConfig.newBuilder()
+                    .setHostname("sip.telco.example.com")
+                    .setTransport(LivekitSip.SIPTransport.SIP_TRANSPORT_UDP).build(),
+                fromNumber = "+15105550199",
+                displayName = "Support",
+            ),
+        ).execute().body()
+        assertNotNull(inline)
 
         val waitApi = api(MockControl.json("delayMs" to 0))
         assertOk(
