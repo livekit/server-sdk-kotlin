@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.13.1
+
+### Patch Changes
+
+- add automatic API failover for LK Cloud - [#162](https://github.com/livekit/server-sdk-kotlin/pull/162) ([@davidzhao](https://github.com/davidzhao))
+
 ## 0.13.0
 
 ### Minor Changes
