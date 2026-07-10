@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.14.0
+
+### Minor Changes
+
+- LiveKitAPI entrypoint, ability to use a token instead of api key/secret - [#164](https://github.com/livekit/server-sdk-kotlin/pull/164) ([@davidzhao](https://github.com/davidzhao))
+
 ## 0.13.1
 
 ### Patch Changes
