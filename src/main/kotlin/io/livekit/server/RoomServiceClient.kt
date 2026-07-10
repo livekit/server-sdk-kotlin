@@ -42,6 +42,7 @@ class RoomServiceClient(
     private val service: RoomService,
     private val apiKey: String,
     private val secret: String,
+    private val token: String? = null,
 ) {
 
     /**
@@ -179,16 +180,22 @@ class RoomServiceClient(
      * @param roomName
      * @param identity
      */
-    fun removeParticipant(roomName: String, identity: String): Call<Void?> {
-        val request = LivekitRoom.RoomParticipantIdentity.newBuilder()
+    @JvmOverloads
+    fun removeParticipant(
+        roomName: String,
+        identity: String,
+        // Revoke all tokens issued to this participant before this Unix timestamp (ms).
+        revokeTokenTs: Long? = null,
+    ): Call<Void?> {
+        val builder = LivekitRoom.RoomParticipantIdentity.newBuilder()
             .setRoom(roomName)
             .setIdentity(identity)
-            .build()
+        revokeTokenTs?.let { builder.setRevokeTokenTs(it) }
         val credentials = authHeader(
             RoomAdmin(true),
             RoomName(roomName),
         )
-        return service.removeParticipant(request, credentials)
+        return service.removeParticipant(builder.build(), credentials)
     }
 
     /**
@@ -377,6 +384,7 @@ class RoomServiceClient(
     }
 
     private fun authHeader(vararg videoGrants: VideoGrant): String {
+        token?.let { return "Bearer $it" }
         val accessToken = AccessToken(apiKey, secret)
         accessToken.addGrants(*videoGrants)
 
@@ -443,7 +451,7 @@ class RoomServiceClient(
                 .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
                 .build()
             val service = Retrofit.Builder()
-                .baseUrl(host)
+                .baseUrl(normalizeApiUrl(host))
                 .addConverterFactory(ProtoConverterFactory.create())
                 .client(okhttp)
                 .build()

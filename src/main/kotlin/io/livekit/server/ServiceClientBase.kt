@@ -29,9 +29,13 @@ open class ServiceClientBase(
     private val apiKey: String,
     private val secret: String,
     private val ttl: Long = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES),
+    // A pre-signed token, set by LiveKitAPI for token auth; sent verbatim,
+    // skipping per-call signing.
+    private val token: String? = null,
 ) {
 
     protected fun authHeader(vararg videoGrants: VideoGrant): String {
+        token?.let { return "Bearer $it" }
         val accessToken = AccessToken(apiKey, secret)
         accessToken.addGrants(*videoGrants)
         accessToken.ttl = ttl
@@ -42,6 +46,7 @@ open class ServiceClientBase(
     }
 
     protected fun authHeader(videoGrants: List<VideoGrant> = emptyList(), sipGrants: List<SIPGrant> = emptyList()): String {
+        token?.let { return "Bearer $it" }
         val accessToken = AccessToken(apiKey, secret)
         accessToken.addGrants(videoGrants)
         accessToken.addSIPGrants(sipGrants)

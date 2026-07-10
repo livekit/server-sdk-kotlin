@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 LiveKit, Inc.
+ * Copyright 2025-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ constructor(
 
     val okHttp by lazy {
         with(OkHttpClient.Builder()) {
+            addInterceptor(UserAgentInterceptor())
             if (logging) {
                 val loggingInterceptor = HttpLoggingInterceptor()
                 loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)

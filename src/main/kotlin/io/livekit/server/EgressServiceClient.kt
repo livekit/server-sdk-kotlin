@@ -50,6 +50,7 @@ class EgressServiceClient(
     private val service: EgressService,
     private val apiKey: String,
     private val secret: String,
+    private val token: String? = null,
 ) {
 
     @JvmOverloads
@@ -704,6 +705,7 @@ class EgressServiceClient(
     }
 
     private fun authHeader(vararg videoGrants: VideoGrant): String {
+        token?.let { return "Bearer $it" }
         val accessToken = AccessToken(apiKey, secret)
         accessToken.addGrants(*videoGrants)
 
@@ -762,7 +764,7 @@ class EgressServiceClient(
                 .build()
 
             val service = Retrofit.Builder()
-                .baseUrl(host)
+                .baseUrl(normalizeApiUrl(host))
                 .addConverterFactory(ProtoConverterFactory.create())
                 .client(okhttp)
                 .build()

@@ -25,6 +25,7 @@ import livekit.LivekitModels.ListUpdate
 import livekit.LivekitRoom
 import livekit.LivekitSip
 import livekit.LivekitSip.SIPDispatchRule
+import livekit.LivekitSip.SIPDispatchRuleCallee
 import livekit.LivekitSip.SIPDispatchRuleDirect
 import livekit.LivekitSip.SIPDispatchRuleIndividual
 import livekit.LivekitSip.SIPDispatchRuleInfo
@@ -45,7 +46,8 @@ class SipServiceClient(
     private val service: SipService,
     apiKey: String,
     secret: String,
-) : ServiceClientBase(apiKey, secret) {
+    token: String? = null,
+) : ServiceClientBase(apiKey, secret, token = token) {
 
     /**
      * Creates an inbound trunk to accept incoming calls.
@@ -70,6 +72,13 @@ class SipServiceClient(
                     opt.allowedNumbers?.let { this.addAllAllowedNumbers(it) }
                     opt.authUsername?.let { this.authUsername = it }
                     opt.authPassword?.let { this.authPassword = it }
+                    opt.authRealm?.let { this.authRealm = it }
+                    opt.krispEnabled?.let { this.krispEnabled = it }
+                    opt.ringingTimeout?.let { this.ringingTimeout = secondsDuration(it) }
+                    opt.maxCallDuration?.let { this.maxCallDuration = secondsDuration(it) }
+                    opt.headers?.let { this.putAllHeaders(it) }
+                    opt.headersToAttributes?.let { this.putAllHeadersToAttributes(it) }
+                    opt.attributesToHeaders?.let { this.putAllAttributesToHeaders(it) }
                 }
                 build()
             }
@@ -106,6 +115,9 @@ class SipServiceClient(
                     opt.authUsername?.let { this.authUsername = it }
                     opt.authPassword?.let { this.authPassword = it }
                     opt.destinationCountry?.let { this.destinationCountry = it }
+                    opt.headers?.let { this.putAllHeaders(it) }
+                    opt.headersToAttributes?.let { this.putAllHeadersToAttributes(it) }
+                    opt.attributesToHeaders?.let { this.putAllAttributesToHeaders(it) }
                 }
                 build()
             }
@@ -148,6 +160,26 @@ class SipServiceClient(
     }
 
     /**
+     * UpdateSIPInboundTrunk replaces an existing SIP Inbound Trunk in its entirety with the
+     * provided [trunk] info. Unlike the field-level [updateSipInboundTrunk] overload, every field
+     * is overwritten with the given value.
+     */
+    @Suppress("unused")
+    fun updateSipInboundTrunk(
+        sipTrunkId: String,
+        trunk: LivekitSip.SIPInboundTrunkInfo,
+    ): Call<LivekitSip.SIPInboundTrunkInfo> {
+        val request = with(LivekitSip.UpdateSIPInboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+            this.replace = trunk
+            build()
+        }
+
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipInboundTrunk(request, credentials)
+    }
+
+    /**
      * UpdateSIPOutboundTrunk updates an existing SIP Outbound Trunk.
      */
     @JvmOverloads
@@ -172,6 +204,26 @@ class SipServiceClient(
                 }
                 build()
             }
+            build()
+        }
+
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.updateSipOutboundTrunk(request, credentials)
+    }
+
+    /**
+     * UpdateSIPOutboundTrunk replaces an existing SIP Outbound Trunk in its entirety with the
+     * provided [trunk] info. Unlike the field-level [updateSipOutboundTrunk] overload, every field
+     * is overwritten with the given value.
+     */
+    @Suppress("unused")
+    fun updateSipOutboundTrunk(
+        sipTrunkId: String,
+        trunk: LivekitSip.SIPOutboundTrunkInfo,
+    ): Call<LivekitSip.SIPOutboundTrunkInfo> {
+        val request = with(LivekitSip.UpdateSIPOutboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+            this.replace = trunk
             build()
         }
 
@@ -264,6 +316,15 @@ class SipServiceClient(
                                 build()
                             }
                         }
+
+                        is SipDispatchRuleCallee -> {
+                            dispatchRuleCallee = with(SIPDispatchRuleCallee.newBuilder()) {
+                                roomPrefix = rule.roomPrefix
+                                rule.pin?.let { this.pin = it }
+                                rule.randomize?.let { this.randomize = it }
+                                build()
+                            }
+                        }
                     }
                     build()
                 }
@@ -306,6 +367,15 @@ class SipServiceClient(
                                     dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
                                         roomPrefix = optRule.roomPrefix
                                         optRule.pin?.let { this.pin = it }
+                                        build()
+                                    }
+                                }
+
+                                is SipDispatchRuleCallee -> {
+                                    dispatchRuleCallee = with(SIPDispatchRuleCallee.newBuilder()) {
+                                        roomPrefix = optRule.roomPrefix
+                                        optRule.pin?.let { this.pin = it }
+                                        optRule.randomize?.let { this.randomize = it }
                                         build()
                                     }
                                 }
@@ -377,6 +447,9 @@ class SipServiceClient(
             ringingTimeout?.let { this.ringingTimeout = secondsDuration(it) }
 
             options?.let { opts ->
+                opts.outboundConfig?.let { this.trunk = it }
+                opts.fromNumber?.let { this.sipNumber = it }
+                opts.displayName?.let { this.displayName = it }
                 opts.participantIdentity?.let { this.participantIdentity = it }
                 opts.participantName?.let { this.participantName = it }
                 opts.participantMetadata?.let { this.participantMetadata = it }
@@ -476,7 +549,7 @@ class SipServiceClient(
                 .build()
 
             val service = Retrofit.Builder()
-                .baseUrl(host)
+                .baseUrl(normalizeApiUrl(host))
                 .addConverterFactory(ProtoConverterFactory.create())
                 .client(okhttp)
                 .build()
@@ -493,6 +566,15 @@ data class CreateSipInboundTrunkOptions(
     var allowedNumbers: List<String>? = null,
     var authUsername: String? = null,
     var authPassword: String? = null,
+    var authRealm: String? = null,
+    var krispEnabled: Boolean? = null,
+    /** Max time to ring, in seconds. */
+    var ringingTimeout: Int? = null,
+    /** Max call duration, in seconds. */
+    var maxCallDuration: Int? = null,
+    var headers: Map<String, String>? = null,
+    var headersToAttributes: Map<String, String>? = null,
+    var attributesToHeaders: Map<String, String>? = null,
 )
 
 data class CreateSipOutboundTrunkOptions(
@@ -501,6 +583,9 @@ data class CreateSipOutboundTrunkOptions(
     var authUsername: String? = null,
     var authPassword: String? = null,
     var destinationCountry: String? = null,
+    var headers: Map<String, String>? = null,
+    var headersToAttributes: Map<String, String>? = null,
+    var attributesToHeaders: Map<String, String>? = null,
 )
 
 data class UpdateSipInboundTrunkOptions(
@@ -527,6 +612,7 @@ data class UpdateSipOutboundTrunkOptions(
 /**
  * @see SipDispatchRuleDirect
  * @see SipDispatchRuleIndividual
+ * @see SipDispatchRuleCallee
  */
 sealed class SipDispatchRule(var type: String)
 
@@ -547,6 +633,17 @@ data class SipDispatchRuleIndividual(
     var roomPrefix: String,
     var pin: String? = null,
 ) : SipDispatchRule("individual")
+
+/**
+ * This creates a Dispatch Rule that creates a new room for each callee.
+ * The created room name will use the given roomPrefix, optionally followed by a random suffix
+ * when randomize is set.
+ */
+data class SipDispatchRuleCallee(
+    var roomPrefix: String,
+    var pin: String? = null,
+    var randomize: Boolean? = null,
+) : SipDispatchRule("callee")
 
 data class CreateSipDispatchRuleOptions(
     /** Human-readable name for the Dispatch Rule. */
@@ -584,6 +681,12 @@ data class CreateSipParticipantOptions(
     var participantIdentity: String?,
     var participantName: String? = null,
     var participantMetadata: String? = null,
+    /** Inline outbound trunk configuration, used instead of a stored trunk ID. */
+    var outboundConfig: LivekitSip.SIPOutboundConfig? = null,
+    /** SIP From number. Required when using an inline [outboundConfig]. */
+    var fromNumber: String? = null,
+    /** Custom caller ID shown to the callee. Requires provider support. */
+    var displayName: String? = null,
     var dtmf: String? = null,
     /** deprecated, use playDialtone instead */
     var playRingtone: Boolean? = null,

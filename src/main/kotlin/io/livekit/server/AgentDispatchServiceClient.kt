@@ -37,6 +37,7 @@ class AgentDispatchServiceClient(
     private val service: AgentDispatchService,
     private val apiKey: String,
     private val secret: String,
+    private val token: String? = null,
 ) {
 
     /**
@@ -122,6 +123,7 @@ class AgentDispatchServiceClient(
     }
 
     private fun authHeader(vararg videoGrants: VideoGrant): String {
+        token?.let { return "Bearer $it" }
         val accessToken = AccessToken(apiKey, secret)
         accessToken.addGrants(*videoGrants)
 
@@ -155,7 +157,7 @@ class AgentDispatchServiceClient(
                 .addInterceptor(RegionFailoverInterceptor(FailoverConfig(enabled = failover)))
                 .build()
             val service = Retrofit.Builder()
-                .baseUrl(host)
+                .baseUrl(normalizeApiUrl(host))
                 .addConverterFactory(ProtoConverterFactory.create())
                 .client(okhttp)
                 .build()

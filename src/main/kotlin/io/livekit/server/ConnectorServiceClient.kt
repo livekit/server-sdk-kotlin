@@ -41,7 +41,8 @@ class ConnectorServiceClient(
     private val service: ConnectorService,
     apiKey: String,
     secret: String,
-) : ServiceClientBase(apiKey, secret) {
+    token: String? = null,
+) : ServiceClientBase(apiKey, secret, token = token) {
 
     /**
      * Dial an outbound WhatsApp call.
@@ -213,7 +214,7 @@ class ConnectorServiceClient(
                 .build()
 
             val service = Retrofit.Builder()
-                .baseUrl(host)
+                .baseUrl(normalizeApiUrl(host))
                 .addConverterFactory(ProtoConverterFactory.create())
                 .client(okhttp)
                 .build()
