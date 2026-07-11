@@ -43,7 +43,7 @@ dependencies {
 
 ### Server API Access
 
-Obtain a `RoomServiceClient` or `EgressServiceClient` through their respective `create` methods, and then run calls through the client.
+`LiveKitAPI` is a single entry point to every server API, exposing each service (`room`, `egress`, `ingress`, `sip`, `agentDispatch`, `connector`). Create it with `createClient` (API key & secret, for backend use) or `createClientWithToken` (a pre-signed token, for client-side use where the API secret must not be exposed). Host and credentials fall back to the `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, and `LIVEKIT_TOKEN` environment variables. Values you pass explicitly take precedence; the environment variables are used only as a fallback for arguments you omit — an ambient `LIVEKIT_TOKEN`, for example, won't override an explicitly-provided API key and secret.
 
 ```java
 package org.example;
@@ -52,7 +52,7 @@ import com.google.protobuf.util.JsonFormat;
 
 import java.io.IOException;
 
-import io.livekit.server.RoomServiceClient;
+import io.livekit.server.LiveKitAPI;
 import livekit.LivekitModels;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -60,12 +60,13 @@ import retrofit2.Response;
 public class Main {
   public static void main(String[] args) throws IOException {
 
-    RoomServiceClient client = RoomServiceClient.createClient(
-            "http://example.com",
-            "apiKey",
-            "secret");
+    // With LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET set, call createClient()
+    // with no arguments; pass any of them to override the corresponding env var.
+    LiveKitAPI api = LiveKitAPI.createClient();
+    // explicit:    LiveKitAPI.createClient("http://example.com", "apiKey", "secret");
+    // client-side: LiveKitAPI.createClientWithToken("http://example.com", token); // token from LIVEKIT_TOKEN if omitted
 
-    Call<LivekitModels.Room> call = client.createRoom("room_name");
+    Call<LivekitModels.Room> call = api.getRoom().createRoom("room_name");
     Response<LivekitModels.Room> response = call.execute(); // Use call.enqueue for async
     LivekitModels.Room room = response.body();
 
@@ -74,7 +75,38 @@ public class Main {
 }
 ```
 
-`Call` adapters are also available through [Retrofit](https://github.com/square/retrofit/tree/master/retrofit-adapters) for other async constructs such as `CompletableFuture` and RxJava.
+`Call` adapters are also available through [Retrofit](https://github.com/square/retrofit/tree/master/retrofit-adapters) for other async constructs such as `CompletableFuture` and RxJava. The individual service clients (`RoomServiceClient`, etc.) can also be created directly with the same arguments.
+
+### Error handling
+
+Retrofit doesn't raise on API errors, so a failed call comes back as an unsuccessful response. `ServerError.from(response)` decodes the error code, message, and metadata from it (returns `null` if the response succeeded or isn't a server error):
+
+```java
+import io.livekit.server.ServerError;
+
+Response<LivekitModels.Room> response = api.getRoom().createRoom("my-room").execute();
+if (!response.isSuccessful()) {
+    ServerError error = ServerError.from(response);
+    if (error != null) {
+        System.out.println(error.getCode() + ": " + error.getMessage());
+    }
+}
+```
+
+A failed SIP dial (e.g. the callee is busy) can be decoded as a `SipCallError` (a `ServerError` subclass) that also exposes the SIP status. `SipCallError.from(response)` returns `null` if it isn't a SIP failure:
+
+```java
+import io.livekit.server.SipCallError;
+
+Response<LivekitSip.SIPParticipantInfo> response =
+    api.getSip().createSipParticipant("ST_trunk", "+15105550100", "my-room", null).execute();
+if (!response.isSuccessful()) {
+    SipCallError error = SipCallError.from(response);
+    if (error != null && Integer.valueOf(486).equals(error.getSipStatusCode())) {
+        // callee is busy
+    }
+}
+```
 
 ### Creating Access Tokens
 
