@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.15.0
+
+### Minor Changes
+
+- Add a unified `startEgress` method to `EgressServiceClient` that calls the v2 `Egress.StartEgress` RPC. - [#167](https://github.com/livekit/server-sdk-kotlin/pull/167) ([@frostbyte73](https://github.com/frostbyte73))
+
 ## 0.14.0
 
 ### Minor Changes
