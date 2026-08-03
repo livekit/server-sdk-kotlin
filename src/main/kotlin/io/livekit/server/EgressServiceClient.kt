@@ -22,6 +22,7 @@ import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.retrofit.TransformCall
 import livekit.LivekitEgress
+import livekit.LivekitModels
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -52,6 +53,103 @@ class EgressServiceClient(
     private val secret: String,
     private val token: String? = null,
 ) {
+
+    @JvmOverloads
+    fun startEgress(
+        roomName: String,
+        template: LivekitEgress.TemplateSource,
+        outputs: List<LivekitEgress.Output>,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        storage: LivekitEgress.StorageConfig? = null,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.StartEgressRequest.newBuilder()
+            .setTemplate(template)
+        return startEgressImpl(
+            requestBuilder,
+            roomName,
+            outputs,
+            optionsPreset,
+            optionsAdvanced,
+            storage,
+            webhooks,
+        )
+    }
+
+    @JvmOverloads
+    fun startEgress(
+        roomName: String,
+        web: LivekitEgress.WebSource,
+        outputs: List<LivekitEgress.Output>,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        storage: LivekitEgress.StorageConfig? = null,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.StartEgressRequest.newBuilder()
+            .setWeb(web)
+        return startEgressImpl(
+            requestBuilder,
+            roomName,
+            outputs,
+            optionsPreset,
+            optionsAdvanced,
+            storage,
+            webhooks,
+        )
+    }
+
+    @JvmOverloads
+    fun startEgress(
+        roomName: String,
+        media: LivekitEgress.MediaSource,
+        outputs: List<LivekitEgress.Output>,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
+        optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        storage: LivekitEgress.StorageConfig? = null,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
+    ): Call<LivekitEgress.EgressInfo> {
+        val requestBuilder = LivekitEgress.StartEgressRequest.newBuilder()
+            .setMedia(media)
+        return startEgressImpl(
+            requestBuilder,
+            roomName,
+            outputs,
+            optionsPreset,
+            optionsAdvanced,
+            storage,
+            webhooks,
+        )
+    }
+
+    private fun startEgressImpl(
+        requestBuilder: LivekitEgress.StartEgressRequest.Builder,
+        roomName: String,
+        outputs: List<LivekitEgress.Output>,
+        optionsPreset: LivekitEgress.EncodingOptionsPreset?,
+        optionsAdvanced: LivekitEgress.EncodingOptions?,
+        storage: LivekitEgress.StorageConfig?,
+        webhooks: List<LivekitModels.WebhookConfig>,
+    ): Call<LivekitEgress.EgressInfo> {
+        val request = with(requestBuilder) {
+            this.roomName = roomName
+            addAllOutputs(outputs)
+            if (optionsPreset != null) {
+                this.preset = optionsPreset
+            } else if (optionsAdvanced != null) {
+                this.advanced = optionsAdvanced
+            }
+            if (storage != null) {
+                this.storage = storage
+            }
+            addAllWebhooks(webhooks)
+            build()
+        }
+        val credentials = authHeader(RoomRecord(true))
+
+        return service.startEgress(request, credentials)
+    }
 
     @JvmOverloads
     fun startRoomCompositeEgress(

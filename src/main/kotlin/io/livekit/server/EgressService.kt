@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,13 @@ import retrofit2.http.POST
  * Retrofit Interface for accessing the EgressService Apis.
  */
 interface EgressService {
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("/twirp/livekit.Egress/StartEgress")
+    fun startEgress(
+        @Body request: LivekitEgress.StartEgressRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
     @POST("/twirp/livekit.Egress/StartRoomCompositeEgress")

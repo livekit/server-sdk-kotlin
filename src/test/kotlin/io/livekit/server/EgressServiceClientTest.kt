@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package io.livekit.server
 
 import io.livekit.server.okhttp.OkHttpFactory
 import livekit.LivekitEgress
+import livekit.LivekitModels
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -182,6 +183,61 @@ class EgressServiceClientTest {
         client.startWebEgress(
             url = "http://www.example.com",
             output = DEFAULT_OUTPUTS,
+        )
+    }
+
+    @Test
+    fun startEgressTemplate() {
+        client.startEgress(
+            roomName = "room",
+            template = LivekitEgress.TemplateSource.getDefaultInstance(),
+            outputs = listOf(
+                LivekitEgress.Output.newBuilder()
+                    .setFile(LivekitEgress.FileOutput.getDefaultInstance())
+                    .build(),
+            ),
+        )
+    }
+
+    @Test
+    fun startEgressWeb() {
+        client.startEgress(
+            roomName = "room",
+            web = LivekitEgress.WebSource.getDefaultInstance(),
+            outputs = listOf(
+                LivekitEgress.Output.newBuilder()
+                    .setStream(LivekitEgress.StreamOutput.getDefaultInstance())
+                    .build(),
+            ),
+        )
+    }
+
+    @Test
+    fun startEgressMedia() {
+        client.startEgress(
+            roomName = "room",
+            media = LivekitEgress.MediaSource.getDefaultInstance(),
+            outputs = listOf(
+                LivekitEgress.Output.newBuilder()
+                    .setFile(LivekitEgress.FileOutput.getDefaultInstance())
+                    .build(),
+            ),
+        )
+    }
+
+    @Test
+    fun startEgressWithOptionsStorageAndWebhooks() {
+        client.startEgress(
+            roomName = "room",
+            media = LivekitEgress.MediaSource.getDefaultInstance(),
+            outputs = listOf(
+                LivekitEgress.Output.newBuilder()
+                    .setFile(LivekitEgress.FileOutput.getDefaultInstance())
+                    .build(),
+            ),
+            optionsAdvanced = LivekitEgress.EncodingOptions.getDefaultInstance(),
+            storage = LivekitEgress.StorageConfig.getDefaultInstance(),
+            webhooks = listOf(LivekitModels.WebhookConfig.getDefaultInstance()),
         )
     }
 }
