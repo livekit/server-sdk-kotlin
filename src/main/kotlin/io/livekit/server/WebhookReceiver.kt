@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ class WebhookReceiver(
             val alg = Algorithm.HMAC256(secret)
             val decodedJWT = JWT.require(alg)
                 .withIssuer(apiKey)
+                .withClaimPresence("exp")
                 .build()
                 .verify(authHeader)
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
 
 package io.livekit.server
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.MissingClaimException
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class WebhookReceiverTest {
 
@@ -40,5 +44,27 @@ class WebhookReceiverTest {
 
         assertEquals("mytestroom", event.room.name)
         assertEquals("room_started", event.event)
+    }
+
+    @Test
+    fun receiveRejectsTokenWithoutExp() {
+        val body =
+            """{"event":"room_started", "room":{"sid":"RM_TkVjUvAqgzKz", "name":"mytestroom", 
+                |"emptyTimeout":300, "creationTime":"1628545903", "turnPassword":"ICkSr2rEeslkN6e9bXL4Ji5zzMD5Z7zzr6ulOaxMj6N", 
+                |"enabledCodecs":[{"mime":"audio/opus"}, {"mime":"video/VP8"}]}}""".trimMargin()
+        val testApiKey = "abcdefg"
+        val testSecret = "ababababababababababababababababababababababababababababababa"
+
+        // java-jwt 4.x treats a missing exp as valid unless presence is required.
+        val jwt = JWT.create()
+            .withIssuer(testApiKey)
+            .withClaim("sha256", "1renMMRYeCXsy6M9bjJ90XA3M1q1byhUGNoD91aPuhM=")
+            .sign(Algorithm.HMAC256(testSecret))
+
+        val receiver = WebhookReceiver(testApiKey, testSecret)
+
+        assertFailsWith<MissingClaimException> {
+            receiver.receive(body, jwt)
+        }
     }
 }
