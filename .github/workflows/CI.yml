@@ -58,7 +58,7 @@ jobs:
       run: ./gradlew assemble
 
     - name: Run unit tests (no livekit-server integration tests)
-      run: ./gradlew test --tests "io.livekit.server.AccessTokenTest"
+      run: ./gradlew test --tests "io.livekit.server.AccessTokenTest" --tests "io.livekit.server.WebhookReceiverTest"
 
     - name: get version name
       if: github.event_name == 'push'

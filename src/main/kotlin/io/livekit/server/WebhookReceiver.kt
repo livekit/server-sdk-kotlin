@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package io.livekit.server
 
 import com.auth0.jwt.JWT
+import com.auth0.jwt.RegisteredClaims
 import com.auth0.jwt.algorithms.Algorithm
 import com.google.protobuf.util.JsonFormat
 import livekit.LivekitWebhook
@@ -42,6 +43,7 @@ class WebhookReceiver(
             val alg = Algorithm.HMAC256(secret)
             val decodedJWT = JWT.require(alg)
                 .withIssuer(apiKey)
+                .withClaimPresence(RegisteredClaims.EXPIRES_AT)
                 .build()
                 .verify(authHeader)
 
