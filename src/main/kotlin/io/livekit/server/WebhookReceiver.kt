@@ -17,6 +17,7 @@
 package io.livekit.server
 
 import com.auth0.jwt.JWT
+import com.auth0.jwt.RegisteredClaims
 import com.auth0.jwt.algorithms.Algorithm
 import com.google.protobuf.util.JsonFormat
 import livekit.LivekitWebhook
@@ -42,7 +43,7 @@ class WebhookReceiver(
             val alg = Algorithm.HMAC256(secret)
             val decodedJWT = JWT.require(alg)
                 .withIssuer(apiKey)
-                .withClaimPresence("exp")
+                .withClaimPresence(RegisteredClaims.EXPIRES_AT)
                 .build()
                 .verify(authHeader)
 
