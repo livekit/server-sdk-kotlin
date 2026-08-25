@@ -1,5 +1,20 @@
 # server-sdk-kotlin
 
+## 0.15.1
+
+### Patch Changes
+
+- Update com.auth0:java-jwt to 4.6.0 and com.fasterxml.jackson.core:jackson-databind to 2.22.2 - [#172](https://github.com/livekit/server-sdk-kotlin/pull/172) ([@davidliu](https://github.com/davidliu))
+
+  There were vulnerabilities found effective previous versions of jackson-databind. This update
+  resolves those.
+
+  See:
+  CVE-2026-54515
+  CVE-2026-59889
+
+- WebhookReceiver requires the JWT exp claim. java-jwt accepts a signed token with no expiry unless presence is required. - [#170](https://github.com/livekit/server-sdk-kotlin/pull/170) ([@SashaMIT](https://github.com/SashaMIT))
+
 ## 0.15.0
 
 ### Minor Changes
