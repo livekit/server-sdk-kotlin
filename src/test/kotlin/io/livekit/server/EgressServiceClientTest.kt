@@ -226,6 +226,20 @@ class EgressServiceClientTest {
     }
 
     @Test
+    fun startEgressMediaPassthrough() {
+        client.startEgress(
+            roomName = "room",
+            media = LivekitEgress.MediaSource.getDefaultInstance(),
+            outputs = listOf(
+                LivekitEgress.Output.newBuilder()
+                    .setFile(LivekitEgress.FileOutput.getDefaultInstance())
+                    .build(),
+            ),
+            optionsPreset = LivekitEgress.EncodingOptionsPreset.PASSTHROUGH,
+        )
+    }
+
+    @Test
     fun startEgressWithOptionsStorageAndWebhooks() {
         client.startEgress(
             roomName = "room",
