@@ -321,7 +321,7 @@ class LiveKitApiTest {
         if (!MockControl.serverUp()) return
         val e = sipError(mapOf("code" to 486, "status" to "Busy Here"))
         assertTrue(e is ServerError)
-        assertEquals("resource_exhausted", e.code)
+        assertEquals("failed_precondition", e.code)
         assertEquals(486, e.sipStatusCode)
         assertEquals("Busy Here", e.sipStatus)
         assertTrue(e.toString().contains("486") && e.toString().contains("Busy Here"))
