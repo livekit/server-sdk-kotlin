@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.16.0
+
+### Minor Changes
+
+- Update protocol: `startEgress` accepts the new `EncodingOptionsPreset.PASSTHROUGH` to skip transcoding for a single-track `MediaSource`. Removes the unused `UpdateEgressRequest` message. - [#173](https://github.com/livekit/server-sdk-kotlin/pull/173) ([@frostbyte73](https://github.com/frostbyte73))
+
 ## 0.15.1
 
 ### Patch Changes
