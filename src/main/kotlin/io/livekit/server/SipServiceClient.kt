@@ -453,6 +453,7 @@ class SipServiceClient(
                 opts.participantIdentity?.let { this.participantIdentity = it }
                 opts.participantName?.let { this.participantName = it }
                 opts.participantMetadata?.let { this.participantMetadata = it }
+                opts.headers?.let { this.putAllHeaders(it) }
                 opts.dtmf?.let { this.dtmf = it }
                 opts.hidePhoneNumber?.let { this.hidePhoneNumber = it }
                 opts.playRingtone?.let {
@@ -706,6 +707,10 @@ data class CreateSipParticipantOptions(
      * waitUntilAnswered is set (dialing takes time).
      */
     var timeout: Int? = null,
+    /**
+     * Optional custom headers to include in the SIP INVITE request.
+     */
+    var headers: Map<String, String>? = null,
 )
 
 data class TransferSipParticipantOptions(
