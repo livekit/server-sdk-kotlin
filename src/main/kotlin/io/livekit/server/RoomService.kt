@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,75 +29,75 @@ import retrofit2.http.POST
  */
 interface RoomService {
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/CreateRoom")
+    @POST("twirp/livekit.RoomService/CreateRoom")
     fun createRoom(@Body request: LivekitRoom.CreateRoomRequest, @Header("Authorization") authorization: String): Call<LivekitModels.Room>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/ListRooms")
+    @POST("twirp/livekit.RoomService/ListRooms")
     fun listRooms(
         @Body request: LivekitRoom.ListRoomsRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitRoom.ListRoomsResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/DeleteRoom")
+    @POST("twirp/livekit.RoomService/DeleteRoom")
     fun deleteRoom(@Body request: LivekitRoom.DeleteRoomRequest, @Header("Authorization") authorization: String): Call<Void?>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/UpdateRoomMetadata")
+    @POST("twirp/livekit.RoomService/UpdateRoomMetadata")
     fun updateRoomMetadata(
         @Body request: LivekitRoom.UpdateRoomMetadataRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitModels.Room>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/ListParticipants")
+    @POST("twirp/livekit.RoomService/ListParticipants")
     fun listParticipants(
         @Body request: LivekitRoom.ListParticipantsRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitRoom.ListParticipantsResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/GetParticipant")
+    @POST("twirp/livekit.RoomService/GetParticipant")
     fun getParticipant(
         @Body request: LivekitRoom.RoomParticipantIdentity,
         @Header("Authorization") authorization: String
     ): Call<LivekitModels.ParticipantInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/RemoveParticipant")
+    @POST("twirp/livekit.RoomService/RemoveParticipant")
     fun removeParticipant(@Body request: LivekitRoom.RoomParticipantIdentity, @Header("Authorization") authorization: String): Call<Void?>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/ForwardParticipant")
+    @POST("twirp/livekit.RoomService/ForwardParticipant")
     fun forwardParticipant(@Body request: LivekitRoom.ForwardParticipantRequest, @Header("Authorization") authorization: String): Call<LivekitRoom.ForwardParticipantResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/MoveParticipant")
+    @POST("twirp/livekit.RoomService/MoveParticipant")
     fun moveParticipant(@Body request: LivekitRoom.MoveParticipantRequest, @Header("Authorization") authorization: String): Call<LivekitRoom.MoveParticipantResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/MutePublishedTrack")
+    @POST("twirp/livekit.RoomService/MutePublishedTrack")
     fun mutePublishedTrack(
         @Body request: LivekitRoom.MuteRoomTrackRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitRoom.MuteRoomTrackResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/UpdateParticipant")
+    @POST("twirp/livekit.RoomService/UpdateParticipant")
     fun updateParticipant(
         @Body request: LivekitRoom.UpdateParticipantRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitModels.ParticipantInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/UpdateSubscriptions")
+    @POST("twirp/livekit.RoomService/UpdateSubscriptions")
     fun updateSubscriptions(
         @Body request: LivekitRoom.UpdateSubscriptionsRequest,
         @Header("Authorization") authorization: String
     ): Call<Void?>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.RoomService/SendData")
+    @POST("twirp/livekit.RoomService/SendData")
     fun sendData(@Body request: LivekitRoom.SendDataRequest, @Header("Authorization") authorization: String): Call<Void?>
 }

@@ -18,6 +18,7 @@ package io.livekit.server
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class UrlNormalizationTest {
     @Test
@@ -35,5 +36,37 @@ class UrlNormalizationTest {
     @Test
     fun preservesExistingTrailingSlash() {
         assertEquals("https://my.livekit.cloud/", normalizeApiUrl("wss://my.livekit.cloud/"))
+    }
+
+    @Test
+    fun preservesBasePathForApiRequests() {
+        val prefixedUrls = apiRequestUrls("https://example.com/api")
+        assertTrue(
+            prefixedUrls.all { it.startsWith("https://example.com/api/twirp/") },
+            prefixedUrls.toString(),
+        )
+
+        val rootUrls = apiRequestUrls("https://example.com")
+        assertTrue(
+            rootUrls.all { it.startsWith("https://example.com/twirp/") },
+            rootUrls.toString(),
+        )
+    }
+
+    private fun apiRequestUrls(host: String): List<String> {
+        val api = LiveKitAPI.createClient(
+            host = host,
+            apiKey = "key",
+            secret = "secret",
+            failover = false,
+        )
+
+        return listOf(
+            api.room.listRooms().request().url.toString(),
+            api.egress.listEgress().request().url.toString(),
+            api.ingress.listIngress().request().url.toString(),
+            api.sip.listSipInboundTrunk().request().url.toString(),
+            api.agentDispatch.listDispatch("room").request().url.toString()
+        )
     }
 }
