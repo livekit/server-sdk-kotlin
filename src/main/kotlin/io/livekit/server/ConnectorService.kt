@@ -30,28 +30,28 @@ import retrofit2.http.POST
 interface ConnectorService {
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Connector/DialWhatsAppCall")
+    @POST("twirp/livekit.Connector/DialWhatsAppCall")
     fun dialWhatsAppCall(
         @Body request: LivekitConnectorWhatsapp.DialWhatsAppCallRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitConnectorWhatsapp.DialWhatsAppCallResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Connector/DisconnectWhatsAppCall")
+    @POST("twirp/livekit.Connector/DisconnectWhatsAppCall")
     fun disconnectWhatsAppCall(
         @Body request: LivekitConnectorWhatsapp.DisconnectWhatsAppCallRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitConnectorWhatsapp.DisconnectWhatsAppCallResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Connector/ConnectWhatsAppCall")
+    @POST("twirp/livekit.Connector/ConnectWhatsAppCall")
     fun connectWhatsAppCall(
         @Body request: LivekitConnectorWhatsapp.ConnectWhatsAppCallRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitConnectorWhatsapp.ConnectWhatsAppCallResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Connector/AcceptWhatsAppCall")
+    @POST("twirp/livekit.Connector/AcceptWhatsAppCall")
     fun acceptWhatsAppCall(
         @Body request: LivekitConnectorWhatsapp.AcceptWhatsAppCallRequest,
         @Header("Authorization") authorization: String,
@@ -61,7 +61,7 @@ interface ConnectorService {
     ): Call<LivekitConnectorWhatsapp.AcceptWhatsAppCallResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Connector/ConnectTwilioCall")
+    @POST("twirp/livekit.Connector/ConnectTwilioCall")
     fun connectTwilioCall(
         @Body request: LivekitConnectorTwilio.ConnectTwilioCallRequest,
         @Header("Authorization") authorization: String

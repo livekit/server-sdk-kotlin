@@ -29,70 +29,70 @@ import retrofit2.http.POST
 interface EgressService {
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartEgress")
+    @POST("twirp/livekit.Egress/StartEgress")
     fun startEgress(
         @Body request: LivekitEgress.StartEgressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartRoomCompositeEgress")
+    @POST("twirp/livekit.Egress/StartRoomCompositeEgress")
     fun startRoomCompositeEgress(
         @Body request: LivekitEgress.RoomCompositeEgressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartParticipantEgress")
+    @POST("twirp/livekit.Egress/StartParticipantEgress")
     fun startParticipantEgress(
         @Body request: LivekitEgress.ParticipantEgressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartTrackCompositeEgress")
+    @POST("twirp/livekit.Egress/StartTrackCompositeEgress")
     fun startTrackCompositeEgress(
         @Body request: LivekitEgress.TrackCompositeEgressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartTrackEgress")
+    @POST("twirp/livekit.Egress/StartTrackEgress")
     fun startTrackEgress(
         @Body request: LivekitEgress.TrackEgressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StartWebEgress")
+    @POST("twirp/livekit.Egress/StartWebEgress")
     fun startWebEgress(
         @Body request: LivekitEgress.WebEgressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/UpdateLayout")
+    @POST("twirp/livekit.Egress/UpdateLayout")
     fun updateLayout(
         @Body request: LivekitEgress.UpdateLayoutRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/UpdateStream")
+    @POST("twirp/livekit.Egress/UpdateStream")
     fun updateStream(
         @Body request: LivekitEgress.UpdateStreamRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitEgress.EgressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/ListEgress")
+    @POST("twirp/livekit.Egress/ListEgress")
     fun listEgress(
         @Body request: LivekitEgress.ListEgressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitEgress.ListEgressResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Egress/StopEgress")
+    @POST("twirp/livekit.Egress/StopEgress")
     fun stopEgress(
         @Body request: LivekitEgress.StopEgressRequest,
         @Header("Authorization") authorization: String

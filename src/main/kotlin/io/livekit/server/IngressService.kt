@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,28 +30,28 @@ import retrofit2.http.POST
 interface IngressService {
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Ingress/CreateIngress")
+    @POST("twirp/livekit.Ingress/CreateIngress")
     fun createIngress(
         @Body request: LivekitIngress.CreateIngressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitIngress.IngressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Ingress/UpdateIngress")
+    @POST("twirp/livekit.Ingress/UpdateIngress")
     fun updateIngress(
         @Body request: LivekitIngress.UpdateIngressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitIngress.IngressInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Ingress/ListIngress")
+    @POST("twirp/livekit.Ingress/ListIngress")
     fun listIngress(
         @Body request: LivekitIngress.ListIngressRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitIngress.ListIngressResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.Ingress/DeleteIngress")
+    @POST("twirp/livekit.Ingress/DeleteIngress")
     fun deleteIngress(
         @Body request: LivekitIngress.DeleteIngressRequest,
         @Header("Authorization") authorization: String
