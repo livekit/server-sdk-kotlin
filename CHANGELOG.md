@@ -1,5 +1,11 @@
 # server-sdk-kotlin
 
+## 0.17.0
+
+### Minor Changes
+
+- Add custom SIP headers to CreateSipParticipant options. - [#176](https://github.com/livekit/server-sdk-kotlin/pull/176) ([@piotr-dydycz-whirly](https://github.com/piotr-dydycz-whirly))
+
 ## 0.16.0
 
 ### Minor Changes
