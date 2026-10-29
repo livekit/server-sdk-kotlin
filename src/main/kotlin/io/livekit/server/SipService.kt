@@ -29,84 +29,84 @@ import retrofit2.http.POST
 interface SipService {
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/CreateSIPInboundTrunk")
+    @POST("twirp/livekit.SIP/CreateSIPInboundTrunk")
     fun createSipInboundTrunk(
         @Body request: LivekitSip.CreateSIPInboundTrunkRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPInboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/CreateSIPOutboundTrunk")
+    @POST("twirp/livekit.SIP/CreateSIPOutboundTrunk")
     fun createSipOutboundTrunk(
         @Body request: LivekitSip.CreateSIPOutboundTrunkRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPOutboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/UpdateSIPInboundTrunk")
+    @POST("twirp/livekit.SIP/UpdateSIPInboundTrunk")
     fun updateSipInboundTrunk(
         @Body request: LivekitSip.UpdateSIPInboundTrunkRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPInboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/UpdateSIPOutboundTrunk")
+    @POST("twirp/livekit.SIP/UpdateSIPOutboundTrunk")
     fun updateSipOutboundTrunk(
         @Body request: LivekitSip.UpdateSIPOutboundTrunkRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPOutboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/ListSIPInboundTrunk")
+    @POST("twirp/livekit.SIP/ListSIPInboundTrunk")
     fun listSIPInboundTrunk(
         @Body request: LivekitSip.ListSIPInboundTrunkRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.ListSIPInboundTrunkResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/ListSIPOutboundTrunk")
+    @POST("twirp/livekit.SIP/ListSIPOutboundTrunk")
     fun listSipOutboundTrunk(
         @Body request: LivekitSip.ListSIPOutboundTrunkRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.ListSIPOutboundTrunkResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/DeleteSIPTrunk")
+    @POST("twirp/livekit.SIP/DeleteSIPTrunk")
     fun deleteSipTrunk(
         @Body request: LivekitSip.DeleteSIPTrunkRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/CreateSIPDispatchRule")
+    @POST("twirp/livekit.SIP/CreateSIPDispatchRule")
     fun createSipDispatchRule(
         @Body request: LivekitSip.CreateSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPDispatchRuleInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/UpdateSIPDispatchRule")
+    @POST("twirp/livekit.SIP/UpdateSIPDispatchRule")
     fun updateSipDispatchRule(
         @Body request: LivekitSip.UpdateSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPDispatchRuleInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/ListSIPDispatchRule")
+    @POST("twirp/livekit.SIP/ListSIPDispatchRule")
     fun listSipDispatchRule(
         @Body request: LivekitSip.ListSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.ListSIPDispatchRuleResponse>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/DeleteSIPDispatchRule")
+    @POST("twirp/livekit.SIP/DeleteSIPDispatchRule")
     fun deleteSipDispatchRule(
         @Body request: LivekitSip.DeleteSIPDispatchRuleRequest,
         @Header("Authorization") authorization: String
     ): Call<LivekitSip.SIPDispatchRuleInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/CreateSIPParticipant")
+    @POST("twirp/livekit.SIP/CreateSIPParticipant")
     fun createSipParticipant(
         @Body request: LivekitSip.CreateSIPParticipantRequest,
         @Header("Authorization") authorization: String,
@@ -116,7 +116,7 @@ interface SipService {
     ): Call<LivekitSip.SIPParticipantInfo>
 
     @Headers("Content-Type: application/protobuf")
-    @POST("/twirp/livekit.SIP/TransferSIPParticipant")
+    @POST("twirp/livekit.SIP/TransferSIPParticipant")
     fun transferSipParticipant(
         @Body request: LivekitSip.TransferSIPParticipantRequest,
         @Header("Authorization") authorization: String,
