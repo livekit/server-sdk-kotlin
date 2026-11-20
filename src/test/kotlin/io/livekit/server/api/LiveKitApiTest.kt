@@ -221,6 +221,22 @@ class LiveKitApiTest {
     }
 
     @Test
+    fun ingressOptions() {
+        if (!MockControl.serverUp()) return
+        val api = api()
+        assertOk(
+            api.ingress.createIngress(
+                name = "stream-input",
+                roomName = "test-room",
+                participantIdentity = "ingress-bot",
+                participantMetadata = "{\"source\":\"obs\"}",
+                enabled = false,
+            ),
+        )
+        assertOk(api.ingress.updateIngress("IN_abc123", participantMetadata = "{}", enabled = true))
+    }
+
+    @Test
     fun agentDispatchSmoke() {
         if (!MockControl.serverUp()) return
         val api = api()
