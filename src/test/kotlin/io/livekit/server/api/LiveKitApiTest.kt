@@ -219,11 +219,15 @@ class LiveKitApiTest {
                 "outbound-media",
                 "sip.telco.example.com",
                 listOf("+15105550100"),
-                CreateSipOutboundTrunkOptions(media = media),
+                CreateSipOutboundTrunkOptions(
+                    includeHeaders = LivekitSip.SIPHeaderOptions.SIP_X_HEADERS,
+                    media = media,
+                    fromHost = "sip.example.com",
+                ),
             ),
         )
-        assertOk(api.sip.updateSipInboundTrunk("ST_abc123", UpdateSipInboundTrunkOptions(media = media)))
-        assertOk(api.sip.updateSipOutboundTrunk("ST_abc123", UpdateSipOutboundTrunkOptions(media = media)))
+        assertOk(api.sip.updateSipInboundTrunk("ST_abc123", UpdateSipInboundTrunkOptions(media = media, authRealm = "example.com")))
+        assertOk(api.sip.updateSipOutboundTrunk("ST_abc123", UpdateSipOutboundTrunkOptions(media = media, fromHost = "sip.example.com")))
     }
 
     @Test
