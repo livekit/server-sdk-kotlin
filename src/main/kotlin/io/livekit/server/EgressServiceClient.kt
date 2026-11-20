@@ -161,7 +161,8 @@ class EgressServiceClient(
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
         customBaseUrl: String = "",
-        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING
+        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
@@ -176,7 +177,8 @@ class EgressServiceClient(
             audioOnly,
             videoOnly,
             customBaseUrl,
-            audioMixing
+            audioMixing,
+            webhooks,
         )
     }
 
@@ -190,7 +192,8 @@ class EgressServiceClient(
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
         customBaseUrl: String = "",
-        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING
+        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
@@ -205,7 +208,8 @@ class EgressServiceClient(
             audioOnly,
             videoOnly,
             customBaseUrl,
-            audioMixing
+            audioMixing,
+            webhooks,
         )
     }
 
@@ -219,7 +223,8 @@ class EgressServiceClient(
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
         customBaseUrl: String = "",
-        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING
+        audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
@@ -234,7 +239,8 @@ class EgressServiceClient(
             audioOnly,
             videoOnly,
             customBaseUrl,
-            audioMixing
+            audioMixing,
+            webhooks,
         )
     }
 
@@ -249,6 +255,7 @@ class EgressServiceClient(
         videoOnly: Boolean = false,
         customBaseUrl: String = "",
         audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
@@ -262,7 +269,8 @@ class EgressServiceClient(
             audioOnly,
             videoOnly,
             customBaseUrl,
-            audioMixing
+            audioMixing,
+            webhooks,
         )
     }
 
@@ -277,6 +285,7 @@ class EgressServiceClient(
         videoOnly: Boolean = false,
         customBaseUrl: String = "",
         audioMixing: AudioMixing = AudioMixing.DEFAULT_MIXING,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.RoomCompositeEgressRequest.newBuilder()
         if (output.fileOutput != null) {
@@ -301,7 +310,8 @@ class EgressServiceClient(
             audioOnly,
             videoOnly,
             customBaseUrl,
-            audioMixing
+            audioMixing,
+            webhooks,
         )
     }
 
@@ -314,7 +324,8 @@ class EgressServiceClient(
         audioOnly: Boolean,
         videoOnly: Boolean,
         customBaseUrl: String,
-        audioMixing: AudioMixing
+        audioMixing: AudioMixing,
+        webhooks: List<LivekitModels.WebhookConfig>,
     ): Call<LivekitEgress.EgressInfo> {
         val protoAudioMixing = when (audioMixing) {
             AudioMixing.DEFAULT_MIXING -> LivekitEgress.AudioMixing.DEFAULT_MIXING
@@ -334,6 +345,7 @@ class EgressServiceClient(
             this.videoOnly = videoOnly
             this.customBaseUrl = customBaseUrl
             this.audioMixing = protoAudioMixing
+            addAllWebhooks(webhooks)
             build()
         }
         val credentials = authHeader(RoomRecord(true))
@@ -349,6 +361,7 @@ class EgressServiceClient(
         screenShare: Boolean = false,
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.ParticipantEgressRequest.newBuilder()
         if (output.fileOutput != null) {
@@ -370,7 +383,8 @@ class EgressServiceClient(
             identity,
             screenShare,
             optionsPreset,
-            optionsAdvanced
+            optionsAdvanced,
+            webhooks,
         )
     }
 
@@ -380,7 +394,8 @@ class EgressServiceClient(
         identity: String,
         screenShare: Boolean,
         optionsPreset: LivekitEgress.EncodingOptionsPreset?,
-        optionsAdvanced: LivekitEgress.EncodingOptions?
+        optionsAdvanced: LivekitEgress.EncodingOptions?,
+        webhooks: List<LivekitModels.WebhookConfig>,
     ): Call<LivekitEgress.EgressInfo> {
         val request = with(requestBuilder) {
             this.roomName = roomName
@@ -391,6 +406,7 @@ class EgressServiceClient(
             } else if (optionsAdvanced != null) {
                 this.advanced = optionsAdvanced
             }
+            addAllWebhooks(webhooks)
             build()
         }
         val credentials = authHeader(RoomRecord(true))
@@ -406,6 +422,7 @@ class EgressServiceClient(
         videoTrackId: String?,
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
@@ -418,6 +435,7 @@ class EgressServiceClient(
             videoTrackId,
             optionsPreset,
             optionsAdvanced,
+            webhooks,
         )
     }
 
@@ -429,6 +447,7 @@ class EgressServiceClient(
         videoTrackId: String?,
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
@@ -441,6 +460,7 @@ class EgressServiceClient(
             videoTrackId,
             optionsPreset,
             optionsAdvanced,
+            webhooks,
         )
     }
 
@@ -452,6 +472,7 @@ class EgressServiceClient(
         videoTrackId: String?,
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
@@ -464,6 +485,7 @@ class EgressServiceClient(
             videoTrackId,
             optionsPreset,
             optionsAdvanced,
+            webhooks,
         )
     }
 
@@ -475,6 +497,7 @@ class EgressServiceClient(
         videoTrackId: String?,
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
@@ -486,6 +509,7 @@ class EgressServiceClient(
             videoTrackId,
             optionsPreset,
             optionsAdvanced,
+            webhooks,
         )
     }
 
@@ -497,6 +521,7 @@ class EgressServiceClient(
         videoTrackId: String?,
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.TrackCompositeEgressRequest.newBuilder()
         if (output.fileOutput != null) {
@@ -519,6 +544,7 @@ class EgressServiceClient(
             videoTrackId,
             optionsPreset,
             optionsAdvanced,
+            webhooks,
         )
     }
 
@@ -529,6 +555,7 @@ class EgressServiceClient(
         videoTrackId: String?,
         optionsPreset: LivekitEgress.EncodingOptionsPreset? = null,
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
+        webhooks: List<LivekitModels.WebhookConfig>,
     ): Call<LivekitEgress.EgressInfo> {
         val request = with(requestBuilder) {
             this.roomName = roomName
@@ -539,21 +566,25 @@ class EgressServiceClient(
             } else if (optionsAdvanced != null) {
                 this.advanced = optionsAdvanced
             }
+            addAllWebhooks(webhooks)
             build()
         }
         val credentials = authHeader(RoomRecord(true))
         return service.startTrackCompositeEgress(request, credentials)
     }
 
+    @JvmOverloads
     fun startTrackEgress(
         roomName: String,
         output: LivekitEgress.DirectFileOutput,
         trackId: String,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         val request = with(LivekitEgress.TrackEgressRequest.newBuilder()) {
             this.roomName = roomName
             this.file = output
             this.trackId = trackId
+            addAllWebhooks(webhooks)
             build()
         }
         val credentials = authHeader(RoomRecord(true))
@@ -561,15 +592,18 @@ class EgressServiceClient(
         return service.startTrackEgress(request, credentials)
     }
 
+    @JvmOverloads
     fun startTrackEgress(
         roomName: String,
         websocketUrl: String,
         trackId: String,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         val request = with(LivekitEgress.TrackEgressRequest.newBuilder()) {
             this.roomName = roomName
             this.websocketUrl = websocketUrl
             this.trackId = trackId
+            addAllWebhooks(webhooks)
             build()
         }
         val credentials = authHeader(RoomRecord(true))
@@ -585,7 +619,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        awaitStartSignal: Boolean = false
+        awaitStartSignal: Boolean = false,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
@@ -598,7 +633,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            awaitStartSignal
+            awaitStartSignal,
+            webhooks,
         )
     }
 
@@ -610,7 +646,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        awaitStartSignal: Boolean = false
+        awaitStartSignal: Boolean = false,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
@@ -623,7 +660,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            awaitStartSignal
+            awaitStartSignal,
+            webhooks,
         )
     }
 
@@ -635,7 +673,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        awaitStartSignal: Boolean = false
+        awaitStartSignal: Boolean = false,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
@@ -648,7 +687,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            awaitStartSignal
+            awaitStartSignal,
+            webhooks,
         )
     }
 
@@ -660,7 +700,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        awaitStartSignal: Boolean = false
+        awaitStartSignal: Boolean = false,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         @Suppress("DEPRECATION")
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
@@ -672,7 +713,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            awaitStartSignal
+            awaitStartSignal,
+            webhooks,
         )
     }
 
@@ -684,7 +726,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions? = null,
         audioOnly: Boolean = false,
         videoOnly: Boolean = false,
-        awaitStartSignal: Boolean = false
+        awaitStartSignal: Boolean = false,
+        webhooks: List<LivekitModels.WebhookConfig> = emptyList(),
     ): Call<LivekitEgress.EgressInfo> {
         val requestBuilder = LivekitEgress.WebEgressRequest.newBuilder()
         if (output.fileOutput != null) {
@@ -707,7 +750,8 @@ class EgressServiceClient(
             optionsAdvanced,
             audioOnly,
             videoOnly,
-            awaitStartSignal
+            awaitStartSignal,
+            webhooks,
         )
     }
 
@@ -718,7 +762,8 @@ class EgressServiceClient(
         optionsAdvanced: LivekitEgress.EncodingOptions?,
         audioOnly: Boolean,
         videoOnly: Boolean,
-        awaitStartSignal: Boolean
+        awaitStartSignal: Boolean,
+        webhooks: List<LivekitModels.WebhookConfig>,
     ): Call<LivekitEgress.EgressInfo> {
         val request = with(requestBuilder) {
             this.url = url
@@ -730,6 +775,7 @@ class EgressServiceClient(
             this.audioOnly = audioOnly
             this.videoOnly = videoOnly
             this.awaitStartSignal = awaitStartSignal
+            addAllWebhooks(webhooks)
             build()
         }
         val credentials = authHeader(RoomRecord(true))

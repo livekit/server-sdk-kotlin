@@ -135,6 +135,24 @@ class LiveKitApiTest {
     }
 
     @Test
+    fun egressWebhooks() {
+        if (!MockControl.serverUp()) return
+        val api = api()
+        val webhooks = listOf(
+            LivekitModels.WebhookConfig.newBuilder().setUrl("https://example.com/hook").setSigningKey("devkey").build(),
+        )
+        val file = LivekitEgress.EncodedFileOutput.newBuilder()
+            .setFileType(LivekitEgress.EncodedFileType.MP4).setFilepath("room.mp4").build()
+        val direct = LivekitEgress.DirectFileOutput.newBuilder().setFilepath("track.ogg").build()
+        assertOk(api.egress.startRoomCompositeEgress("test-room", file, layout = "grid", webhooks = webhooks))
+        assertOk(api.egress.startWebEgress("https://example.com/scene", file, webhooks = webhooks))
+        assertOk(api.egress.startParticipantEgress("test-room", "participant-42", EncodedOutputs(file, null, null, null), webhooks = webhooks))
+        assertOk(api.egress.startTrackCompositeEgress("test-room", file, "TR_audio1", "TR_video1", webhooks = webhooks))
+        assertOk(api.egress.startTrackEgress("test-room", direct, "TR_audio1", webhooks))
+        assertOk(api.egress.startTrackEgress("test-room", "wss://example.com/ws", "TR_audio1", webhooks))
+    }
+
+    @Test
     fun ingressSmoke() {
         if (!MockControl.serverUp()) return
         val api = api()
