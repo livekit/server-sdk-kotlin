@@ -230,6 +230,16 @@ class LiveKitApiTest {
         assertOk(api.agentDispatch.deleteDispatch("test-room", "AD_abc123"))
     }
 
+    @Test
+    fun sipListFilters() {
+        if (!MockControl.serverUp()) return
+        val api = api()
+        val page = LivekitModels.Pagination.newBuilder().setAfterId("ST_abc122").setLimit(10).build()
+        assertOk(api.sip.listSipInboundTrunk(trunkIds = listOf("ST_abc123"), numbers = listOf("+15105550100"), page = page))
+        assertOk(api.sip.listSipOutboundTrunk(trunkIds = listOf("ST_abc123"), numbers = listOf("+15105550100"), page = page))
+        assertOk(api.sip.listSipDispatchRule(dispatchRuleIds = listOf("SDR_abc123"), trunkIds = listOf("ST_abc123"), page = page))
+    }
+
     // -- deep: create_room round-trip -------------------------------------------
 
     @Test
