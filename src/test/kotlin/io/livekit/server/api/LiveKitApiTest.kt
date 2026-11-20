@@ -164,7 +164,13 @@ class LiveKitApiTest {
         assertOk(
             api.sip.createSipDispatchRule(
                 SipDispatchRuleIndividual(roomPrefix = "call-", noRandomness = true),
-                CreateSipDispatchRuleOptions(name = "rule", inboundNumbers = listOf("+15105550100"), media = media),
+                CreateSipDispatchRuleOptions(
+                    name = "rule",
+                    inboundNumbers = listOf("+15105550100"),
+                    numbers = listOf("+15105550111"),
+                    media = media,
+                    krispEnabled = true,
+                ),
             ),
         )
         assertOk(
