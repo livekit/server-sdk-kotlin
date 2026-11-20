@@ -22,6 +22,7 @@ import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.retrofit.withTransform
 import livekit.LivekitModels.ListUpdate
+import livekit.LivekitModels.Pagination
 import livekit.LivekitRoom
 import livekit.LivekitSip
 import livekit.LivekitSip.SIPDispatchRule
@@ -234,12 +235,25 @@ class SipServiceClient(
     /**
      * List inbound trunks.
      *
+     * @param trunkIds only list these trunks, in the same order
+     * @param numbers only list trunks that contain one of these numbers, including wildcard trunks
+     * @param page pagination options
+     *
      * See: [SIP Inbound Trunk](https://docs.livekit.io/sip/trunk-inbound/)
      */
     @JvmOverloads
     @Suppress("unused")
-    fun listSipInboundTrunk(): Call<List<LivekitSip.SIPInboundTrunkInfo>> {
-        val request = LivekitSip.ListSIPInboundTrunkRequest.newBuilder().build()
+    fun listSipInboundTrunk(
+        trunkIds: List<String>? = null,
+        numbers: List<String>? = null,
+        page: Pagination? = null,
+    ): Call<List<LivekitSip.SIPInboundTrunkInfo>> {
+        val request = with(LivekitSip.ListSIPInboundTrunkRequest.newBuilder()) {
+            trunkIds?.let { this.addAllTrunkIds(it) }
+            numbers?.let { this.addAllNumbers(it) }
+            page?.let { this.page = it }
+            build()
+        }
 
         val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
         return service.listSIPInboundTrunk(request, credentials)
@@ -249,12 +263,25 @@ class SipServiceClient(
     /**
      * List outbound trunks.
      *
+     * @param trunkIds only list these trunks, in the same order
+     * @param numbers only list trunks that contain one of these numbers, including wildcard trunks
+     * @param page pagination options
+     *
      * See: [SIP Outbound Trunk](https://docs.livekit.io/sip/trunk-outbound/)
      */
     @JvmOverloads
     @Suppress("unused")
-    fun listSipOutboundTrunk(): Call<List<LivekitSip.SIPOutboundTrunkInfo>> {
-        val request = LivekitSip.ListSIPOutboundTrunkRequest.newBuilder().build()
+    fun listSipOutboundTrunk(
+        trunkIds: List<String>? = null,
+        numbers: List<String>? = null,
+        page: Pagination? = null,
+    ): Call<List<LivekitSip.SIPOutboundTrunkInfo>> {
+        val request = with(LivekitSip.ListSIPOutboundTrunkRequest.newBuilder()) {
+            trunkIds?.let { this.addAllTrunkIds(it) }
+            numbers?.let { this.addAllNumbers(it) }
+            page?.let { this.page = it }
+            build()
+        }
 
         val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
         return service.listSipOutboundTrunk(request, credentials)
@@ -396,11 +423,25 @@ class SipServiceClient(
     /**
      * Lists the dispatch rules.
      *
+     * @param dispatchRuleIds only list these rules, in the same order
+     * @param trunkIds only list rules that contain one of these trunk IDs, including wildcard rules
+     * @param page pagination options
+     *
      * See: [Dispatch Rules](https://docs.livekit.io/sip/dispatch-rule/)
      */
+    @JvmOverloads
     @Suppress("unused")
-    fun listSipDispatchRule(): Call<List<SIPDispatchRuleInfo>> {
-        val request = LivekitSip.ListSIPDispatchRuleRequest.newBuilder().build()
+    fun listSipDispatchRule(
+        dispatchRuleIds: List<String>? = null,
+        trunkIds: List<String>? = null,
+        page: Pagination? = null,
+    ): Call<List<SIPDispatchRuleInfo>> {
+        val request = with(LivekitSip.ListSIPDispatchRuleRequest.newBuilder()) {
+            dispatchRuleIds?.let { this.addAllDispatchRuleIds(it) }
+            trunkIds?.let { this.addAllTrunkIds(it) }
+            page?.let { this.page = it }
+            build()
+        }
         val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
         return service.listSipDispatchRule(request, credentials)
             .withTransform { it.itemsList }
