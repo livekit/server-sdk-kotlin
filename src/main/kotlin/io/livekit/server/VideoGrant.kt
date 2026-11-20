@@ -119,3 +119,13 @@ class Recorder(value: Boolean) : VideoGrant("recorder", value)
  * indicates this participant is allowed to connect to LiveKit as an Agent Framework worker
  */
 class Agent(value: Boolean) : VideoGrant("agent", value)
+
+/**
+ * allows the participant to manage an agent session via RemoteSession
+ */
+class CanManageAgentSession(value: Boolean) : VideoGrant("canManageAgentSession", value)
+
+/**
+ * allows the participant to subscribe to metrics
+ */
+class CanSubscribeMetrics(value: Boolean) : VideoGrant("canSubscribeMetrics", value)

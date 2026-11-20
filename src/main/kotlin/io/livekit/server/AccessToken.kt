@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 LiveKit, Inc.
+ * Copyright 2024-2026 LiveKit, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
 import com.google.protobuf.MessageOrBuilder
+import livekit.LivekitModels.ParticipantInfo
 import livekit.LivekitRoom.RoomConfiguration
 import java.time.Instant
 import java.util.Date
@@ -36,6 +37,12 @@ import java.util.concurrent.TimeUnit
 class AccessToken(private val apiKey: String, private val secret: String) {
     private val videoGrants = mutableSetOf<VideoGrant>()
     private val sipGrants = mutableSetOf<SIPGrant>()
+    private val inferenceGrants = mutableSetOf<InferenceGrant>()
+    private val observabilityGrants = mutableSetOf<ObservabilityGrant>()
+    private val agentGrants = mutableSetOf<AgentGrant>()
+    private val agentEndpointGrants = mutableSetOf<AgentEndpointGrant>()
+    private val agentThreadGrants = mutableSetOf<AgentThreadGrant>()
+    private val agentDatabaseGrants = mutableSetOf<AgentDatabaseGrant>()
 
     /**
      * Amount of time in milliseconds the created token is valid for.
@@ -59,6 +66,9 @@ class AccessToken(private val apiKey: String, private val secret: String) {
      * .
      */
     var notBefore: Date? = null
+
+    /** Kind of the participant, available as `Participant.kind` */
+    var kind: ParticipantInfo.Kind? = null
 
     /** Display name for the participant, available as `Participant.name` */
     var name: String? = null
@@ -123,6 +133,120 @@ class AccessToken(private val apiKey: String, private val secret: String) {
         sipGrants.clear()
     }
 
+    /** Add [InferenceGrant] to this token. */
+    fun addInferenceGrants(vararg grants: InferenceGrant) {
+        for (grant in grants) {
+            inferenceGrants.add(grant)
+        }
+    }
+
+    /** Add [InferenceGrant] to this token. */
+    fun addInferenceGrants(grants: Iterable<InferenceGrant>) {
+        for (grant in grants) {
+            inferenceGrants.add(grant)
+        }
+    }
+
+    /** Clear all previously added [InferenceGrant]s. */
+    fun clearInferenceGrants() {
+        inferenceGrants.clear()
+    }
+
+    /** Add [ObservabilityGrant] to this token. */
+    fun addObservabilityGrants(vararg grants: ObservabilityGrant) {
+        for (grant in grants) {
+            observabilityGrants.add(grant)
+        }
+    }
+
+    /** Add [ObservabilityGrant] to this token. */
+    fun addObservabilityGrants(grants: Iterable<ObservabilityGrant>) {
+        for (grant in grants) {
+            observabilityGrants.add(grant)
+        }
+    }
+
+    /** Clear all previously added [ObservabilityGrant]s. */
+    fun clearObservabilityGrants() {
+        observabilityGrants.clear()
+    }
+
+    /** Add [AgentGrant] to this token. */
+    fun addAgentGrants(vararg grants: AgentGrant) {
+        for (grant in grants) {
+            agentGrants.add(grant)
+        }
+    }
+
+    /** Add [AgentGrant] to this token. */
+    fun addAgentGrants(grants: Iterable<AgentGrant>) {
+        for (grant in grants) {
+            agentGrants.add(grant)
+        }
+    }
+
+    /** Clear all previously added [AgentGrant]s. */
+    fun clearAgentGrants() {
+        agentGrants.clear()
+    }
+
+    /** Add [AgentEndpointGrant] to this token. */
+    fun addAgentEndpointGrants(vararg grants: AgentEndpointGrant) {
+        for (grant in grants) {
+            agentEndpointGrants.add(grant)
+        }
+    }
+
+    /** Add [AgentEndpointGrant] to this token. */
+    fun addAgentEndpointGrants(grants: Iterable<AgentEndpointGrant>) {
+        for (grant in grants) {
+            agentEndpointGrants.add(grant)
+        }
+    }
+
+    /** Clear all previously added [AgentEndpointGrant]s. */
+    fun clearAgentEndpointGrants() {
+        agentEndpointGrants.clear()
+    }
+
+    /** Add [AgentThreadGrant] to this token. */
+    fun addAgentThreadGrants(vararg grants: AgentThreadGrant) {
+        for (grant in grants) {
+            agentThreadGrants.add(grant)
+        }
+    }
+
+    /** Add [AgentThreadGrant] to this token. */
+    fun addAgentThreadGrants(grants: Iterable<AgentThreadGrant>) {
+        for (grant in grants) {
+            agentThreadGrants.add(grant)
+        }
+    }
+
+    /** Clear all previously added [AgentThreadGrant]s. */
+    fun clearAgentThreadGrants() {
+        agentThreadGrants.clear()
+    }
+
+    /** Add [AgentDatabaseGrant] to this token. */
+    fun addAgentDatabaseGrants(vararg grants: AgentDatabaseGrant) {
+        for (grant in grants) {
+            agentDatabaseGrants.add(grant)
+        }
+    }
+
+    /** Add [AgentDatabaseGrant] to this token. */
+    fun addAgentDatabaseGrants(grants: Iterable<AgentDatabaseGrant>) {
+        for (grant in grants) {
+            agentDatabaseGrants.add(grant)
+        }
+    }
+
+    /** Clear all previously added [AgentDatabaseGrant]s. */
+    fun clearAgentDatabaseGrants() {
+        agentDatabaseGrants.clear()
+    }
+
     fun toJwt(): String {
         return with(JWT.create()) {
             withIssuer(apiKey)
@@ -152,6 +276,7 @@ class AccessToken(private val apiKey: String, private val secret: String) {
             val sipGrantsMap = sipGrants.associate { grant -> grant.toPair() }
 
             name?.let { claimsMap["name"] = it }
+            kind?.let { claimsMap["kind"] = it.name.lowercase() }
             metadata?.let { claimsMap["metadata"] = it }
             sha256?.let { claimsMap["sha256"] = it }
             roomPreset?.let { claimsMap["roomPreset"] = it }
@@ -164,6 +289,24 @@ class AccessToken(private val apiKey: String, private val secret: String) {
 
             claimsMap["video"] = videoGrantsMap
             claimsMap["sip"] = sipGrantsMap
+            if (inferenceGrants.isNotEmpty()) {
+                claimsMap["inference"] = inferenceGrants.associate { grant -> grant.toPair() }
+            }
+            if (observabilityGrants.isNotEmpty()) {
+                claimsMap["observability"] = observabilityGrants.associate { grant -> grant.toPair() }
+            }
+            if (agentGrants.isNotEmpty()) {
+                claimsMap["agent"] = agentGrants.associate { grant -> grant.toPair() }
+            }
+            if (agentEndpointGrants.isNotEmpty()) {
+                claimsMap["agentEndpoint"] = agentEndpointGrants.associate { grant -> grant.toPair() }
+            }
+            if (agentThreadGrants.isNotEmpty()) {
+                claimsMap["agentThread"] = agentThreadGrants.associate { grant -> grant.toPair() }
+            }
+            if (agentDatabaseGrants.isNotEmpty()) {
+                claimsMap["agentDatabase"] = agentDatabaseGrants.associate { grant -> grant.toPair() }
+            }
 
             claimsMap.forEach { (key, value) -> withClaimAny(key, value) }
 
