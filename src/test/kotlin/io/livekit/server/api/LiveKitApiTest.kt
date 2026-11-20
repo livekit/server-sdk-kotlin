@@ -18,6 +18,7 @@ package io.livekit.server.api
 
 import io.livekit.server.AccessToken
 import io.livekit.server.CreateSipInboundTrunkOptions
+import io.livekit.server.CreateSipOutboundTrunkOptions
 import io.livekit.server.CreateSipParticipantOptions
 import io.livekit.server.EncodedOutputs
 import io.livekit.server.LiveKitAPI
@@ -196,6 +197,33 @@ class LiveKitApiTest {
         assertOk(api.sip.updateSipDispatchRule("SDR_abc123", UpdateSipDispatchRuleOptions(name = "rule")))
         assertOk(api.sip.listSipDispatchRule())
         assertOk(api.sip.deleteSipDispatchRule("SDR_abc123"))
+    }
+
+    @Test
+    fun sipTrunkMedia() {
+        if (!MockControl.serverUp()) return
+        val api = api()
+        val media = LivekitSip.SIPMediaConfig.newBuilder()
+            .addCodecs(LivekitSip.SIPCodec.newBuilder().setName("G722"))
+            .setEncryption(LivekitSip.SIPMediaEncryption.SIP_MEDIA_ENCRYPT_ALLOW)
+            .build()
+        assertOk(
+            api.sip.createSipInboundTrunk(
+                "inbound-media",
+                listOf("+15105550102"),
+                CreateSipInboundTrunkOptions(includeHeaders = LivekitSip.SIPHeaderOptions.SIP_X_HEADERS, media = media),
+            ),
+        )
+        assertOk(
+            api.sip.createSipOutboundTrunk(
+                "outbound-media",
+                "sip.telco.example.com",
+                listOf("+15105550100"),
+                CreateSipOutboundTrunkOptions(media = media),
+            ),
+        )
+        assertOk(api.sip.updateSipInboundTrunk("ST_abc123", UpdateSipInboundTrunkOptions(media = media)))
+        assertOk(api.sip.updateSipOutboundTrunk("ST_abc123", UpdateSipOutboundTrunkOptions(media = media)))
     }
 
     @Test
