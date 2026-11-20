@@ -27,7 +27,7 @@ import java.util.*
 class WebhookReceiver @JvmOverloads constructor(
     private val apiKey: String,
     private val secret: String,
-    private val leewaySeconds: Long = 0,
+    private val leewaySeconds: Long = 60,
 ) {
 
     /**
