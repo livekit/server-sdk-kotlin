@@ -276,6 +276,24 @@ class LiveKitApiTest {
         ).execute().body()
         assertNotNull(inline)
 
+        assertOk(
+            api().sip.createSipParticipant(
+                "ST_abc123",
+                "+15105550100",
+                "test-room",
+                CreateSipParticipantOptions(
+                    participantIdentity = "sip-options",
+                    participantAttributes = mapOf("team" to "support"),
+                    includeHeaders = LivekitSip.SIPHeaderOptions.SIP_X_HEADERS,
+                    maxCallDuration = 3600,
+                    krispEnabled = true,
+                    media = LivekitSip.SIPMediaConfig.newBuilder()
+                        .addCodecs(LivekitSip.SIPCodec.newBuilder().setName("G722")).build(),
+                    toUserOverride = "queue-7",
+                ),
+            ),
+        )
+
         val waitApi = api(MockControl.json("delayMs" to 0))
         assertOk(
             waitApi.sip.createSipParticipant(
