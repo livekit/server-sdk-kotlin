@@ -18,8 +18,10 @@ package io.livekit.server
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.IncorrectClaimException
 import com.auth0.jwt.exceptions.MissingClaimException
 import org.junit.jupiter.api.Test
+import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -64,6 +66,55 @@ class WebhookReceiverTest {
         val receiver = WebhookReceiver(testApiKey, testSecret)
 
         assertFailsWith<MissingClaimException> {
+            receiver.receive(body, jwt)
+        }
+    }
+
+    @Test
+    fun receiveAcceptsClockSkewWithinLeeway() {
+        val body =
+            """{"event":"room_started", "room":{"sid":"RM_TkVjUvAqgzKz", "name":"mytestroom", 
+                |"emptyTimeout":300, "creationTime":"1628545903", "turnPassword":"ICkSr2rEeslkN6e9bXL4Ji5zzMD5Z7zzr6ulOaxMj6N", 
+                |"enabledCodecs":[{"mime":"audio/opus"}, {"mime":"video/VP8"}]}}""".trimMargin()
+
+        // Sender's clock is 30s ahead of the receiver.
+        val senderNow = Instant.now().plusSeconds(30)
+        val jwt = JWT.create()
+            .withIssuer(TestConstants.KEY)
+            .withNotBefore(senderNow)
+            .withIssuedAt(senderNow)
+            .withExpiresAt(senderNow.plusSeconds(600))
+            .withClaim("sha256", "1renMMRYeCXsy6M9bjJ90XA3M1q1byhUGNoD91aPuhM=")
+            .sign(Algorithm.HMAC256(TestConstants.SECRET))
+
+        val receiver = WebhookReceiver(TestConstants.KEY, TestConstants.SECRET, leewaySeconds = 60)
+
+        val event = receiver.receive(body, jwt)
+
+        assertEquals("mytestroom", event.room.name)
+        assertEquals("room_started", event.event)
+    }
+
+    @Test
+    fun receiveRejectsClockSkewByDefault() {
+        val body =
+            """{"event":"room_started", "room":{"sid":"RM_TkVjUvAqgzKz", "name":"mytestroom", 
+                |"emptyTimeout":300, "creationTime":"1628545903", "turnPassword":"ICkSr2rEeslkN6e9bXL4Ji5zzMD5Z7zzr6ulOaxMj6N", 
+                |"enabledCodecs":[{"mime":"audio/opus"}, {"mime":"video/VP8"}]}}""".trimMargin()
+
+        // Sender's clock is 30s ahead of the receiver.
+        val senderNow = Instant.now().plusSeconds(30)
+        val jwt = JWT.create()
+            .withIssuer(TestConstants.KEY)
+            .withNotBefore(senderNow)
+            .withIssuedAt(senderNow)
+            .withExpiresAt(senderNow.plusSeconds(600))
+            .withClaim("sha256", "1renMMRYeCXsy6M9bjJ90XA3M1q1byhUGNoD91aPuhM=")
+            .sign(Algorithm.HMAC256(TestConstants.SECRET))
+
+        val receiver = WebhookReceiver(TestConstants.KEY, TestConstants.SECRET)
+
+        assertFailsWith<IncorrectClaimException> {
             receiver.receive(body, jwt)
         }
     }
