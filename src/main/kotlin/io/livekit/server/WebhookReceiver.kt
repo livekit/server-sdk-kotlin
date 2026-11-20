@@ -24,9 +24,10 @@ import livekit.LivekitWebhook
 import java.security.MessageDigest
 import java.util.*
 
-class WebhookReceiver(
+class WebhookReceiver @JvmOverloads constructor(
     private val apiKey: String,
     private val secret: String,
+    private val leewaySeconds: Long = 60,
 ) {
 
     /**
@@ -44,6 +45,7 @@ class WebhookReceiver(
             val decodedJWT = JWT.require(alg)
                 .withIssuer(apiKey)
                 .withClaimPresence(RegisteredClaims.EXPIRES_AT)
+                .acceptLeeway(leewaySeconds)
                 .build()
                 .verify(authHeader)
 
