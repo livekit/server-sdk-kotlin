@@ -17,6 +17,7 @@
 package io.livekit.server.api
 
 import io.livekit.server.AccessToken
+import io.livekit.server.CreateSipDispatchRuleOptions
 import io.livekit.server.CreateSipInboundTrunkOptions
 import io.livekit.server.CreateSipParticipantOptions
 import io.livekit.server.EncodedOutputs
@@ -26,6 +27,7 @@ import io.livekit.server.ServerError
 import io.livekit.server.SipCallError
 import io.livekit.server.SipDispatchRuleCallee
 import io.livekit.server.SipDispatchRuleDirect
+import io.livekit.server.SipDispatchRuleIndividual
 import io.livekit.server.TransferSipParticipantOptions
 import io.livekit.server.UpdateSipDispatchRuleOptions
 import io.livekit.server.UpdateSipInboundTrunkOptions
@@ -151,6 +153,30 @@ class LiveKitApiTest {
         assertOk(api.ingress.updateIngress("IN_abc123", name = "stream-input-v2", roomName = "test-room"))
         assertOk(api.ingress.listIngress(roomName = "test-room", ingressId = "IN_abc123"))
         assertOk(api.ingress.deleteIngress("IN_abc123"))
+    }
+
+    @Test
+    fun sipDispatchRuleOptions() {
+        if (!MockControl.serverUp()) return
+        val api = api()
+        val media = LivekitSip.SIPMediaConfig.newBuilder()
+            .addCodecs(LivekitSip.SIPCodec.newBuilder().setName("G722")).build()
+        assertOk(
+            api.sip.createSipDispatchRule(
+                SipDispatchRuleIndividual(roomPrefix = "call-", noRandomness = true),
+                CreateSipDispatchRuleOptions(name = "rule", inboundNumbers = listOf("+15105550100"), media = media),
+            ),
+        )
+        assertOk(
+            api.sip.updateSipDispatchRule(
+                "SDR_abc123",
+                UpdateSipDispatchRuleOptions(
+                    rule = SipDispatchRuleIndividual(roomPrefix = "call-", noRandomness = true),
+                    attributes = mapOf("team" to "support"),
+                    media = media,
+                ),
+            ),
+        )
     }
 
     @Test
