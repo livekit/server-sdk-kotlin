@@ -290,6 +290,7 @@ class LiveKitApiTest {
                     media = LivekitSip.SIPMediaConfig.newBuilder()
                         .addCodecs(LivekitSip.SIPCodec.newBuilder().setName("G722")).build(),
                     toUserOverride = "queue-7",
+                    destination = LivekitSip.Destination.newBuilder().setCountry("US").build(),
                 ),
             ),
         )
@@ -308,7 +309,7 @@ class LiveKitApiTest {
                 "test-room",
                 "sip-caller",
                 "tel:+15105550122",
-                TransferSipParticipantOptions(ringingTimeout = 2),
+                TransferSipParticipantOptions(ringingTimeout = 2, headers = mapOf("X-Transfer-Reason" to "escalation")),
             ),
         )
     }
