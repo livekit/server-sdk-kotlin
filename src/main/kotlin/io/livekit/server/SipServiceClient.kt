@@ -453,7 +453,14 @@ class SipServiceClient(
                 opts.participantIdentity?.let { this.participantIdentity = it }
                 opts.participantName?.let { this.participantName = it }
                 opts.participantMetadata?.let { this.participantMetadata = it }
+                opts.participantAttributes?.let { this.putAllParticipantAttributes(it) }
                 opts.headers?.let { this.putAllHeaders(it) }
+                opts.includeHeaders?.let { this.includeHeaders = it }
+                opts.maxCallDuration?.let { this.maxCallDuration = secondsDuration(it) }
+                opts.krispEnabled?.let { this.krispEnabled = it }
+                opts.media?.let { this.media = it }
+                opts.toUserOverride?.let { this.toUserOverride = it }
+                opts.destination?.let { this.destination = it }
                 opts.dtmf?.let { this.dtmf = it }
                 opts.hidePhoneNumber?.let { this.hidePhoneNumber = it }
                 opts.playRingtone?.let {
@@ -506,6 +513,7 @@ class SipServiceClient(
 
             options?.let { opts ->
                 opts.playDialtone?.let { this.playDialtone = it }
+                opts.headers?.let { this.putAllHeaders(it) }
             }
             build()
         }
@@ -711,6 +719,18 @@ data class CreateSipParticipantOptions(
      * Optional custom headers to include in the SIP INVITE request.
      */
     var headers: Map<String, String>? = null,
+    var participantAttributes: Map<String, String>? = null,
+    /** Which SIP headers are mapped to participant attributes. */
+    var includeHeaders: LivekitSip.SIPHeaderOptions? = null,
+    /** Max call duration, in seconds. */
+    var maxCallDuration: Int? = null,
+    var krispEnabled: Boolean? = null,
+    /** Media configuration for the call, including codecs, encryption, and media timeout. */
+    var media: LivekitSip.SIPMediaConfig? = null,
+    /** Replaces the user part of the outbound To header. The call is still placed to the dialed number. */
+    var toUserOverride: String? = null,
+    /** Optional destination of the call: city, country and region. */
+    var destination: LivekitSip.Destination? = null,
 )
 
 data class TransferSipParticipantOptions(
@@ -722,4 +742,6 @@ data class TransferSipParticipantOptions(
      * transferring dials a phone.
      */
     var timeout: Int? = null,
+    /** Optional custom headers to include in the SIP REFER request. */
+    var headers: Map<String, String>? = null,
 )
