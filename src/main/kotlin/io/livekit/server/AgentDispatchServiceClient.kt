@@ -47,6 +47,7 @@ class AgentDispatchServiceClient(
      * @param metadata Optional metadata to attach to the dispatch
      * @param restartPolicy Optional restart policy for the dispatched job (cloud only). Defaults to [LivekitAgentDispatch.JobRestartPolicy.JRP_ON_FAILURE].
      * @param deployment Optional deployment to dispatch to; leave empty to target production (cloud only).
+     * @param attributes Optional key/value attributes passed on to the dispatched job
      * @return Created agent dispatch
      */
     @JvmOverloads
@@ -56,6 +57,7 @@ class AgentDispatchServiceClient(
         metadata: String? = null,
         restartPolicy: LivekitAgentDispatch.JobRestartPolicy? = null,
         deployment: String? = null,
+        attributes: Map<String, String>? = null,
     ): Call<LivekitAgentDispatch.AgentDispatch> {
         val request = with(LivekitAgentDispatch.CreateAgentDispatchRequest.newBuilder()) {
             setRoom(room)
@@ -68,6 +70,9 @@ class AgentDispatchServiceClient(
             }
             if (deployment != null) {
                 setDeployment(deployment)
+            }
+            if (attributes != null) {
+                putAllAttributes(attributes)
             }
             build()
         }
