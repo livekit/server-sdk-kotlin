@@ -57,6 +57,20 @@ interface SipService {
     ): Call<LivekitSip.SIPOutboundTrunkInfo>
 
     @Headers("Content-Type: application/protobuf")
+    @POST("twirp/livekit.SIP/GetSIPInboundTrunk")
+    fun getSipInboundTrunk(
+        @Body request: LivekitSip.GetSIPInboundTrunkRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.GetSIPInboundTrunkResponse>
+
+    @Headers("Content-Type: application/protobuf")
+    @POST("twirp/livekit.SIP/GetSIPOutboundTrunk")
+    fun getSipOutboundTrunk(
+        @Body request: LivekitSip.GetSIPOutboundTrunkRequest,
+        @Header("Authorization") authorization: String
+    ): Call<LivekitSip.GetSIPOutboundTrunkResponse>
+
+    @Headers("Content-Type: application/protobuf")
     @POST("twirp/livekit.SIP/ListSIPInboundTrunk")
     fun listSIPInboundTrunk(
         @Body request: LivekitSip.ListSIPInboundTrunkRequest,

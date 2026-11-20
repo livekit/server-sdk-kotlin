@@ -232,6 +232,40 @@ class SipServiceClient(
     }
 
     /**
+     * Gets an inbound trunk by ID.
+     *
+     * See: [SIP Inbound Trunk](https://docs.livekit.io/sip/trunk-inbound/)
+     */
+    @Suppress("unused")
+    fun getSipInboundTrunk(sipTrunkId: String): Call<LivekitSip.SIPInboundTrunkInfo> {
+        val request = with(LivekitSip.GetSIPInboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+            build()
+        }
+
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.getSipInboundTrunk(request, credentials)
+            .withTransform { it.trunk }
+    }
+
+    /**
+     * Gets an outbound trunk by ID.
+     *
+     * See: [SIP Outbound Trunk](https://docs.livekit.io/sip/trunk-outbound/)
+     */
+    @Suppress("unused")
+    fun getSipOutboundTrunk(sipTrunkId: String): Call<LivekitSip.SIPOutboundTrunkInfo> {
+        val request = with(LivekitSip.GetSIPOutboundTrunkRequest.newBuilder()) {
+            this.sipTrunkId = sipTrunkId
+            build()
+        }
+
+        val credentials = authHeader(emptyList(), listOf(SIPAdmin()))
+        return service.getSipOutboundTrunk(request, credentials)
+            .withTransform { it.trunk }
+    }
+
+    /**
      * List inbound trunks.
      *
      * See: [SIP Inbound Trunk](https://docs.livekit.io/sip/trunk-inbound/)

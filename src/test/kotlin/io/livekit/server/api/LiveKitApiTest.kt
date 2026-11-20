@@ -174,6 +174,8 @@ class LiveKitApiTest {
         assertOk(api.sip.createSipOutboundTrunk("outbound", "sip.telco.example.com", listOf("+15105550100")))
         assertOk(api.sip.listSipInboundTrunk())
         assertOk(api.sip.listSipOutboundTrunk())
+        assertOk(api.sip.getSipInboundTrunk("ST_abc123"))
+        assertOk(api.sip.getSipOutboundTrunk("ST_abc123"))
         // field-level update + full replace for both trunk kinds
         assertOk(api.sip.updateSipInboundTrunk("ST_abc123", UpdateSipInboundTrunkOptions(metadata = "{}")))
         assertOk(
