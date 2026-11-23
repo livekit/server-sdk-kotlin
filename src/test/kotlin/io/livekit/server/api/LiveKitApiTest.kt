@@ -288,6 +288,7 @@ class LiveKitApiTest {
         if (!MockControl.serverUp()) return
         val api = api()
         assertOk(api.agentDispatch.createDispatch("test-room", "inbound-agent", metadata = "{}"))
+        assertOk(api.agentDispatch.createDispatch("test-room", "inbound-agent", attributes = mapOf("tier" to "gold")))
         assertOk(api.agentDispatch.listDispatch("test-room"))
         assertOk(api.agentDispatch.getDispatch("test-room", "AD_abc123"))
         assertOk(api.agentDispatch.deleteDispatch("test-room", "AD_abc123"))
