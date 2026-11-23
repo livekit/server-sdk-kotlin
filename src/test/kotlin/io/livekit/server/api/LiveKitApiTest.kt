@@ -32,10 +32,12 @@ import io.livekit.server.UpdateSipInboundTrunkOptions
 import io.livekit.server.UpdateSipOutboundTrunkOptions
 import io.livekit.server.okhttp.OkHttpFactory
 import io.livekit.server.okhttp.OkHttpHolder
+import livekit.LivekitAgentDispatch
 import livekit.LivekitConnectorTwilio
 import livekit.LivekitConnectorWhatsapp
 import livekit.LivekitEgress
 import livekit.LivekitModels
+import livekit.LivekitRoom
 import livekit.LivekitRtc
 import livekit.LivekitSip
 import okhttp3.OkHttpClient
@@ -111,6 +113,33 @@ class LiveKitApiTest {
                 LivekitModels.DataPacket.Kind.RELIABLE,
                 destinationIdentities = listOf("participant-42"),
                 topic = "chat",
+            ),
+        )
+    }
+
+    @Test
+    fun roomOptions() {
+        if (!MockControl.serverUp()) return
+        val api = api()
+        assertOk(
+            api.room.createRoom(
+                name = "options-room",
+                roomPreset = "preset",
+                tags = mapOf("team" to "support"),
+                egress = LivekitRoom.RoomEgress.newBuilder()
+                    .setTracks(LivekitEgress.AutoTrackEgress.newBuilder().setFilepath("{track_id}.ogg"))
+                    .build(),
+                replayEnabled = true,
+                agents = listOf(LivekitAgentDispatch.RoomAgentDispatch.newBuilder().setAgentName("inbound-agent").build()),
+            ),
+        )
+        assertOk(
+            api.room.updateSubscriptions(
+                "test-room",
+                "participant-42",
+                emptyList(),
+                true,
+                listOf(LivekitModels.ParticipantTracks.newBuilder().setParticipantSid("PA_abc123").addTrackSids("TR_video1").build()),
             ),
         )
     }

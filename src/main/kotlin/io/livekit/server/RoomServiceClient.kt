@@ -22,6 +22,7 @@ import io.livekit.server.okhttp.OkHttpFactory
 import io.livekit.server.okhttp.OkHttpHolder
 import io.livekit.server.okhttp.RegionFailoverInterceptor
 import io.livekit.server.retrofit.TransformCall
+import livekit.LivekitAgentDispatch
 import livekit.LivekitModels
 import livekit.LivekitRoom
 import okhttp3.OkHttpClient
@@ -61,6 +62,11 @@ class RoomServiceClient(
         maxPlayoutDelay: Int? = null,
         syncStreams: Boolean? = null,
         departureTimeout: Int? = null,
+        roomPreset: String? = null,
+        tags: Map<String, String>? = null,
+        egress: LivekitRoom.RoomEgress? = null,
+        replayEnabled: Boolean? = null,
+        agents: List<LivekitAgentDispatch.RoomAgentDispatch>? = null,
     ): Call<LivekitModels.Room> {
         val request = with(LivekitRoom.CreateRoomRequest.newBuilder()) {
             this.name = name
@@ -87,6 +93,21 @@ class RoomServiceClient(
             }
             if (departureTimeout != null) {
                 this.departureTimeout = departureTimeout
+            }
+            if (roomPreset != null) {
+                this.roomPreset = roomPreset
+            }
+            if (tags != null) {
+                putAllTags(tags)
+            }
+            if (egress != null) {
+                this.egress = egress
+            }
+            if (replayEnabled != null) {
+                this.replayEnabled = replayEnabled
+            }
+            if (agents != null) {
+                addAllAgents(agents)
             }
             build()
         }
@@ -320,18 +341,22 @@ class RoomServiceClient(
      * @param identity
      * @param trackSids
      * @param subscribe true to subscribe, false to unsubscribe
+     * @param participantTracks tracks to subscribe to or unsubscribe from, grouped by publisher
      */
+    @JvmOverloads
     fun updateSubscriptions(
         roomName: String,
         identity: String,
         trackSids: List<String>,
         subscribe: Boolean,
+        participantTracks: List<LivekitModels.ParticipantTracks> = emptyList(),
     ): Call<Void?> {
         val request = with(LivekitRoom.UpdateSubscriptionsRequest.newBuilder()) {
             this.room = roomName
             this.identity = identity
             addAllTrackSids(trackSids)
             this.subscribe = subscribe
+            addAllParticipantTracks(participantTracks)
             build()
         }
 
