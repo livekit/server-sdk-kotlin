@@ -19,11 +19,13 @@ package io.livekit.server
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import livekit.LivekitAgentDispatch
+import livekit.LivekitModels
 import livekit.LivekitRoom.RoomConfiguration
 import org.junit.jupiter.api.Test
 import java.util.Date
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class AccessTokenTest {
 
@@ -99,6 +101,57 @@ class AccessTokenTest {
         val sipGrants = claims["sip"]?.asMap()
         assertNotNull(sipGrants)
         assertEquals(true, sipGrants["admin"])
+    }
+
+    @Test
+    fun kindAndServiceGrants() {
+        val token = AccessToken(KEY, SECRET)
+        token.identity = "identity"
+        token.kind = LivekitModels.ParticipantInfo.Kind.AGENT
+        token.addGrants(CanManageAgentSession(true), CanSubscribeMetrics(true))
+        token.addInferenceGrants(InferencePerform())
+        token.addObservabilityGrants(ObservabilityWrite())
+        token.addAgentGrants(AgentAdmin(), AgentSimulationAdmin(), AgentDispatchAdmin())
+        token.addAgentEndpointGrants(AgentEndpointCall(), AgentEndpointAgentName("agent"), AgentEndpointDeployment("staging"))
+        token.addAgentThreadGrants(AgentThreadScope("scope"), AgentThreadIds(listOf("TH_1")), AgentThreadRead(), AgentThreadSql())
+        token.addAgentDatabaseGrants(AgentDatabaseIds(listOf("DB_1")), AgentDatabaseList())
+
+        val claims = JWT.require(Algorithm.HMAC256(SECRET))
+            .withIssuer(KEY)
+            .build()
+            .verify(token.toJwt())
+            .claims
+
+        assertEquals("agent", claims["kind"]?.asString())
+        val video = claims["video"]?.asMap()
+        assertNotNull(video)
+        assertEquals(true, video["canManageAgentSession"])
+        assertEquals(true, video["canSubscribeMetrics"])
+        assertEquals(mapOf("perform" to true), claims["inference"]?.asMap())
+        assertEquals(mapOf("write" to true), claims["observability"]?.asMap())
+        assertEquals(mapOf("admin" to true, "simulationAdmin" to true, "dispatchAdmin" to true), claims["agent"]?.asMap())
+        assertEquals(mapOf("call" to true, "agentName" to "agent", "deployment" to "staging"), claims["agentEndpoint"]?.asMap())
+        assertEquals(
+            mapOf("scope" to "scope", "threadIds" to listOf("TH_1"), "read" to true, "sql" to true),
+            claims["agentThread"]?.asMap(),
+        )
+        assertEquals(mapOf("databaseIds" to listOf("DB_1"), "list" to true), claims["agentDatabase"]?.asMap())
+
+        token.clearAgentGrants()
+        val cleared = JWT.decode(token.toJwt()).claims
+        assertNull(cleared["agent"])
+        assertNotNull(cleared["inference"])
+    }
+
+    @Test
+    fun noServiceGrantsByDefault() {
+        val token = AccessToken(KEY, SECRET)
+        token.identity = "identity"
+        val claims = JWT.decode(token.toJwt()).claims
+        assertNull(claims["kind"])
+        listOf("inference", "observability", "agent", "agentEndpoint", "agentThread", "agentDatabase").forEach {
+            assertNull(claims[it], it)
+        }
     }
 
     @Test
