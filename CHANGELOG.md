@@ -1,5 +1,27 @@
 # server-sdk-kotlin
 
+## 0.18.0
+
+### Minor Changes
+
+- Add participant attributes, include headers, max call duration, Krisp, media config, To user override and destination to CreateSipParticipant options, and headers to TransferSipParticipant options. - [#191](https://github.com/livekit/server-sdk-kotlin/pull/191) ([@Darshak03](https://github.com/Darshak03))
+
+- Add room preset, tags, auto egress, replay and agent dispatches to createRoom, and participant tracks to updateSubscriptions. - [#200](https://github.com/livekit/server-sdk-kotlin/pull/200) ([@Darshak03](https://github.com/Darshak03))
+
+- Add media config to SIP trunk create and update options, include headers to the trunk create options, from host to the outbound trunk options, and auth realm to UpdateSipInboundTrunk options. - [#192](https://github.com/livekit/server-sdk-kotlin/pull/192) ([@Darshak03](https://github.com/Darshak03))
+
+- Add participant metadata and enabled to createIngress and updateIngress. - [#201](https://github.com/livekit/server-sdk-kotlin/pull/201) ([@Darshak03](https://github.com/Darshak03))
+
+- Add ID, number and trunk filters and pagination to the SIP list methods. - [#194](https://github.com/livekit/server-sdk-kotlin/pull/194) ([@Darshak03](https://github.com/Darshak03))
+
+- Add webhooks to the source-specific egress start methods. - [#190](https://github.com/livekit/server-sdk-kotlin/pull/190) ([@Darshak03](https://github.com/Darshak03))
+
+- Add participant kind, canManageAgentSession and canSubscribeMetrics video grants, and inference, observability, agent, agent endpoint, agent thread and agent database grants to AccessToken. - [#203](https://github.com/livekit/server-sdk-kotlin/pull/203) ([@Darshak03](https://github.com/Darshak03))
+
+- Add inbound numbers, numbers, media config and Krisp to SIP dispatch rule create options, attributes and media config to update options, and noRandomness to individual dispatch rules. - [#193](https://github.com/livekit/server-sdk-kotlin/pull/193) ([@Darshak03](https://github.com/Darshak03))
+
+- Add attributes to createDispatch. - [#202](https://github.com/livekit/server-sdk-kotlin/pull/202) ([@Darshak03](https://github.com/Darshak03))
+
 ## 0.17.1
 
 ### Patch Changes
