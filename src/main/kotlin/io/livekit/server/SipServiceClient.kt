@@ -306,6 +306,10 @@ class SipServiceClient(
                     opt.attributes?.let { this.putAllAttributes(it) }
                     opt.roomPreset?.let { this.roomPreset = it }
                     opt.roomConfig?.let { this.roomConfig = it }
+                    opt.inboundNumbers?.let { this.addAllInboundNumbers(it) }
+                    opt.numbers?.let { this.addAllNumbers(it) }
+                    opt.media?.let { this.media = it }
+                    opt.krispEnabled?.let { this.krispEnabled = it }
                 }
                 build()
                 this.rule = with(SIPDispatchRule.newBuilder()) {
@@ -322,6 +326,7 @@ class SipServiceClient(
                             dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
                                 roomPrefix = rule.roomPrefix
                                 rule.pin?.let { this.pin = it }
+                                rule.noRandomness?.let { this.noRandomness = it }
                                 build()
                             }
                         }
@@ -361,6 +366,8 @@ class SipServiceClient(
                     opt.name?.let { this.name = it }
                     opt.metadata?.let { this.metadata = it }
                     opt.trunkIds?.let { this.trunkIds = buildListUpdate(it) }
+                    opt.attributes?.let { this.putAllAttributes(it) }
+                    opt.media?.let { this.media = it }
                     opt.rule?.let { optRule ->
                         this.rule = with(SIPDispatchRule.newBuilder()) {
                             when (optRule) {
@@ -376,6 +383,7 @@ class SipServiceClient(
                                     dispatchRuleIndividual = with(SIPDispatchRuleIndividual.newBuilder()) {
                                         roomPrefix = optRule.roomPrefix
                                         optRule.pin?.let { this.pin = it }
+                                        optRule.noRandomness?.let { this.noRandomness = it }
                                         build()
                                     }
                                 }
@@ -667,6 +675,8 @@ data class SipDispatchRuleDirect(
 data class SipDispatchRuleIndividual(
     var roomPrefix: String,
     var pin: String? = null,
+    /** Don't append a random suffix, so callers with the same number join the same room. */
+    var noRandomness: Boolean? = null,
 ) : SipDispatchRule("individual")
 
 /**
@@ -703,6 +713,13 @@ data class CreateSipDispatchRuleOptions(
      * RoomConfiguration to use if the participant initiates the room
      */
     var roomConfig: LivekitRoom.RoomConfiguration? = null,
+    /** If set, only calls from these numbers are accepted. */
+    var inboundNumbers: List<String>? = null,
+    /** If set, only calls to these numbers are accepted. */
+    var numbers: List<String>? = null,
+    /** Media configuration for calls handled by this rule, including codecs, encryption, and media timeout. */
+    var media: LivekitSip.SIPMediaConfig? = null,
+    var krispEnabled: Boolean? = null,
 )
 
 data class UpdateSipDispatchRuleOptions(
@@ -710,6 +727,13 @@ data class UpdateSipDispatchRuleOptions(
     var name: String? = null,
     var metadata: String? = null,
     var rule: SipDispatchRule? = null,
+    /**
+     * User-defined attributes for the Dispatch Rule.
+     * Participants created by this rule will inherit these attributes.
+     */
+    var attributes: Map<String, String>? = null,
+    /** Media configuration for calls handled by this rule, including codecs, encryption, and media timeout. */
+    var media: LivekitSip.SIPMediaConfig? = null,
 )
 
 data class CreateSipParticipantOptions(
