@@ -79,6 +79,8 @@ class SipServiceClient(
                     opt.headers?.let { this.putAllHeaders(it) }
                     opt.headersToAttributes?.let { this.putAllHeadersToAttributes(it) }
                     opt.attributesToHeaders?.let { this.putAllAttributesToHeaders(it) }
+                    opt.includeHeaders?.let { this.includeHeaders = it }
+                    opt.media?.let { this.media = it }
                 }
                 build()
             }
@@ -118,6 +120,9 @@ class SipServiceClient(
                     opt.headers?.let { this.putAllHeaders(it) }
                     opt.headersToAttributes?.let { this.putAllHeadersToAttributes(it) }
                     opt.attributesToHeaders?.let { this.putAllAttributesToHeaders(it) }
+                    opt.includeHeaders?.let { this.includeHeaders = it }
+                    opt.media?.let { this.media = it }
+                    opt.fromHost?.let { this.fromHost = it }
                 }
                 build()
             }
@@ -145,10 +150,12 @@ class SipServiceClient(
                     opt.name?.let { this.name = it }
                     opt.authUsername?.let { this.authUsername = it }
                     opt.authPassword?.let { this.authPassword = it }
+                    opt.authRealm?.let { this.authRealm = it }
                     opt.metadata?.let { this.metadata = it }
                     opt.numbers?.let { this.numbers = buildListUpdate(it) }
                     opt.allowedNumbers?.let { this.allowedNumbers = buildListUpdate(it) }
                     opt.allowedAddresses?.let { this.allowedAddresses = buildListUpdate(it) }
+                    opt.media?.let { this.media = it }
                 }
                 build()
             }
@@ -201,6 +208,8 @@ class SipServiceClient(
                     opt.authPassword?.let { this.authPassword = it }
                     opt.numbers?.let { this.numbers = buildListUpdate(it) }
                     opt.destinationCountry?.let { this.destinationCountry = it }
+                    opt.media?.let { this.media = it }
+                    opt.fromHost?.let { this.fromHost = it }
                 }
                 build()
             }
@@ -584,6 +593,10 @@ data class CreateSipInboundTrunkOptions(
     var headers: Map<String, String>? = null,
     var headersToAttributes: Map<String, String>? = null,
     var attributesToHeaders: Map<String, String>? = null,
+    /** Which SIP headers are mapped to participant attributes. */
+    var includeHeaders: LivekitSip.SIPHeaderOptions? = null,
+    /** Media configuration for calls on this trunk, including codecs, encryption, and media timeout. */
+    var media: LivekitSip.SIPMediaConfig? = null,
 )
 
 data class CreateSipOutboundTrunkOptions(
@@ -595,6 +608,12 @@ data class CreateSipOutboundTrunkOptions(
     var headers: Map<String, String>? = null,
     var headersToAttributes: Map<String, String>? = null,
     var attributesToHeaders: Map<String, String>? = null,
+    /** Which SIP headers are mapped to participant attributes. */
+    var includeHeaders: LivekitSip.SIPHeaderOptions? = null,
+    /** Media configuration for calls on this trunk, including codecs, encryption, and media timeout. */
+    var media: LivekitSip.SIPMediaConfig? = null,
+    /** Custom host for the From header, used instead of the project's SIP domain. */
+    var fromHost: String? = null,
 )
 
 data class UpdateSipInboundTrunkOptions(
@@ -605,6 +624,9 @@ data class UpdateSipInboundTrunkOptions(
     var allowedNumbers: List<String>? = null,
     var authUsername: String? = null,
     var authPassword: String? = null,
+    var authRealm: String? = null,
+    /** Media configuration for calls on this trunk, including codecs, encryption, and media timeout. */
+    var media: LivekitSip.SIPMediaConfig? = null,
 )
 
 data class UpdateSipOutboundTrunkOptions(
@@ -616,6 +638,10 @@ data class UpdateSipOutboundTrunkOptions(
     var authUsername: String? = null,
     var authPassword: String? = null,
     var destinationCountry: String? = null,
+    /** Media configuration for calls on this trunk, including codecs, encryption, and media timeout. */
+    var media: LivekitSip.SIPMediaConfig? = null,
+    /** Custom host for the From header, used instead of the project's SIP domain. */
+    var fromHost: String? = null,
 )
 
 /**
