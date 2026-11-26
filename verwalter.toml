@@ -1,0 +1,10 @@
+[packages.server-sdk-kotlin]
+path = "."
+versioning.files = [
+  { path = "gradle.properties", regex = "VERSION_NAME=(?<version>.+)" },
+  { path = "README.md", regex = "<version>(?<version>[^<]+)</version>" },
+  { path = "README.md", regex = "io.livekit:livekit-server:(?<version>[^'\"]+)" },
+]
+publish.registry = "custom"
+publish.exists_url = "https://repo1.maven.org/maven2/io/livekit/livekit-server/{version}/livekit-server-{version}.pom"
+publish.command = "./gradlew publishMavenPublicationToSonatypeRepository closeAndReleaseSonatypeRepository -Dorg.gradle.parallel=false"
