@@ -1,6 +1,9 @@
 # Fails a contributor PR that changes a versioned package without a
 # changeset, with a comment that links to a prefilled changeset file.
 # The `internal` label (config: [check] exempt_label) skips the check.
+# On the release PR, the same run does the publish dry run of
+# verwalter.toml (`check.publish_dry_run`): a Gradle publish to the local
+# Maven repository. A failed dry run fails the release PR before the merge.
 name: Changeset check
 
 on:
@@ -19,6 +22,11 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # the tags find the last release
-      - uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+          submodules: recursive # the dry run builds the protocol
+      - uses: actions/setup-java@v5 # the Gradle dry run
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
         with:
           command: check

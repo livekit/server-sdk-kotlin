@@ -8,3 +8,7 @@ versioning.files = [
 publish.registry = "custom"
 publish.exists_url = "https://repo1.maven.org/maven2/io/livekit/livekit-server/{version}/livekit-server-{version}.pom"
 publish.command = "./gradlew publishMavenPublicationToSonatypeRepository closeAndReleaseSonatypeRepository -Dorg.gradle.parallel=false"
+# On the release PR, the changeset check builds and publishes to the local
+# Maven repository without signing, so a broken build fails the PR before
+# the merge.
+check.publish_dry_run = "./gradlew publishMavenPublicationToMavenLocal -PRELEASE_SIGNING_ENABLED=false"

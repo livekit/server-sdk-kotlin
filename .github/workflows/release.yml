@@ -6,8 +6,7 @@ name: Release
 
 on:
   # No `branches` filter: an rc PR from pre-release.yml targets the branch
-  # the workflow was run on. The condition on the first job decides which
-  # PRs release.
+  # the workflow was run on. The `gate` job decides which PRs release.
   pull_request:
     types: [closed]
   # A failed job is re-run with "Re-run failed jobs" on the run itself:
@@ -25,10 +24,28 @@ permissions:
   contents: write
 
 jobs:
+  # Only a run by hand, or a merged release PR or rc PR that the tool
+  # opened: the branch name alone would let any pushed `release/*` branch
+  # trigger a publish. The author is `[release].author` in verwalter.toml,
+  # default verwalter-release[bot].
+  gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      release: ${{ steps.verwalter.outputs.release }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+      - id: verwalter
+        uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
+        with:
+          command: gate
+
   release:
-    # Only a release PR the tool opened: the branch prefix alone would let
-    # any pushed `release/*` branch trigger a publish.
-    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/') && github.event.pull_request.user.login == 'verwalter-release[bot]' && contains(github.event.pull_request.body, '<!-- verwalter release -->'))
+    needs: gate
+    if: needs.gate.outputs.release == 'true'
     runs-on: ubuntu-latest
     outputs:
       released: ${{ steps.verwalter.outputs.released }}
@@ -41,7 +58,7 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
           fetch-depth: 0
       - id: verwalter
-        uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+        uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
         with:
           command: release
 
@@ -80,7 +97,7 @@ jobs:
           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
 
-      - uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+      - uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
         env:
           GH_TOKEN: ${{ github.token }}
         with:
@@ -89,29 +106,20 @@ jobs:
 
   # The end state, asserted: `status --check` fails when the tag is not on
   # the remote, the GitHub release is missing or still a draft, or Maven
-  # Central does not have the version.
+  # Central does not have the version. A release takes minutes to reach
+  # repo1.maven.org, so the check asks again for up to 60 minutes.
   verify:
     needs: publish
     runs-on: ubuntu-latest
     timeout-minutes: 75
+    permissions:
+      contents: write # reads only. A draft release is visible only with write access
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
           fetch-depth: 0
-      # A release to Maven Central takes minutes to reach repo1.maven.org,
-      # which is the URL the registry check asks.
-      - name: Wait for the version on Maven Central
-        run: |
-          VERSION=$(sed -n 's/^VERSION_NAME=//p' gradle.properties)
-          URL="https://repo1.maven.org/maven2/io/livekit/livekit-server/$VERSION/livekit-server-$VERSION.pom"
-          for _ in $(seq 1 60); do
-            curl -fsS -o /dev/null "$URL" && exit 0
-            sleep 60
-          done
-          echo "::error::$URL is not there after 60 minutes"
-          exit 1
-      - uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+      - uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
         with:
           command: status
-          args: --check
+          args: --check --wait 60m

@@ -18,7 +18,7 @@ install snippets in `README.md`. The release PR moves all three.
 
 | File | Starts when | Does |
 |---|---|---|
-| `changeset-check.yml` | A PR is opened or updated | Fails a PR that changes the package without a changeset. |
+| `changeset-check.yml` | A PR is opened or updated | Fails a PR that changes the package without a changeset. On the release PR, it runs a Gradle publish to the local Maven repository and fails the PR if the build breaks. |
 | `release-pr.yml` | A push to `main` | Keeps the release PR `release/main` current. |
 | `release.yml` | The release PR merges | Tags, creates the GitHub release, publishes to Maven Central, waits until the version is on repo1.maven.org. |
 | `pre-release.yml` | Run by hand | Opens an rc PR, such as `0.18.0-rc.1`. |
